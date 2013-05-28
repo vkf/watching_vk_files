@@ -5,7 +5,6 @@ init: function(opts) {
   placeholderSetup(cur.searchEl, {back: true});
 
   cur.nav.push(function(changed, old, n) {
-    debugLog(n);
     if (old[0] == 'dev' && !old.act) {
       return true;
     }
@@ -56,6 +55,14 @@ initPage: function(opts) {
   }
   extend(cur, opts);
   elfocus(cur.searchEl);
+  cur.editors = [];
+  if (opts.editors) {
+    for(var i in opts.editors) {
+      var ed = opts.editors[i];
+      cur.initEdit.apply(cur.initEdit, ed);
+    }
+  }
+
 },
 
 switchPage: function(page, edit) {
@@ -149,6 +156,16 @@ saveDoc: function(hash, btn) {
   var textareas = geByClass('dev_textarea', ge('dev_page'));
   for (var i in textareas) {
     params[Dev.getParamName(textareas[i])] = val(textareas[i]);
+  }
+  if (cur.editors) {
+    for (var i in cur.editors) {
+      var ed = cur.editors[i];
+      if (ed) {
+        params[Dev.getParamName(ed.cont)] = ed.val();
+
+      }
+      debugLog('ed', ed);
+    }
   }
   var inputs = geByClass('dev_input', ge('dev_page'));
   for (var i in inputs) {

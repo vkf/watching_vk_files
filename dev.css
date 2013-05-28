@@ -809,3 +809,8 @@ textarea.dev_poll_code {
   text-align: center;
   color: #607387;
 }
+#dev_page_cont textarea.dev_editor_textarea,
+#dev_page_cont .dev_editor_cont {
+  padding: 6px;
+  font-size: 1em;
+}

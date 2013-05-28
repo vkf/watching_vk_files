@@ -510,7 +510,9 @@ extend(WkEditor.prototype, {
     if (this.onPlainToggle) {
       this.onPlainToggle(this.plainMode, true);
     }
-    WkView.onResize();
+    if (window.WkView) {
+      WkView.onResize();
+    }
   },
 
   prepareCont: function(cont) {
@@ -823,6 +825,14 @@ extend(WkEditor.prototype, {
       }
       openBracket = '[[';
       closeBracket = ']]';
+    } else if (page = url.match(this.re.devHref)) {
+      try {
+        url = decodeURIComponent(page[1]);
+      } catch(e) {
+        url = page[1];
+      }
+      openBracket = '[[';
+      closeBracket = ']]';
     } else if (page = url.match(this.re.pageId)) {
       url = page[1];
       openBracket = '[[';
@@ -844,7 +854,6 @@ extend(WkEditor.prototype, {
   },
 
   insertLink: function(name, url, outer) {
-
     if (this.plainMode) {
       this.plainInsert(this.getLinkWiki(url, name), '', {replace: 1});
       return false;
@@ -865,6 +874,7 @@ extend(WkEditor.prototype, {
     }
     delete cur.wkLinkRange;
     delete cur.wkLinkEl;
+    this.changed = true;
   },
 
   checkEditPlace: function() {
@@ -2160,6 +2170,7 @@ extend(WkEditor.prototype, {
     pageWikiHref: new RegExp('^/?page([\00-9]+)_([0-9]+)'),
     away: new RegExp('/away\\.php\\?to=([^&]+)'),
     pageHref: new RegExp('(?:[/|\.]vk.com|^)/(?:pages|developers)\?(?:.*&)?p=([^&]+)'),
+    devHref: new RegExp('(?:[/|\.]vk.com|^)/dev/([^?#]+)'),
     pageId: new RegExp('[/|\.]vk.com/(page[\-0-9]+_[\-0-9]+)'),
     audio: new RegExp('audio([\-0-9]+)_([\-0-9]+)(_[0-9]+)?'),
     wikiLi: new RegExp('^([*#])'),

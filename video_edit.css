@@ -1,0 +1,145 @@
+#video_edit_css {
+  display: none;
+}
+
+.video_album_edit_header {
+  color: #36638E;
+  font-size: 1.09em;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+#video_album_edit_title {
+  width: 368px;
+  padding: 5px;
+}
+
+.video_change_album {
+  color: #777777;
+}
+
+.video_upload_tab {
+  padding: 20px 40px 25px 40px;
+}
+
+.video_upload_tab #video_upload_error_msg {
+  background-color: #FFEFE8;
+  border: 1px solid #E89B88;
+  text-align: center;
+  padding: 5px;
+  margin-bottom: 15px;
+}
+
+.video_upload_tab .text_warn {
+  display: none;
+  color: #777777;
+}
+.video_upload_tab .external_text_warn {
+  display: none;
+  color: #777777;
+}
+
+.video_upload_tab .video_add_label {
+  color: #36638E;
+  font-size: 1.09em;
+  font-weight: bold;
+  text-align: left;
+  margin: 10px auto;
+}
+
+.video_upload_tab .text {
+  width: 400px;
+  padding: 5px;
+}
+
+.video_upload_tab .video_upload_textarea {
+  width: 400px;
+  height: 80px;
+  padding: 5px;
+}
+
+.video_upload_privacy {
+  margin-bottom: 10px;
+}
+
+.video_upload_checkbox {
+  margin: 10px 0px;
+  width: 240px;
+}
+
+#video_upload_info {
+  position: relative;
+  border: 1px solid #FFFFFF;
+}
+
+#video_add_from_youtube_tab {
+  display: none;
+}
+
+#video_add_from_youtube_tab #video_share_error {
+  color: #777777;
+  margin-top: 5px;
+  display: none;
+}
+
+#video_share_not_allowed {
+  color: #777777;
+  margin-top: 10px;
+  display: none;
+}
+
+#video_add_from_youtube_tab #video_share_server_error {
+  color: #777777;
+  margin-top: 5px;
+  display: none;
+}
+
+#video_upload_file {
+  display: none;
+}
+#video_upload_box {
+  text-align: center;
+  margin: 15px 0 0;
+}
+.video_upload_rules {
+  padding-left: 20px;
+  margin-bottom: 15px;
+  line-height: 160%;
+}
+.video_upload_rules li {
+  list-style: square;
+  color: #758EAC;
+  line-height: 140%;
+}
+.video_upload_rules li span {
+  color: #000000;
+}
+
+#video_external_image {
+  background: url('/images/video_s.png') no-repeat;
+  width: 130px;
+  height: 98px;
+  overflow: hidden;
+}
+#video_external_image img {
+  cursor: pointer;
+}
+#video_upload_info_box {
+  background: #F7F7F7;
+  border: 1px solid #CCCCCC;
+  padding: 5px;
+  margin-top: 20px;
+}
+.video_upload_progress_wrap {
+  width: 250px;
+  height: 18px;
+  margin: auto;
+  background: #FFF;
+  border: 1px solid #CCC;
+}
+.video_upload_progress {
+  height: 18px;
+  background: #597DA3 url(/images/progress_grad.gif) repeat;
+  border: 1px solid #45688E;
+  margin: -1px;
+}

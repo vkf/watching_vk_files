@@ -1,0 +1,137 @@
+#translation_css {
+  display: none;
+}
+
+span.translationinfo {
+  color: #777;
+}
+i.translated, i.untranslated {
+  cursor: copy;
+  font-style: normal;
+}
+i.translated {
+  border-bottom: 1px dotted #555;
+}
+i i.translated {
+  border-bottom: 1px solid #000;
+}
+i.untranslated {
+  border-bottom: 1px dotted #FF0000;
+}
+i i.untranslated {
+  border-bottom: 1px solid #FF0000;
+}
+.tokens a {
+  border-bottom: 1px dotted;
+}
+.tokens a:hover {
+  border-bottom: 1px solid;
+}
+blockquote {
+  border-left:3px solid #EEE;
+  margin:10px 0 10px 0px;
+  padding:2px 6px;
+  color: #000;
+}
+.inlineTransBox {
+  border: 1px solid #ADBBCA;
+  margin: 20px auto;
+  padding: 0;
+  text-align: left;
+  width: 791px;
+}
+.inlineTransBox li {
+  margin-bottom:10px;
+}
+.inlineTransBox h5 {
+  margin-top: 0px;
+  font-size: 1.18em;
+}
+.hidden {
+  visibility: hidden;
+}
+
+#translation_inv_wrap {
+  background: #F7F7F7;
+  border-bottom: 1px solid #CCC;
+  padding: 6px 9px;
+  height: 30px;
+  overflow: hidden;
+  line-height: 130%;
+}
+#translation_inv_text div {
+  text-align: center;
+}
+#translation_inv_box {
+  display: none;
+  text-align: center;
+  margin-top: 4px;
+}
+#translation_inv_controls {
+  display: none;
+}
+#translation_inv_progress {
+  margin: 7px auto 0px;
+}
+.translation_box {
+  padding: 14px;
+}
+.translation_box .button_gray {
+  margin-top: 8px;
+}
+.translation_box a.button_link:hover {
+  text-decoration: none;
+}
+.translation_box .help {
+  padding: 5px 5px 0px 5px;
+}
+.translation_inl_box h6 {
+  border: none;
+  font-size: 1.18em;
+  color: #36638E;
+  margin: 10px 0px 0px;
+  padding: 0px 0px 5px;
+}
+.translation_inl_box .error {
+  display: none;
+  margin-bottom: 10px;
+}
+.translation_inl_box .controls {
+  font-size: 0.9em;
+  padding: 3px 3px 0px 0px;
+}
+#translation_inl_additional {
+  display: none;
+}
+#translation_ext_wiki {
+  color: #777;
+}
+#translation_all .loading {
+  text-align: center;
+  padding: 20px;
+}
+#translation_all h5 {
+  font-size: 1.18em;
+  color: #36638E;
+  margin: 0px 0px 6px 8px;
+}
+#translation_all {
+  border: 1px solid #ADBBCA;
+  margin: 20px auto;
+  padding: 0px;
+  width: 791px;
+}
+#translation_all .wrap {
+  border: 10px solid #DAE2E8;
+  padding: 20px;
+}
+#translation_all .clear_fix a {
+  font-size: 0.9em;
+}
+#translation_all li {
+  margin-bottom: 10px;
+}
+#translation_all small {
+  color: #AAA;
+  float: right;
+}

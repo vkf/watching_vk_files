@@ -1,0 +1,124 @@
+#invite_css {
+  display: none;
+}
+
+.invite_box {
+  background: #F7F7F7;
+  padding: 20px;
+  border-bottom: 1px solid #DAE1e8;
+}
+.invite_box .about {
+  border: 1px solid #DAE1E8;
+  background: #FFF;
+  padding: 10px;
+  margin-bottom: 20px;
+  line-height: 150%;
+}
+.invite_box .about_no {
+  border: 1px solid #DAE1E8;
+  background: #FFF;
+  font-size: 1.09em;
+  color: #777;
+  padding: 50px 10px;
+  text-align: center;
+  line-height: 160%;
+}
+.invite_box .row {
+  height: 30px;
+}
+.invite_box .label, .invite_box .hlabel {
+  width: 200px;
+  text-align: right;
+  padding: 4px 10px 0px;
+  color: #555;
+}
+.invite_box .hlabel {
+  padding-top: 5px;
+}
+.invite_box .labeled {
+  padding-right: 5px;
+}
+.invite_box .labeled .text {
+  width: 170px;
+}
+.invite_box h2 {
+  border-bottom: 0px;
+}
+.invite_box .labeled small {
+  display: block;
+  padding: 5px 0px 20px;
+  width: 180px;
+  line-height: 150%;
+  color: #777;
+}
+#inv_lang_row, #inv_sex_row {
+  display: none;
+}
+#invite_progress {
+  margin: 15px 10px;
+}
+.invite_box .labeled .button_blue {
+  margin: 10px 0px 20px;
+}
+
+.info_block_link {
+  padding: 10px 0px 10px 220px;
+}
+.info_block {
+  padding-top: 20px;
+  display: none;
+}
+
+.invited_box {
+  padding: 0px 10px;
+  background: #FFF;
+}
+.invited_box .no_invited {
+  padding: 20px 0px 20px 220px;
+  font-size: 1.09em;
+  color: #777;
+}
+.invited_box .user {
+  padding: 10px 0px;
+  border-top: 1px solid #DAE1E8;
+}
+.invited_box div.first {
+  border-top: 0px;
+}
+.invited_box .thumb {
+  width: 100px;
+  height: 100px;
+}
+.invited_box .actions {
+  width: 130px;
+}
+.invited_box .actions a {
+  display: block;
+  padding: 4px 5px;
+}
+.invited_box .actions a:hover {
+  text-decoration: none;
+  background: #E1E7ED;
+}
+.invited_box .info {
+  padding: 0px 10px;
+  width: 300px;
+}
+.invited_box .info .label {
+  margin-bottom: 3px;
+  width: 70px;
+  color: #777;
+}
+.invited_box .info .labeled {
+  margin-bottom: 3px;
+  width: 220px;
+}
+.invite_block .error {
+  margin: 10px 30px;
+  background-color: #F9F6E7;
+  border: 1px solid #D4BC4C;
+  display: none;
+}
+.inv_about_resend {
+  line-height: 150%;
+}

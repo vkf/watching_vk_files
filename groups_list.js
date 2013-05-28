@@ -1,0 +1,981 @@
+var GroupsList = {
+  rand: function() {
+    return Math.floor(Math.random() * 10000);
+  },
+  enter: function(el, gid, hash, act, past) {
+    if (cur.invSwitching) {
+      setTimeout(GroupsList.enter.pbind(el, gid, hash, act, past), 100);
+      return false;
+    }
+    var sp, hp, tab = cur.scrollList.tab;
+
+    if (el.tagName.toLowerCase() != 'button') {
+      if (!el.backhtml) {
+        el.backhtml = el.innerHTML;
+      }
+      sp = function() {
+        var w = getSize(el)[0];
+        el.innerHTML = '<span class="progress_inline"></span>';
+        setStyle(el, {width: w - 30});
+      }
+      hp = function() {
+        el.innerHTML = el.backhtml;
+      }
+    } else {
+      sp = lockButton.pbind(el);
+      hp = unlockButton.pbind(el);
+    }
+
+    var key = GroupsList.rand(), value = GroupsList.rand();
+    cur.scrollList[key] = value;
+
+    var context = (cur.scrollList.tab == 'groups') ? '2' : '1';
+
+    var shown = false;
+    cur.invSwitching = true;
+    if (GroupsList.switchInvite(gid)) {
+      shown = true;
+      sp = false;
+      hp = false;
+    }
+
+    ajax.post('al_groups.php', {
+      act: 'enter',
+      gid: gid,
+      hash: hash,
+      context: context + (act ? '_' + act : ''),
+      inv_shown: cur.scrollList.invShown
+    }, {
+      onDone: function(newRow, added) {
+        cur.invSwitching = false;
+        if (!cur.scrollList || cur.scrollList[key] != value) return;
+
+        var list = cur.scrollList.lists[tab], newStatus = past ? 5 : 1;
+        if (act == 'unsure') {
+          newStatus = past ? 5 : 3;
+        } else if (act == 'decline') {
+          newStatus = past ? -3 : -1;
+        } else if (act == 'undecided') {
+          newStatus = 4;
+        }
+        if (!list || list == 'loading' || list == 'update') {
+          cur.scrollList.processed[tab][gid] = newStatus;
+        } else {
+          for (var i = 0, count = list.length; i < count; ++i) {
+            if (list[i][2] == gid) {
+              list[i][1] = newStatus;
+            }
+          }
+        }
+
+        var row = ge('gl_' + tab + gid);
+
+        GroupsList.addInvite(newRow, added, act);
+
+        var rowEl = geByClass1('group_list_row', ge('groups_list_content'));
+        if (rowEl && rowEl.id == 'gl_' + tab + gid) {
+          setStyle(rowEl, {backgroundColor: '#FEFAE4'});
+          animate(rowEl, {backgroundColor: '#FFF'}, 2000);
+        }
+
+        if (shown) {
+          return;
+        }
+
+        if (!row) return;
+
+        var status = geByClass1('group_row_status', row), actions = geByClass1('group_row_actions', row), old = status.basehtml;
+        var actOld = actions.basehtml;
+        status.basehtml = status.innerHTML;
+        actions.basehtml = actions.innerHTML;
+        if (act == 'undecided') {
+          actions.innerHTML = actOld || '';
+          status.innerHTML = old || '\
+<div class="group_row_buttons">\
+  <div class="group_row_button button_blue fl_l">\
+    <button onclick="GroupsList.enter(this, ' + gid + ', \'' + hash + '\', \'join\')">' + getLang('groups_event_go_btn') + '</button>\
+  </div>\
+  <div class="group_row_button button_blue fl_l">\
+    <button onclick="GroupsList.enter(this, ' + gid + ', \'' + hash + '\', \'unsure\')">' + getLang('groups_event_maybe_btn') + '</button>\
+  </div>\
+  <div class="group_row_button button_cancel fl_l">\
+    <div class="button" onclick="GroupsList.enter(this, ' + gid + ', \'' + hash + '\', \'decline\')">' + getLang('groups_event_cant_btn') + '</div>\
+  </div>\
+</div>';
+        } else if (act) {
+          if (past) {
+            var statHTML = getLang('groups_was_on_event');
+            if (act == 'decline') {
+              actions.innerHTML = '<a onclick="GroupsList.enter(this.parentNode, ' + gid + ', \'' + hash + '\', \'join\', true)">' + getLang('groups_return_event') + '</a>';
+            } else {
+              actions.innerHTML = '<a onclick="GroupsList.enter(this.parentNode, ' + gid + ', \'' + hash + '\', \'decline\', true)">' + getLang('groups_remove_event') + '</a>';
+            }
+          } else {
+            var acts = '<a onclick="GroupsList.enter(this.parentNode, ' + gid + ', \'' + hash + '\', \'undecided\')">' + getLang('groups_event_change') + '</a>';
+            if (act == 'unsure') {
+              var statHTML = getLang('groups_unsure_event');
+            } else if (act == 'decline') {
+              var statHTML = getLang('groups_event_left');
+              //if (tab == 'inv') {
+                acts += '<span class="divider">|</span><a onclick="GroupsList.spam(this.parentNode, ' + gid + ', \'' + hash + '\')">' + getLang('its_spam') + '</a>';
+              //}
+            } else {
+              var statHTML = getLang('groups_you_in_event');
+            }
+            actions.innerHTML = acts;
+          }
+          status.innerHTML = '<div class="groups_acted_text">'+statHTML+'</div>';
+          cur.lst = status;
+        } else {
+          status.innerHTML = '<div class="groups_acted_text">'+getLang('groups_group_enter_message')+'</div>';
+          actions.innerHTML = '<a onclick="GroupsList.cancel(this.parentNode, ' + gid + ', \'' + hash + '\')">' + getLang('global_cancel') + '</a>';
+        }
+
+        if (tab == 'inv') {
+          var row = ge('gl_groups'+ gid);
+          if (row) {
+            var statusOne = geByClass1('group_row_status', row), actionsOne = geByClass1('group_row_actions', row);
+            statusOne.innerHTML = status.innerHTML;
+            actionsOne.innerHTML = actions.innerHTML;
+          }
+        }
+        if (act == 'join' || act == 'unsure') {
+          GroupsList.updateEventsList(gid);
+        } else if (act == 'undecided') {
+          GroupsList.updateEventsList(false);
+        }
+        /*var list = cur.scrollList.lists[tab];
+        if (act == 'join' || act == 'unsure' || act == 'decline') {
+          GroupsList.updateEventsList();
+          for(var i in list) {
+            if (list[i][2] == gid) {
+              cur['gid_restore_el'+gid] = [list.splice(i, 1), i];
+            }
+          }
+        } else if (act == 'undecided' && cur['gid_restore_el'+gid]) {
+          list.splice(cur['gid_restore_el'+gid][1], 0, cur['gid_restore_el'+gid][0][0]);
+        }*/
+      },
+      onFail: function(text) {
+        if (text) {
+          setTimeout(showFastBox(getLang('global_error'), text).hide, 3000);
+          return true;
+        }
+      },
+      showProgress: sp, hideProgress: hp
+    });
+  },
+
+  addInvite: function(newRow, added, act) {
+    if (newRow) {
+      var moreCont = ge('gle_invites_more');
+      moreCont.appendChild(se(newRow));
+      cur.scrollList.invShown += 1;
+      if (cur.scrollList.invSwitchGid) {
+        GroupsList.switchInvite(cur.scrollList.invSwitchGid);
+        cur.scrollList.invSwitchGid = false;
+      }
+    }
+
+    if (added && cur.scrollList.lists.groups) {
+      var l = cur.scrollList.lists.groups;
+      if (act == 'join' || act == 'unsure') {;
+        l.push(added);
+      } else if (!act) {
+        l.unshift(added); // add to the start
+      } else if (act == 'undecided') {
+        for (var i in l) {
+          if (l[i][2] == added[2]) {
+            l.splice(i, 1)
+          }
+        }
+      }
+      cur.scrollList.cache['groups'] = {all: []};
+      var c = cur.scrollList.cache['groups'];
+      for (var i in l) {
+        c.all.push(i);
+      }
+      cur.scrollList.index['groups'] = new vkIndexer(c.all, function(obj) {
+        return l[obj][0];
+      });
+      GroupsList.showMore(true);
+    }
+  },
+
+  switchInvite: function(gid, prepareActs) {
+    var tab = cur.scrollList.tab;
+    if (tab != 'groups') {
+      return false;
+    }
+
+    var row = ge('gl_' + tab + gid);
+
+    var moreCont = ge('gle_invites_more');
+    var newRows = moreCont.childNodes;
+    if (!newRows.length) {
+      if (cur.scrollList.invShown < cur.scrollList.invCount) {
+        cur.scrollList.invSwitchGid = gid;
+        return true;
+      }
+      return false;
+    }
+    var newRow = newRows[0];
+
+    if (!newRow) {
+      return false;
+    }
+
+    if (cur.switchedInvite) {
+      slideUp(cur.switchedInvite);
+    }
+    if (prepareActs) {
+      cur.switchedInvite = ce('div', {className: 'gle_invites_actions', innerHTML: '<div class="progress_inline"></div>'});
+      newRow.insertBefore(cur.switchedInvite, newRow.firstChild)
+    }
+
+    cur.scrollList.invShown -= 1;
+    cur.scrollList.invCount -= 1;
+
+    var cont = row.parentNode;
+    var size = getSize(cont);
+    setStyle(newRow, {opacity: 0, overflow: 'hidden', height: 1, position: 'absolute'});
+    cont.appendChild(newRow);
+    animate(newRow, {marginTop: -size[1], opacity: 1, height: size[1]}, 200, function() {
+      hide(row);
+      setStyle(newRow, {marginTop: 0, position: 'static', height: 'auto'});
+    });
+
+    if (cur.scrollList.invCount) {
+      ge('gle_inv_summary').innerHTML = langNumeric(cur.scrollList.invCount, cur.scrollList.summaries.inv);
+    } else {
+      ge('gle_inv_summary').innerHTML = cur.scrollList.summaries.invEmpty;
+    }
+    return true;
+  },
+
+  leave: function(el, gid, hash, pp) {
+    if (cur.invSwitching) {
+      setTimeout(GroupsList.leave.pbind(el, gid, hash, pp), 100);
+      return false;
+    }
+    var sp, hp, tab = cur.scrollList.tab;
+
+    if (el.firstChild && el.firstChild.className == 'progress_inline') return;
+    sp = function() {
+      var w = getSize(el)[0];
+      el.oldhtml = el.innerHTML;
+      el.innerHTML = '<span class="progress_inline"></span>';
+      setStyle(el, {width: w - 30});
+    }
+    hp = function() {
+      el.innerHTML = el.oldhtml;
+    }
+
+    var key = GroupsList.rand(), value = GroupsList.rand();
+    cur.scrollList[key] = value;
+
+    var shown = false;
+    cur.invSwitching = true;
+    if (GroupsList.switchInvite(gid, true)) {
+      shown = true;
+      sp = false;
+      hp = false;
+    }
+
+    var context = (cur.scrollList.tab == 'groups') ? '2' : '1';
+
+    ajax.post('al_groups.php', {
+      act: 'leave',
+      gid: gid,
+      hash: hash,
+      context: context,
+      inv_shown: cur.scrollList.invShown
+    }, {
+      onDone: function(newRow) {
+        cur.invSwitching = false;
+        if (!cur.scrollList || cur.scrollList[key] != value) return;
+
+        var list = cur.scrollList.lists[tab];
+        if (!list || list == 'loading' || list == 'update') {
+          cur.scrollList.processed[tab][gid] = -1;
+        } else {
+          for (var i = 0, count = list.length; i < count; ++i) {
+            if (list[i][2] == gid) {
+              list[i][1] = -1;
+            }
+          }
+        }
+
+        var row = ge('gl_' + tab + gid);
+        if (!row) return;
+
+        var acts = '<a onclick="GroupsList.cancel(this.parentNode, ' + gid + ', \'' + hash + '\')">' + getLang('global_cancel') + '</a><span class="divider">|</span><a onclick="GroupsList.spam(this.parentNode, ' + gid + ', \'' + hash + '\')">' + getLang('its_spam') + '</a>';
+
+        var text = '';
+        if (tab == 'groups') {
+          text = getLang(pp ? 'public_you_unsubscribed' : 'groups_group_left');
+        } else {
+          text = getLang('groups_group_deny_message');
+        }
+
+
+
+        GroupsList.addInvite(newRow, false, false);
+
+        if (shown) {
+          if (cur.switchedInvite) {
+            cur.switchedInvite.innerHTML = text+' <a onclick="GroupsList.spam(this.parentNode, ' + gid + ', \'' + hash + '\', cur.switchedInvite)">' + getLang('its_spam') + '</a>';
+          }
+          return;
+        }
+
+        var status = geByClass1('group_row_status', row), actions = geByClass1('group_row_actions', row);
+        status.basehtml = status.innerHTML;
+        actions.basehtml = actions.innerHTML;
+        status.innerHTML = text;
+        actions.innerHTML = acts;
+      },
+      showProgress: sp, hideProgress: hp
+    });
+  },
+  rejectAll: function(el, hash) {
+    var box = showFastBox(getLang('global_warning'), getLang('groups_sure_reject_all'), getLang('groups_members_application_decline'), function() {
+      ajax.post('al_groups.php', {act: 'reject_all', hash: hash}, {progress: box.progress});
+    }, getLang('global_cancel'));
+  },
+  spam: function(el, gid, hash, applyCont) {
+    var sp, hp, tab = cur.scrollList.tab;
+
+    if (el.firstChild && el.firstChild.className == 'progress_inline') return;
+    sp = function() {
+      el.oldhtml = el.innerHTML;
+      el.innerHTML = '<span class="progress_inline"></span>';
+    }
+    hp = function() {
+      el.innerHTML = el.oldhtml;
+    }
+
+    var key = GroupsList.rand(), value = GroupsList.rand();
+    cur.scrollList[key] = value;
+
+    ajax.post('al_groups.php', {act: 'spam', gid: gid, hash: hash, context: 1}, {
+      onDone: function(respText) {
+        if (!cur.scrollList || cur.scrollList[key] != value) return;
+        if (applyCont) {
+          applyCont.innerHTML = respText;
+        }
+
+        var list = cur.scrollList.lists[tab];
+        if (!list || list == 'loading' || list == 'update') {
+          cur.scrollList.processed[tab][gid] = -2;
+        } else {
+          for (var i = 0, count = list.length; i < count; ++i) {
+            if (list[i][2] == gid) {
+              list[i][1] = -2;
+            }
+          }
+        }
+
+        var row = ge('gl_' + tab + gid);
+        if (!row) return;
+
+        var status = geByClass1('group_row_status', row), actions = geByClass1('group_row_actions', row);
+        status.basehtml = status.innerHTML;
+        actions.basehtml = actions.innerHTML;
+        status.innerHTML = getLang('groups_ajax_inv_declined_spam');
+        actions.innerHTML = '';
+      },
+      showProgress: sp, hideProgress: hp
+    });
+  },
+  cancel: function(el, gid, hash) {
+    var sp, hp, tab = cur.scrollList.tab;
+
+    if (el.firstChild && el.firstChild.className == 'progress_inline') return;
+    sp = function() {
+      el.oldhtml = el.innerHTML;
+      el.innerHTML = '<span class="progress_inline"></span>';
+    }
+    hp = function() {
+      el.innerHTML = el.oldhtml;
+    }
+
+    var key = GroupsList.rand(), value = GroupsList.rand();
+    cur.scrollList[key] = value;
+
+    ajax.post('al_groups.php', {act: 'cancel', gid: gid, hash: hash, context: 1}, {
+      onDone: function() {
+        if (!cur.scrollList || cur.scrollList[key] != value) return;
+
+        var list = cur.scrollList.lists[tab], elem = false;
+        if (!list || list == 'loading' || list == 'update') {
+          cur.scrollList.processed[tab][gid] = 0;
+        } else {
+          for (var i in list) {
+            if (list[i][2] == gid) {
+              list.splice(i, 1)
+            }
+          }
+          cur.scrollList.cache['groups'] = {all: []};
+          var c = cur.scrollList.cache['groups'];
+          for (var i in list) {
+            c.all.push(i);
+          }
+          cur.scrollList.index[tab] = new vkIndexer(c.all, function(obj) {
+            return list[obj][0];
+          });
+        }
+        /*} else {
+          for (var i = 0, count = list.length; i < count; ++i) {
+            if (list[i][2] == gid) {
+              list[i][1] = 0;
+              elem = list[i];
+              break;
+            }
+          }
+        }*/
+
+        var row = ge('gl_' + tab + gid);
+        if (!row) return;
+
+        if (elem) {
+          var name = elem[0], q = trim(cur.scrollList.query.value);
+          if (q) {
+            var highlight = GroupsList.getHighlight(q);
+            name = name.replace(highlight.re, highlight.val);
+          }
+          var newRow = (cur.scrollList.genRow(elem, name)) ? cur.scrollList.genInvRow(elem, name) : cur.scrollList.genRow(elem, name);
+          row.parentNode.replaceChild(ce('div', {innerHTML: newRow}).firstChild, row);
+        } else {
+          var status = geByClass1('group_row_status', row), actions = geByClass1('group_row_actions', row);
+          status.innerHTML = status.basehtml;
+          actions.innerHTML = actions.basehtml;
+        }
+      },
+      showProgress: sp, hideProgress: hp
+    });
+  },
+
+  scrollCheck: function() {
+    if (browser.mobile) return;
+    var lnk = ge(cur.scrollList.prefix + cur.scrollList.tab + '_more');
+    if (!isVisible(lnk)) {
+      return;
+    }
+
+    var docEl = document.documentElement;
+    var ch = window.innerHeight || docEl.clientHeight || bodyNode.clientHeight;
+    var st = scrollGetY();
+
+    if (st + ch > lnk.offsetTop || (cur.searchOffset && st + 2*ch > lnk.offsetTop)) {
+      GroupsList.showMore();
+    }
+  },
+  initScroll: function() {
+    addEvent((browser.msie6 ? pageNode : window), 'scroll', GroupsList.scrollCheck);
+    addEvent(window, 'resize', GroupsList.scrollCheck);
+  },
+
+  locNav: function(changed, oldLoc, newLoc) {
+    var changedTab = changed.tab, tab = changedTab || 'groups';
+    delete(changed.tab);
+    if (!isEmpty(changed) || changedTab === undefined) return;
+
+    ge('groups_tab_' + cur.scrollList.tab).className = '';
+    hide('groups_list_tab_' + cur.scrollList.tab);
+    cur.scrollList.tab = tab;
+    show('groups_list_tab_' + tab);
+    var tabEl = ge('groups_tab_' + tab);
+    tabEl.className = 'active_link';
+    show(tabEl);
+
+    if (cur.scrollList.events) {
+      toggle(cur.scrollList.events, tab == 'groups' && ge('gle_list_cont').innerHTML);
+      cur.scrollList.eventsShow = false;
+      if (isVisible(cur.scrollList.eventsMore)) {
+        hide(cur.scrollList.eventsMore);
+        show(cur.scrollList.eventsMoreLnk);
+      }
+    }
+    if (cur.scrollList.invites) {
+      toggle(cur.scrollList.invites, tab == 'groups');
+    }
+    if (cur.scrollList.invites || cur.scrollList.events) {
+      ((tab == 'groups') ? addClass : removeClass)(cur.scrollList.summary.parentNode, 'gl_summary_short');
+    }
+
+    toggle('gl_about_events', (tab == 'groups' || tab == 'inv'));
+
+    nav.setLoc(newLoc);
+    ge('groups_list_search').setValue('');
+    setTimeout(elfocus.pbind('groups_list_search'), 0);
+
+    cur.scrollList.summary.innerHTML = cur.scrollList.summaries[tab];
+    cur.scrollList.offset = ge('groups_list_' + tab).childNodes.length;
+
+    GroupsList.showMore(true);
+
+    return false;
+  },
+
+  init: function(opts) {
+    placeholderSetup('groups_list_search', {back: true});
+    setTimeout(elfocus.pbind('groups_list_search'), 0);
+    extend(cur, {
+      module: 'groups_list',
+      _back: {
+        text: getLang('groups_back_to_list'),
+        show: [GroupsList.initScroll],
+        hide: [function() {
+          removeEvent((browser.msie6 ? pageNode : window), 'scroll', GroupsList.scrollCheck);
+          removeEvent(window, 'resize', GroupsList.scrollCheck);
+        }]
+      },
+
+      scrollList: {
+        tab: opts.tab,
+
+        url: 'al_groups.php',
+        params: {act: 'get_list', mid: opts.mid},
+        prefix: 'groups_list_',
+        query: ge('groups_list_search'),
+        summary: ge('groups_list_summary'),
+        events: ge('gle_list_wrap'),
+        eventsMore: ge('gle_list_more'),
+        eventsMoreLnk: ge('gle_list_more_lnk'),
+        invites: ge('gle_invites_wrap'),
+        searchCont: ge('groups_list_search_cont'),
+
+        perpage: 20,
+        offset: ge('groups_list_' + opts.tab).childNodes.length,
+
+        lists: {},
+        cache: {},
+        index: {},
+        processed: {'groups': {}, 'admin': {}, 'inv': {}},
+        filtered: {},
+        queries: {},
+        summaries: opts.summaries,
+
+        genEmpty: opts.genEmpty,
+        genRow: opts.genRow,
+        genEvent: opts.genEvent,
+        genInvRow: opts.genInvRow,
+        genSummary: opts.genSummary,
+        genGroupsSummary: opts.genGroupsSummary,
+        invShown: opts.invShown,
+        invCount: opts.invCount
+      },
+      filter: opts.filter
+    });
+
+    cur.nav.push(GroupsList.locNav);
+
+    setTimeout(GroupsList.load, 0);
+    if (vk.version) {
+      addEvent(window, 'load', GroupsList.initScroll);
+    } else {
+      GroupsList.initScroll();
+    }
+  },
+  load: function(force, forceTab) {
+    var tab = forceTab || cur.scrollList.tab;
+    if (cur.scrollList.lists[tab]) return;
+
+    var key = GroupsList.rand(), value = GroupsList.rand();
+    cur.scrollList[key] = value;
+
+    cur.scrollList.lists[tab] = 'loading';
+    ajax.post(cur.scrollList.url, extend(cur.scrollList.params, {tab: tab}), {onDone: function(result) {
+      if (!cur.scrollList || cur.scrollList[key] != value) return;
+
+      var upd = (cur.scrollList.lists[tab] == 'update');
+      if (!upd && cur.scrollList.lists[tab] != 'loading') return;
+
+      cur.scrollList.cache[tab] = {all: []};
+      var processed = cur.scrollList.processed[tab], gid;
+      for (var i = 0, count = result.length; i < count; ++i) {
+        res = processed[result[i][2]];
+        if (res) {
+          result[i][1] = res;
+        }
+        cur.scrollList.cache[tab].all.push(i);
+      }
+      cur.scrollList.lists[tab] = result;
+
+      var callback = upd ? function() {
+        if (cur.scrollList && cur.scrollList[key] == value && cur.scrollList.tab == tab) {
+          GroupsList.showMore(force);
+        }
+      } : function() {};
+
+      cur.scrollList.index[tab] = new vkIndexer(cur.scrollList.cache[tab].all, function(obj) {
+        return cur.scrollList.lists[tab][obj][0];
+      }, callback);
+
+      if (cur.scrollList.eventsShow) {
+        GroupsList.eventsMore();
+      }
+    }});
+  },
+
+  htmlencode: function(str) {
+    var res = [];
+    for (var i = 0, l = str.length; i < l; ++i) {
+      var c = str.charCodeAt(i);
+      if (c == 33 || c == 39 || (c > 127 && c < 1040) || c > 1103) {
+        res.push('&#' + c + ';');
+      } else if (c == 36) {
+        res.push('&#0' + c + ';');
+      } else {
+        c = str.charAt(i);
+        switch (c) {
+          case '>': res.push('&gt;'); break;
+          case '<': res.push('&lt;'); break;
+          case '"': res.push('&quot;'); break;
+          case '&': res.push('&amp;'); break;
+          default:  res.push(c); break;
+        }
+      }
+    }
+    return res.join('');
+  },
+  getHighlight: function(q) {
+    var indxr = cur.scrollList.index[cur.scrollList.tab], delimiter = indxr.delimiter, trimmer = indxr.trimmer;
+
+    q += ' ' + (parseLatin(q) || '');
+    q = escapeRE(q).replace(/&/g, '&amp;');
+    q = q.replace(trimmer, '').replace(delimiter, '|');
+    return {
+      re: new RegExp('(' + q + ')', 'gi'),
+      val: '<span class="group_row_highlight">$1</span>'
+    }
+  },
+  updateEvents: function() {
+    if (!cur.scrollList.events || cur.scrollList.tab != 'groups') return;
+    toggle(cur.scrollList.events, !cur.scrollList.query.value && ge('gle_list_cont').innerHTML);
+    cur.scrollList.eventsShow = false;
+    if (isVisible(cur.scrollList.eventsMore)) {
+      hide(cur.scrollList.eventsMore);
+      show(cur.scrollList.eventsMoreLnk);
+    }
+    if (cur.scrollList.invites) {
+      toggle(cur.scrollList.invites, !cur.scrollList.query.value);
+    }
+    (!cur.scrollList.query.value ? addClass : removeClass)(cur.scrollList.summary.parentNode, 'gl_summary_short');
+  },
+  updateEventsList: function(addedGid) {
+    ajax.post('groups', {act: 'update_events'}, {
+      onDone: function(html, more) {
+        var gleCont = ge('gle_list_cont');
+        val(gleCont, html);
+        toggle(cur.scrollList.events, !!html);
+        hide(cur.scrollList.eventsMore);
+        val(cur.scrollList.eventsMore, '');
+        val(cur.scrollList.eventsMoreLnk, more || '');
+        toggle(cur.scrollList.eventsMoreLnk, !!more);
+        cur.scrollList.eventsShow = false;
+        if (addedGid) {
+          var addedRow = ge('gle_block_'+addedGid);
+          if (addedRow) {
+            setStyle(addedRow, {backgroundColor: '#FEFAE4'});
+            animate(addedRow, {backgroundColor: '#FFF'}, 2000);
+          }
+        }
+      }
+    })
+  },
+  eventsMore: function() {
+    var list = cur.scrollList.lists['groups'];
+    if (!list || list == 'loading' || list == 'update') {
+      cur.scrollList.eventsShow = true;
+      return;
+    }
+
+    hide(cur.scrollList.eventsMoreLnk);
+    if (val(cur.scrollList.eventsMore)) {
+      show(cur.scrollList.eventsMore);
+    } else {
+      var res = {}, shown = {}, dates = {}, list = [], html = [];
+      each(ge('gle_list_cont').childNodes, function(k, v) {
+        var id = intval(((v || {}).id || '').replace(/^gle_block_/, ''));
+        if (id) shown[id] = true;
+      });
+      each(cur.scrollList.lists['groups'], function(k, v) {
+        var gid = intval(v[2]);
+        if (!v[11] || shown[gid]) return;
+        list.push(gid);
+        res[gid] = cur.scrollList.genEvent(v);
+        dates[gid] = intval(v[11].split('<*>')[0]);
+      });
+      list.sort(function(gid1, gid2) {
+        return (dates[gid1] < dates[gid2]) ? -1 : ((dates[gid2] < dates[gid1]) ? 1 : 0);
+      });
+      each(list, function(k, v) {
+        html.push(res[v]);
+      });
+      if (html.length) {
+        val(cur.scrollList.eventsMore, html.join(''));
+        show(cur.scrollList.eventsMore);
+      }
+    }
+  },
+  showMore: function(force) {
+    var tab = cur.scrollList.tab, list = cur.scrollList.lists[tab];
+    if (!list || list == 'loading' || list == 'update') {
+      if (!list) GroupsList.load(force);
+      cur.scrollList.lists[tab] = 'update';
+      return;
+    }
+
+    var tab = cur.scrollList.tab, list = cur.scrollList.cache[tab].all;
+
+    var q = trim(cur.scrollList.query.value);
+    cur.searchStr = q;
+    if (!cur.loadingShown) {
+      if (q) {
+        show('groups_reset_search');
+      } else {
+        hide('groups_reset_search');
+      }
+    }
+
+    if (cur.scrollList.queries[tab] === undefined) {
+      cur.scrollList.queries[tab] = '';
+    }
+    var refresh = (force || q != cur.scrollList.queries[tab]);
+    if (!refresh && force === false) return;
+
+    cur.scrollList.queries[tab] = q;
+
+    var highlight = false;
+    if (q) {
+      list = cur.scrollList.cache[tab]['_' + q];
+      if (list === undefined) {
+        var tmp = cur.scrollList.index[tab].search(q), mp = {};
+        list = [];
+        for (var i = 0, l = tmp.length; i < l; ++i) {
+          if (!mp[tmp[i]]) {
+            mp[tmp[i]] = true;
+            list.push(tmp[i]);
+          }
+        }
+        list.sort(function(a,b){return a-b;});
+        cur.scrollList.cache[tab]['_' + q] = list;
+      }
+      highlight = GroupsList.getHighlight(q);
+    }
+
+    var len = list.length;
+
+    var cont = ge(cur.scrollList.prefix + tab), more = ge(cur.scrollList.prefix + tab + '_more');
+    if (!len) {
+      if (q && tab == 'groups') {
+        if (refresh) {
+          GroupsList.serverSearch(cont, q, true);
+          hide(more);
+        } else if (cur.searchOffset) {
+          GroupsList.serverSearchMore(cont, q);
+        }
+      } else {
+        q = cur.scrollList.query.value;
+        cont.innerHTML = cur.scrollList.genEmpty(q);
+        cur.scrollList.summary.innerHTML = q ? cur.scrollList.genSummary(len) : cur.scrollList.summaries[tab];
+        hide(more);
+        hide(cur.scrollList.searchCont);
+        cur.searchOffset = 0;
+      }
+      return;
+    } else if (tab == 'groups' && cur.scrollList.params.mid == vk.id) {
+      cur.scrollList.summary.innerHTML = cur.scrollList.genGroupsSummary(len);
+    } else {
+      cur.scrollList.summary.innerHTML = q ? cur.scrollList.genSummary(len) : cur.scrollList.summaries[tab];
+    }
+
+    var start = refresh ? 0 : cur.scrollList.offset, end = Math.min(len, start + cur.scrollList.perpage);
+    var html = [];
+
+    for (var i = start; i < end; ++i) {
+      var row = cur.scrollList.lists[tab][list[i]];
+      if (!row) continue;
+      var name = row[0];
+      if (highlight) {
+        name = name.replace(highlight.re, highlight.val);
+      }
+      if (cur.scrollList.tab == 'inv') {
+        html.push(cur.scrollList.genInvRow(row, name));
+      } else {
+        html.push(cur.scrollList.genRow(row, name));
+      }
+    }
+
+    if (!q && (!start || refresh)) {
+      hide(cur.scrollList.searchCont);
+      cur.searchOffset = 0;
+    }
+
+    if (refresh) {
+      cont.innerHTML = html.join('');
+      cur.searchOffset = false;
+      if (list.length < 10 && q && tab == 'groups') {
+        var exclude = [];
+        for (var i in list) {
+          var el = cur.scrollList.lists[tab][list[i]];
+          exclude.push(el[2]);
+        }
+        GroupsList.serverSearch(cont, q, false, exclude);
+      } else {
+        hide(cur.scrollList.searchCont);
+        cur.searchOffset = 0;
+      }
+    } else {
+      cont.innerHTML += html.join('');
+      if (cur.searchOffset) {
+        GroupsList.serverSearchMore(cont, q);
+      }
+    }
+    cur.scrollList.offset = end;
+
+    if (!cur.searchOffset) {
+      (end < len ? show : hide)(more);
+    }
+  },
+
+  serverSearchMore: function(cont, q) {
+    if (cur.searchLoadingMore) return;
+    cur.searchLoadingMore = 1;
+    var more = ge(cur.scrollList.prefix + cur.scrollList.tab + '_more');
+    var back = more.innerHTML;
+    ajax.post('al_groups.php', {
+      act: 'server_search',
+      q: q,
+      offset: cur.searchOffset,
+      exclude: cur.searchExclude.join(',')
+    }, {
+      onDone: function(count, rows, finish) {
+        cur.searchLoadingMore = 0;
+        if (count) {
+          cur.searchOffset += count;
+          cur.scrollList.searchCont.appendChild(cf(rows));
+        } else {
+          cur.searchOffset = 0;
+        }
+        (finish ? hide : show)(cur.scrollList.prefix + cur.scrollList.tab + '_more');
+        debugLog((finish ? 'hide' : 'show'));
+      },
+      onFail: function() {
+        cur.searchLoadingMore = 0;
+      },
+      showProgress: function() {
+        more.innerHTML = '<img src="/images/upload.gif" />';
+      },
+      hideProgress: function() {
+        more.innerHTML = back;
+      }
+    })
+  },
+
+  serverSearch: function(cont, q, emptyLocal, exclude) {
+    if (cur.scrollList.tab != 'groups') {
+      return false;
+    }
+    clearTimeout(cur.searchTimeout);
+    cur.searchTimeout = setTimeout(function() {
+      if (cur.searchStr != q) return;
+      cur.searchExclude = exclude || [];
+      ajax.post('al_groups.php', {
+        act: 'server_search',
+        q: q,
+        empty: emptyLocal ? 1 : 0,
+        exclude: cur.searchExclude.join(',')
+      }, {
+        onDone: function(count, rows, summary, finish) {
+          if (cur.searchStr != q) return;
+          if (count) {
+            var last = geByClass('group_list_row', cont).pop();
+            if (last) {
+              addClass(last, 'groups_list_last_row');
+            }
+            cur.scrollList.searchCont.innerHTML = rows;
+            show(cur.scrollList.searchCont);
+            if (emptyLocal) {
+              cur.scrollList.summary.innerHTML = summary;
+              cont.innerHTML = '';
+            }
+            if (!finish) {
+              show(cur.scrollList.prefix + cur.scrollList.tab + '_more');
+            }
+          } else {
+            cur.scrollList.searchCont.innerHTML = '';
+            hide(cur.scrollList.searchCont);
+            if (emptyLocal) {
+              cont.innerHTML = cur.scrollList.genEmpty(q);
+              cur.scrollList.summary.innerHTML = cur.scrollList.genSummary(0);
+            }
+          }
+          cur.searchOffset = count;
+        },
+        showProgress: GroupsList.showLoading,
+        hideProgress: GroupsList.hideLoading
+      })
+    }, 300);
+  },
+
+  resetSearch: function() {
+    val(cur.scrollList.query, '');
+    GroupsList.showMore(true);
+    GroupsList.updateEvents();
+  },
+
+  showLoading: function() {
+    cur.loadingShown = 1;
+    show('groups_loading');
+    hide('groups_reset_search');
+  },
+
+  hideLoading: function() {
+    cur.loadingShown = 0;
+    hide('groups_loading');
+    if (cur.scrollList.query.value) {
+      show('groups_reset_search');
+    }
+  },
+
+  goToSearch: function() {
+    var q = trim(cur.scrollList.query.value);
+    nav.go('search?c%5Bq%5D='+encodeURIComponent(q)+'&c%5Bsection%5D=communities');
+  },
+
+  showInvites: function(obj) {
+    removeClass(obj.previousSibling, 'groups_list_last_row');
+    hide(obj);
+    show(obj.nextSibling);
+  },
+
+  ttShow: function(obj, text) {
+    var showsp = 200;
+    if (cur.groupMemTT && cur.groupMemTT != obj && window.tooltips) {
+      tooltips.hideAll();
+      cur.groupMemTT = false;
+      showsp = 0;
+    }
+    cur.groupMemTT = obj;
+    return showTooltip(obj, {
+      center: 1,
+      black: 1,
+      showsp: showsp,
+      shift: [0, 2, 10],
+      text: text
+    });
+  },
+
+  showMapBox: function(place, zoom, link) {
+    if (window.showZeroZoneBox && showZeroZoneBox('places', function() {
+      GroupsList.showMapBox(place, zoom, link);
+    })) { return; }
+
+    showTabbedBox('places.php', {act: 'a_get_place_box', id: place}, {stat: ['places.css', 'map.css', 'maps.js', 'ui_controls.css', 'ui_controls.js']});
+  }
+}
+
+try{stManager.done('groups_list.js');}catch(e){}

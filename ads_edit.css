@@ -1,0 +1,432 @@
+#ads_edit_css { display: none; }
+
+/* -------------- */
+/* Edit ad - main */
+/* -------------- */
+
+.ads_edit_page_wrap1 {
+  border: 2px solid #EDEFF1
+}
+.ads_edit_page_wrap2 {
+  border: 1px solid #ADBBCA;
+}
+.ads_edit_page_wrap3 {
+  border: 10px solid #DAE2E8;
+  background-color: #F5F7FA;
+  padding: 20px;
+}
+
+#ads_page .error {
+  margin-bottom: 20px;
+}
+
+.ads_edit_panels_top {
+  padding-top: 20px;
+}
+.ads_edit_panel_edit {
+  width: 500px;
+}
+.ads_edit_panel_preview {
+  padding-right: 60px;
+}
+.ads_edit_table {
+  border: 0px;
+  border-collapse: collapse;
+}
+
+.ads_edit_label,
+.ads_edit_value {
+  padding: 0 0 10px 0;
+  vertical-align: top;
+}
+
+.ads_edit_label {
+  width: 170px;
+  text-align: right;
+  padding-right: 10px;
+  color: #777777;
+}
+
+.ads_edit_label_input_ui {
+  padding-top: 5px;
+}
+
+.ads_edit_label_input {
+  padding-top: 4px;
+}
+
+.ads_edit_label_checkbox {
+  padding-top: 3px;
+}
+
+.ads_edit_label_radiobutton {
+  padding-top: 6px;
+}
+
+.ads_edit_label_textarea {
+  padding-top: 4px;
+}
+
+.ads_edit_value .text {
+  width: 250px;
+}
+.ads_edit_value .ads_edit_value_range .text {
+  width: 116px;
+}
+.ads_edit_value .text.ads_edit_value_ui {
+  height: 14px;
+}
+
+.ads_edit_value_help {
+  display: none;
+}
+
+.ads_edit_value_help_wrap {
+  padding: 4px 0 0 7px;
+}
+
+.listing.ads_edit_help_listing {
+  margin-bottom: 0;
+}
+
+.ads_edit_value_range_from,
+.ads_edit_value_range_sep,
+.ads_edit_value_range_to {
+}
+
+.ads_edit_value_range_sep {
+  padding: 4px 3px 0 3px;
+}
+
+.ads_edit_value_cost_type_wrap {
+  min-height: 54px;
+}
+
+.ads_edit_value_checkbox_wrap {
+  height: 20px
+}
+.ads_edit_value_checkbox_wrap2 {
+  padding: 1px 0;
+}
+.ads_edit_value_checkbox_wrap3 {
+  margin: -6px 0;
+}
+
+.ads_edit_value_tip {
+  font-size: 0.9em;
+  color: #777777;
+  width: 250px;
+  padding-top: 5px;
+}
+
+.ads_edit_separator_big {
+  border-bottom: 1px solid #DAE2E8;
+  height: 1px;
+  width: 475px;
+  margin: 10px 0 20px 0;
+}
+
+.ads_edit_hider_on,
+.ads_edit_hider_off {
+  color: #666666;
+  cursor: pointer;
+  font-weight: bold;
+  padding: 5px 0 5px 14px;
+}
+.ads_edit_hider_on {
+  background: url("/images/filterset_on.gif") no-repeat scroll 1px 9px transparent;
+}
+.ads_edit_hider_off {
+  background: url("/images/filterset_off.gif") no-repeat scroll 2px 8px transparent;
+}
+.ads_edit_hider_separator {
+  width: 258px;
+  height: 1px;
+  background-color: #DDDDDD;
+  border-bottom: 1px solid white;
+}
+.ads_edit_value.ads_edit_hider_row {
+  padding-bottom: 4px;
+}
+.ads_targeting_group {
+  padding-top: 3px;
+}
+
+/* ---------------- */
+/* Edit ad - common */
+/* ---------------- */
+
+.ads_param_title_remain_wrap,
+.ads_param_description_remain_wrap,
+#ads_targeting_criterion_tags_remain {
+  font-size: 0.9em;
+  color: #999999;
+  padding-top: 6px;
+}
+
+#ads_param_category_more {
+  font-size: 0.9em;
+  padding-top: 6px;
+}
+
+/* ------------ */
+/* Edit ad - ad */
+/* ------------ */
+
+.ads_edit_ad_view_wrap {
+  text-align: center;
+}
+
+.ads_edit_panel_preview .ads_ad_box_border {
+  border-width: 1px;
+  background-color: white;
+}
+
+.ads_ad_play.empty {
+  background-image: url("/images/ad_video_empty.png");
+}
+
+.ads_edit_ad_view_controls {
+  padding-top: 5px;
+}
+
+
+/* -------------- */
+/* Edit ad - view */
+/* -------------- */
+
+#ads_param_link_id_wrap,
+#ads_param_link_url_wrap {
+  padding-top: 10px;
+}
+
+#ads_param_title {
+  height: 26px;
+}
+#ads_param_description {
+  height: 52px;
+}
+#ads_param_title,
+#ads_param_description {
+  overflow: hidden;
+  resize: none;
+}
+
+#ads_param_link_domain_progress {
+  padding: 6px 0 0 5px;
+}
+
+.ads_edit_value_header {
+  color: #36638E;
+  font-size: 1.09em;
+  font-weight: bold;
+  padding-top: 10px;
+}
+
+#ads_edit_ad_row_additional .ads_edit_value_checkbox_wrap {
+  height: 26px;
+}
+
+#ads_edit_ad_row_upload_photo .ads_edit_value {
+  padding-bottom: 13px;
+}
+
+/* ------------------ */
+/* Edit ad - behavior */
+/* ------------------ */
+
+.ads_param_cost_per_click_currency_wrap {
+  padding: 4px 0 0 6px;
+}
+
+.text#ads_param_cost_per_click {
+  width: 50px;
+}
+
+#ads_param_cost_per_click_recommended {
+  color: #777777;
+  font-size: 0.9em;
+  padding-top: 8px;
+}
+
+#ads_param_views_limit_flag_wrap {
+  padding-top: 2px;
+}
+
+.ads_edit_value_campaign_type_wrap {
+  padding-bottom: 10px;
+}
+
+#ads_param_campaign_name_wrap {
+  min-height: 22px;
+}
+
+.ads_edit_value_terms {
+  line-height: 160%;
+}
+
+#ads_edit_controls_row .button_blue {
+  margin-right: 10px;
+}
+
+/* ------------------- */
+/* Edit ad - targeting */
+/* ------------------- */
+
+#ads_edit_audience_count {
+  color: #36638E;
+  font-size: 1.09em;
+  font-weight: bold;
+}
+
+.ads_edit_value_birthday_today {
+  padding-right: 5px;
+}
+
+#ads_edit_criterion_row_birthday .ads_edit_label,
+#ads_edit_criterion_row_birthday .ads_edit_value {
+  padding-bottom: 8px;
+}
+
+#ads_targeting_criterion_tags {
+  height: 52px;
+  min-height: 52px;
+  resize: vertical;
+}
+
+/* -------- */
+/* Tooltips */
+/* -------- */
+
+.ads_edit_tt.tt .tt_text {
+  padding: 0;
+}
+
+.ads_edit_tt_text {
+  padding: 10px;
+  width: 281px;
+  color: black;
+  line-height: 150%;
+}
+
+.ads_edit_tt_pointer {
+  background: url(/images/ddtooltip.png) 0 0 no-repeat;
+  width: 8px;
+  height: 11px;
+  position: absolute;
+  left: -7px;
+  top: 38px;
+  overflow: hidden;
+  z-index: 10;
+}
+
+.ads_edit_tt_pointer.ads_edit_tt_pointer_category1_id {
+  top: 24px;
+}
+
+.ads_edit_tt_pointer.ads_edit_tt_pointer_views_limit_flag {
+  top: 19px;
+}
+
+.ads_edit_tt_pointer.ads_edit_tt_pointer_travellers {
+  top: 36px;
+}
+
+.ads_edit_tt_pointer.ads_edit_tt_pointer_positions {
+  top: 24px;
+}
+
+.ads_edit_tt_pointer.ads_edit_tt_pointer_pays_money {
+  top: 24px;
+}
+
+.ads_edit_tt_pointer.ads_edit_tt_pointer_tags {
+  top: 57px;
+}
+
+/* ------ */
+/* Upload */
+/* ------ */
+
+.ads_edit_upload_uploader {
+  text-align: center;
+}
+
+.ads_edit_upload_progress_wrap1 {
+  width: 250px;
+}
+
+/* -------------- */
+/* Upload - photo */
+/* -------------- */
+
+.ads_edit_upload_photo_box .error {
+  margin-bottom: 8px;
+}
+
+/* ------------------- */
+/* Upload - crop photo */
+/* ------------------- */
+
+.ads_edit_crop_photo_box .error {
+  margin-bottom: 8px;
+}
+
+.ads_edit_crop_photo_box .info_msg {
+  margin-bottom: 15px;
+}
+
+.ads_edit_crop_photo_ad {
+  padding-left: 15px;
+}
+
+.ads_edit_crop_photo_ad .ads_ad_play {
+  cursor: move;
+}
+
+#ads_edit_crop_photo_small_wrap {
+  margin: 0 auto;
+}
+
+/* -------------- */
+/* Upload - video */
+/* -------------- */
+
+.ads_edit_upload_video_box .error {
+  margin-bottom: 10px;
+}
+
+#ads_edit_upload_video_info {
+  margin-top: 15px;
+}
+
+#ads_edit_upload_video_external_wrap {
+  padding: 0 30px;
+}
+
+#ads_edit_upload_video_external_link_wrap {
+  margin-right: 12px;
+}
+
+#ads_edit_upload_video_external_link {
+  padding: 5px;
+  width: 100%;
+}
+
+#ads_edit_upload_video_external_error {
+  padding-top: 5px;
+  color: #777777;
+}
+
+/* Other */
+
+/* OLD */
+
+.last_ad_wrap {
+  min-height: 220px;
+  padding-right: 20px;
+}
+
+.last_ad_wrap td {
+  text-align: center;
+}

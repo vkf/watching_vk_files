@@ -1,0 +1,772 @@
+#groups_css {
+  display: none;
+}
+
+#group .narrow_column .module_body {
+  border-left: 1px solid #F1F1F1;
+}
+#group .narrow_column .audios_module .module_body {
+  padding: 8px 0px 8px 8px;
+}
+#group {
+  padding: 10px 10px 0px;
+}
+#group h4.simple .top_header {
+  width: 395px;
+  height: 1.23em;
+  white-space: nowrap;
+  overflow: hidden;
+  -o-text-overflow: ellipsis;
+  text-overflow: ellipsis;
+  text-overflow: ellipsis-word;
+}
+
+.group_info {
+  padding: 7px 6px 10px;
+  line-height: 150%;
+}
+.group_info_private {
+  padding-top: 5px;
+  color: #777;
+}
+.group_info .label {
+  width: 120px;
+  color: #777;
+  padding: 3px 0px 0px;
+}
+.group_info .labeled {
+  width: 265px;
+  overflow: hidden;
+  padding: 3px 0px 0px;
+}
+.group_row_labeled {
+  padding: 0px 0px 2px;
+}
+#page_avatar.group_no_avatar {
+  padding: 175px 10px 15px;
+  text-align: center;
+  background: #EEF2F6 url(/images/no_photo.png) no-repeat 45px 55px;
+}
+
+#group_photos .module_body {
+  padding: 0px 0px 10px;
+}
+#group_photos.module.empty .module_body {
+  border-bottom: none;
+  padding: 0px;
+}
+#group_photos.module.empty .module_body .empty_wrap {
+  padding: 20px 0px;
+}
+.group_photos_wrap {
+  margin: 5px -1px 0px;
+}
+#group_photos .profile_sized_photos {
+  margin: 0;
+}
+.group_photos_wrap .profile_wide_sized_photos,
+.page_wide_no_narrow .profile_sized_photos {
+  display: none;
+}
+.page_wide_no_narrow .group_photos_wrap .profile_wide_sized_photos {
+  display: block;
+}
+.group_photos_table, .group_photos_table a img {
+  margin: 0px auto;
+}
+.profile_wide_sized_photos a.page_post_thumb_wrap {
+  margin-right: 6px;
+}
+.group_photos_table a {
+  display: block;
+  width: 75px;
+  height: 57px;
+  background: #F1F1F1;
+  text-align: center;
+  overflow: hidden;
+  margin: 0px 3px 0px 2px;
+}
+#group_photos_upload {
+  background: #eff1f3;
+  padding: 17px;
+  text-align: center;
+  color: #738392;
+  line-height: 16px;
+  display: block;
+}
+a#group_photos_upload:hover,
+#group_photos_upload.hover {
+  background: #e9edf1;
+  text-decoration: none;
+}
+.group_photos_upload_label {
+  background: url('/images/camera.gif') left 1px no-repeat;
+  padding: 4px 0px 4px 35px;
+}
+
+.group_wiki_wrap {
+  padding-bottom: 10px;
+  overflow: hidden;
+}
+.group_wiki_hider {
+  padding: 8px 0 8px 125px;
+  border-top: 1px solid #FFF;
+  display: block;
+}
+.group_wiki_hider span {
+  padding: 0px 8px;
+  color: #2B587A;
+  visibility: hidden;
+}
+.group_wiki_hider span:hover {
+  text-decoration: underline;
+}
+.group_wiki_hider:hover {
+  text-decoration: none;
+  background: #E9EDF1;
+}
+.group_wiki_hider:hover span {
+  visibility: visible;
+}
+#group .group_wiki_wrap .wk_text {
+  display: none;
+  padding: 10px 8px;
+  width: 370px;
+  word-wrap: break-word;
+  line-height:150%;
+}
+.groups_edit_board_row {
+  padding: 5px 0px;
+}
+.groups_edit_board_label {
+  padding: 5px 10px 0px;
+  width: 200px;
+  color: #777;
+}
+.groups_edit_board_labeled {
+  width: 160px;
+}
+
+#group_voting .module_body {
+  padding-bottom: 11px;
+}
+#group_voting .header_bottom {
+  padding: 3px 9px;
+}
+.group_voting_title {
+  font-weight: bold;
+  color: #45688E;
+  padding: 0px 6px 3px;
+  margin: 13px 8px 4px;
+  border-bottom: 1px solid #E7EAED;
+}
+.group_voting_row_wrap {
+  width: 100%;
+  padding: 0px 5px;
+}
+.group_voting_row {
+  background: #F1F1F1;
+  width: 100%;
+}
+.group_voting_row_desc {
+  padding: 1px 7px 3px;
+}
+.group_voting_text {
+  padding: 6px 7px 4px;
+}
+.group_voting_percent {
+  background: #E1E7ED;
+  border: solid #D8DFE5;
+  border-width: 1px 1px 0px 0px;
+  height: 13px;
+}
+.group_voting_table {
+  padding: 0px 8px;
+}
+.group_voting_table .radiobtn {
+  padding: 12px 6px;
+  border-top: 1px solid #E7EAED;
+}
+.group_voting_table .radiobtn.first {
+  padding-top: 8px;
+  border-top: 0px;
+}
+#group_voting_msg {
+  margin: 10px 14px 0px;
+}
+.group_voting_actions {
+  font-weight: normal;
+}
+
+#group_like_module, .group_block_module {
+  margin: 0px 0px 10px;
+  padding: 11px 10px 10px;
+  background: #F1F1F1;
+  line-height: 160%;
+}
+.group_block_module {
+  margin: 10px 0px 0px;
+}
+.group_like_desc {
+  padding-bottom: 10px;
+}
+.group_like_enter_desc {
+  padding-top: 10px;
+  text-align: center;
+  color: #777;
+}
+.group_share_wrap {
+  padding-top: 1px;
+}
+.group_button_wrap {
+  padding-bottom: 10px;
+}
+.group_button_action {
+  text-align: center;
+}
+.group_button_action .progress {
+  margin: 0px auto;
+}
+
+#group_block_comment_wrap {
+  padding-top: 10px;
+}
+#group_block_comment {
+  width: 200px;
+  height: 50px;
+  margin-top: 10px;
+}
+.group_block_reason_wrap {
+  padding: 10px 0px;
+}
+.page_actions a.group_block_mem {
+  display: inline;
+  padding: 0px;
+  background: none;
+}
+.page_actions a.group_block_mem:hover {
+  text-decoration: underline;
+  background: none;
+}
+
+.group_abuse_made {
+  padding: 4px 6px;
+  color: #777;
+}
+
+.groups_donate {
+  margin: 5px 0px;
+  background: #F7F7F7;
+  border: solid #DAE1E8;
+  border-width: 1px 0px;
+  padding: 7px;
+}
+#groups_donate_options {
+  display: none;
+  padding-bottom: 5px;
+}
+#groups_donate_options .radiobtn {
+  padding: 3px 5px;
+}
+#groups_donate_button {
+  display: none;
+}
+#groups_donate_other {
+  display: none;
+  padding: 0px 5px 7px;
+}
+#groups_donate_other_val {
+  width: 70px;
+}
+#groups_donate_other_add {
+  padding: 0px 5px;
+}
+.groups_no_donations {
+  padding: 30px 10px;
+  text-align: center;
+  color: #777;
+}
+.summary_wrap.groups_donators_summary {
+  padding: 0px;
+  margin: 0px 5px 10px;
+}
+#groups_donators_wrap {
+  padding: 7px 5px 0px;
+  overflow: hidden;
+  height: 360px;
+}
+
+div.gl_message {
+  margin: 10px 10px 0px;
+}
+.groups_list_search {
+  background: #F7F7F7;
+  border-bottom: 1px solid #DAE1E8;
+  padding: 10px;
+}
+#groups_list_search {
+  padding: 5px 40px 5px 20px;
+  background: url(/images/magglass.png) no-repeat scroll 5px 6px white;
+  height: 13px;
+  outline: none;
+  width: 547px;
+}
+#groups_list_search::-ms-clear {
+  display: none;
+}
+
+.groups_list {
+  padding: 0px 10px;
+}
+.group_list_row {
+  border-bottom: 1px solid #EDEDED;
+  padding: 10px 0;
+  background: #FFFFFF;
+}
+.group_list_row:last-child {
+  border-bottom: 0px;
+}
+.group_row_photo {
+  height: 100px;
+  overflow: hidden;
+  width: 100px;
+}
+.group_row_info {
+  padding-left: 10px;
+  width: 485px;
+  overflow: hidden;
+  color: #777777;
+}
+.group_inv_info {
+  padding: 0px 0px 0px 15px;
+  width: 480px;
+  overflow: hidden;
+}
+.group_row_label {
+  color: #777;
+  width: 70px;
+  padding: 0 10px;
+}
+.group_row_labeled, .group_row_status_wrap {
+  margin-bottom: 3px;
+  width: 405px;
+}
+.group_row_status_wrap {
+  color: #777;
+  padding: 5px 0;
+}
+.group_row_actions {
+  padding: 0 5px;
+}
+.group_row_actions {
+  padding: 0px;
+}
+.groups_no_list {
+  border: 0;
+  background: #FFF;
+  color: #777;
+  font-size: 1.18em;
+  margin: 0 0 3px;
+  padding: 80px 0;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.groups_more_link {
+  display: block;
+  padding: 10px 0px;
+  margin: 0px 10px 10px;
+  border-top: 1px solid #DAE1E8;
+  text-align: center;
+}
+.groups_more_link:hover {
+  background: #E1E7ED;
+  text-decoration: none;
+}
+.group_friends_in_gr {
+  padding-top: 6px;
+  margin: 0px -2px;
+}
+.group_friend_in_gr {
+  height: 32px;
+  overflow: hidden;
+  padding: 0px 2px;
+}
+.group_row_buttons {
+  margin: 8px -3px 0px -2px;
+}
+.group_row_button {
+  margin: 0px 3px 0px 2px;
+}
+
+.group_friend_in_img {
+  width: 32px;
+}
+.groups_create_box {
+  padding: 3px 0px 1px;
+  width: 370px;
+}
+.groups_create_header {
+  color: #36638E;
+  font-size: 1.09em;
+  font-weight: bold;
+  margin: 11px 0px 5px;
+}
+.groups_create_section {
+  padding: 9px 1px 2px;
+}
+.groups_create_section .radiobtn div {
+  width: 18px;
+}
+.groups_create_about {
+  color: #777;
+  padding: 2px 23px 0px;
+}
+#group_create_title, #group_create_desc {
+  width: 360px;
+}
+.groups_about_public {
+  font-size: 0.9em;
+  color: #777;
+  padding-top: 10px;
+}
+.groups_search_focused .group_row_highlight {
+  background: #E1E7ED;
+  border-bottom: 1px solid #DAE1E8;
+  padding: 0px 1px 0px;
+  margin: 0px -1px;
+  *padding: 0px;
+  *margin: 0px;
+}
+.group_full_private {
+  font-size: 1.09em;
+  padding: 140px 20px 200px;
+  text-align: center;
+  width: 567px;
+}
+
+.public_contacts_list {
+  padding: 7px 5px 5px;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  height: 298px;
+  width: 455px;
+}
+.public_contacts_list_header {
+  border-bottom: 1px solid rgb(218, 225, 232);
+  margin: 0pt 5px 4px;
+  padding: 5px 0pt 2px;
+  width: 430px;
+}
+.public_contacts_list .row {
+  padding: 6px;
+  width: 50px;
+}
+.public_contacts_list .info {
+  padding: 6px 5px;
+  width: 240px;
+}
+.public_contacts_list .info_wide {
+  padding: 6px 5px;
+  width: 350px;
+}
+.public_contacts_list .actions {
+  width: 120px;
+  padding: 8px 0;
+}
+.public_contacts_list .edit_actions {
+  width: 120px;
+}
+.public_contacts_list .name a {
+  font-size: 1.09em;
+  color: #2B587A;
+  font-weight: bold;
+  padding-bottom: 5px;
+}
+.public_contacts_list .name span {
+  font-weight: bold;
+  font-size: 1.09em;
+  padding-bottom: 5px;
+  color: #777777;
+}
+.public_contacts_list .image {
+  height: 50px;
+  width: 50px;
+  overflow: hidden;
+}
+.public_contacts_list h2 {
+  border: 0;
+}
+.public_contacts_list .cell {
+  width: 435px;
+  border-bottom: 1px solid #E6EAED;
+}
+.public_contacts_list .desc {
+  padding: 4px 2px 0;
+}
+.public_contacts_list .extra_info {
+  padding: 4px 2px 0;
+  color: #777777;
+  line-height: 150%;
+}
+.public_contacts_list .extra_info a {
+  color: #777777;
+}
+.public_contacts_list .extra_info span {
+  background: url(/images/icons/info_icons.gif) no-repeat 0 0;
+  padding: 0 8px 0 13px;
+}
+.public_contacts_list .extra_info .info_phone {
+  background-position: 0 -18px;
+  padding-left: 9px;
+}
+.public_no_contacts {
+  padding: 145px 5px 5px;
+  height: 140px;
+  text-align: center;
+  font-size: 1.09em;
+  color:gray;
+}
+
+
+#group_like_module .like_link_state {
+  width: 180px;
+}
+#group_like_module #group_subscribe.like_link_state {
+  padding: 6px 0px 8px;
+}
+#group_like_module .like_link_state .subscribe_button_wrap {
+  padding: 3px 30px 14px;
+}
+#group_like_module .like_link_state .desc {
+  padding-bottom: 13px;
+}
+#group_like_module .like_link_state .desc .share_event_link {
+  padding-top: 1px;
+}
+#group_like_module .group_friends_count {
+  text-align: center;
+}
+#group_decline_past_event, #group_restore_past_event {
+  padding-top: 8px;
+}
+.group_event_took_place {
+  padding-bottom: 5px;
+}
+.group_user_invited {
+  padding: 2px 0 11px;
+  text-align: center;
+}
+
+
+#public_contact_memlink_tip {
+  color: #777;
+  padding: 3px 0;
+  font-size: 0.9em;
+}
+.public_edit_contact_info h2 {
+  margin: 0 0 10px 10px;
+}
+.public_edit_contact_info .label {
+  padding: 3px 10px 2px;
+  width: 70px;
+  clear: both;
+  color: #777;
+}
+.public_edit_contact_info .labeled_text {
+  padding: 3px 0px 10px;
+  width: 190px;
+}
+.public_edit_contact_info .labeled {
+  padding: 0px 0px 5px;
+  width: 190px;
+  overflow: hidden;
+}
+.public_edit_contact_info .labeled .text {
+  width: 182px;
+}
+
+.gle_block {
+  width: 190px;
+  overflow: hidden;
+  padding: 10px 0px;
+}
+.gle_table {
+  width: 190px;
+}
+.gle_td {
+  vertical-align: top;
+}
+.gle_thumb {
+  display: block;
+  width: 50px;
+  height: 50px;
+  overflow: hidden;
+}
+.gle_img {
+  width: 50px;
+  vertical-align: top;
+}
+.gle_row {
+  padding: 1px 0px 2px;
+  margin: 0px 8px;
+  width: 124px;
+  white-space: nowrap;
+  height: 13px;
+  overflow: hidden;
+  -o-text-overflow: ellipsis;
+  text-overflow: ellipsis;
+}
+.gle_date, .gle_place {
+  color: #777;
+}
+.gl_events_msg_hide {
+  padding: 15px 0px 3px;
+}
+div.gl_summary_short {
+  padding: 13px 0px 0px;
+  margin: 0px 10px;
+}
+.gle_list {
+  padding: 0px 10px;
+}
+#gle_list_more_lnk {
+  display: block;
+  background: #EFF1F3;
+  margin: 0px 10px 10px;
+  padding: 10px;
+  text-align: center;
+  color: #738392;
+}
+#gle_list_more_lnk:hover {
+  background: #E9EDF1;
+  text-decoration: none;
+}
+#gle_list_more {
+  display: none;
+}
+
+.group_share_club {
+  text-decoration: none;
+  width: 11px;
+  height: 13px;
+  background: url(/images/icons/mono_iconset.gif?8) no-repeat 0px -192px;
+  cursor: pointer;
+  margin: 3px 5px 0px;
+}
+#group_share_progress, #group_unshare_progress {
+  height: 17px;
+}
+.groups_list_search_summary {
+  padding: 8px 0px 0px;
+}
+.groups_list_last_row {
+  border-bottom: none;
+}
+#groups_loading {
+  background: url('/images/upload.gif') center center no-repeat;
+  width: 32px;
+  height: 9px;
+  margin: 7px 0px 0px 572px;
+  z-index: 95;
+  position: absolute;
+  display: none;
+}
+#groups_reset_search {
+  margin: 1px 0px 0px 586px;
+  display: none;
+  cursor: pointer;
+  background: transparent url(/images/icons/input_clear.gif) 6px 6px no-repeat;
+  padding: 2px;
+  width: 19px;
+  height: 19px;
+  opacity: 0.6;
+  filter: alpha(opacity=60);
+  position: absolute;
+  z-index: 95;
+}
+#groups_list_search_cont {
+  display: none;
+}
+.groups_row_type {
+  color: #777;
+  /*margin-left: 8px;*/
+  display: block;
+  padding-top: 4px;
+}
+.groups_inv_more {
+  display: none;
+}
+.groups_inv_showmore {
+  display: block;
+  padding: 10px 0px;
+  margin: 0px;
+  border-top: 1px solid #DAE1E8;
+  text-align: center;
+}
+.groups_inv_showmore:hover {
+  background: #E1E7ED;
+  text-decoration: none;
+}
+.gle_invites_list {
+  padding: 0px 10px;
+}
+.groups_inv_last_row {
+  border-bottom: none;
+  padding-bottom: 0px;
+}
+.groups_inv_info {
+  width: 540px;
+  padding-left: 10px;
+}
+.groups_inv_info_l {
+  color: #777777;
+  margin-left: 8px;
+}
+.groups_inv_cont {
+  background: #F7F7F7;
+  padding: 10px;
+  margin: 8px 0px 0px 0px;
+}
+.groups_row_inv_info {
+  padding-left: 10px;
+  width: 410px;
+}
+.group_inv_status {
+  margin-top: 2px;
+  color: #777777;
+}
+.groups_acted_text {
+  padding: 0px 0px 4px;
+}
+.gle_summary_progress {
+  display: none;
+}
+#gle_invites_more {
+  display: none;
+}
+.group_inv_event_time {
+  padding: 2px 0px 4px;
+}
+.groups_row_img {
+  width: 100px;
+}
+.gle_invites_actions {
+  margin: 0px 0px 14px;
+  text-align: center;
+  background: #F7F7F7;
+  padding: 8px;
+}
+
+div.gtop_message {
+  margin: 0 0 10px 0;
+  padding: 8px 13px;
+  border: none;
+  background-color: #F0F2F5;
+}
+.gtop_mesage_buttons {
+  padding: 10px 0px 3px;
+}
+.gtop_mesage_buttons a {
+  margin: 6px 0 0 20px;
+}

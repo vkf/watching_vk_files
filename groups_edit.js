@@ -833,12 +833,8 @@ var GroupsEdit = {
       extend(params, GroupsEdit.getFields(
         'wall', 'photos', 'video', 'audio', 'docs', 'topics', 'wiki', 'access'
       ));
-      if (cur.cls == 0) {
-        extend(params, {
-          category: cur.categoryDD.val(),
-          subcategory: cur.subcategoryDD.val()
-        });
-      } else if (cur.cls == 2) {
+      params.subject = cur.subjectDD.val();
+      if (cur.cls == 2) {
         extend(params, {
           start_date: val('group_start_date'),
           finish_date: isVisible('group_edit_finish_time') ? val('group_finish_date') : 0,
@@ -922,32 +918,22 @@ var GroupsEdit = {
       privacy: cur.privacy || {},
       cls: selData.cls
     });
-    if (cur.cls == 0) {
+    if (cur.cls == 0 || cur.cls == 2) {
       extend(cur, {
-        categoryDD: new Dropdown(ge('group_category'), selData.categories, {
-          width: 186,
+        subjectDD: new Dropdown(ge('group_subject'), selData.subjects, {
+          width: cur.cls == 2 ? 266 : 186,
           multiselect: false,
-          autocomplete: false,
-          onChange: function(val) {
-            val = intval(val);
-            if (val) {
-              cur.subcategoryDD.setOptions({defaultItems: selData.subcategories[val]});
-              cur.subcategoryDD.val(0);
-              GroupsEdit.show(ge('group_edit_subcategory'));
-            } else {
-              GroupsEdit.hide(ge('group_edit_subcategory'));
-            }
-          }
-        }),
-        subcategoryDD: new Dropdown(ge('group_subcategory'), selData.subcategories[selData.category || 0] || [], {
-          width: 186,
-          multiselect: false,
-          autocomplete: false
+          autocomplete: true,
+          introText: getLang('groups_start_typing_subject'),
+          noResult: '',
+          placeholder: getLang('groups_choose_subject')
         })
       });
-      cur.categoryDD.val(selData.category, true);
-      cur.subcategoryDD.val(selData.subcategory);
-    } else if (cur.cls == 1) {
+      if (selData.subject && selData.subject != '0') {
+        cur.subjectDD.val(selData.subject);
+      }
+    }
+    if (cur.cls == 1) {
       extend(cur, {
         pcategoryDD: new Dropdown(ge('public_type'), selData.pcategories, {
           width: 266,
@@ -1003,12 +989,12 @@ var GroupsEdit = {
 
     cur.destroy.push(function(c) {
       if (c.cls == 0) {
-        c.categoryDD.destroy();
-        c.subcategoryDD.destroy();
+        c.subjectDD.destroy();
       } else if (c.cls == 1) {
         c.pcategoryDD.destroy();
         c.psubcategoryDD.destroy();
       } else if (c.cls == 2) {
+        c.subjectDD.destroy();
         if (c.hostDD) c.hostDD.destroy();
       }
     });

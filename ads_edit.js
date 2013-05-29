@@ -3491,9 +3491,9 @@ AdsTargetingEditor.prototype.updateUiCriterionEnabled = function(criterionName) 
   }
 }
 
-AdsTargetingEditor.prototype.getUiCriterionVisibility = function(criterionName, useValue) {
+AdsTargetingEditor.prototype.getUiCriterionVisibility = function(criterionName, checkCriterionValue) {
 
-  useValue = !!useValue;
+  checkCriterionValue = !!checkCriterionValue;
 
   var allowed = !!(!('allowed' in this.criteria[criterionName]) || this.criteria[criterionName].allowed);
   var visible = null;
@@ -3506,7 +3506,7 @@ AdsTargetingEditor.prototype.getUiCriterionVisibility = function(criterionName, 
       break;
     case 'pays_money':
       var viewParams = this.viewEditor.getParams();
-      allowed = !!(allowed && viewParams.link_type == 4);
+      allowed = !!(allowed && (this.criteria[criterionName].allowed_any || viewParams.link_type == 4));
       visible = !!(this.criteria[criterionName].value);
       break;
     case 'retargeting_groups':
@@ -3517,7 +3517,7 @@ AdsTargetingEditor.prototype.getUiCriterionVisibility = function(criterionName, 
       break;
   }
 
-  if (useValue) {
+  if (checkCriterionValue) {
     visible = (allowed || visible)
   } else {
     visible = allowed;

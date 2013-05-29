@@ -308,7 +308,16 @@ td.apps_edit_header {
 .app_cur_status {
   padding: 15px;
   line-height: 160%;
+}
+#apps_comment_form {
+  padding: 0px 15px 15px;
   border-bottom: 1px solid #DAE1E8;
+}
+#apps_comment_form .checkbox {
+  margin: 16px 0px 0px 10px;
+}
+.is_rtl1 #apps_comment_form .checkbox {
+  margin: 16px 10px 0px 0px;
 }
 .app_checks_summary {
   border-bottom: 1px solid #DAE1E8;
@@ -319,6 +328,9 @@ td.apps_edit_header {
 .app_comment {
   padding: 10px 0;
   border-bottom: 1px solid #DAE1E8;
+}
+.app_comment:last-child {
+  border-bottom: 0px;
 }
 .app_comment .image {
   width: 50px;
@@ -351,11 +363,11 @@ td.apps_edit_header {
   background-position: 0 -42px;
 }
 .app_comment .info {
-  padding-left: 8px;
+  padding-left: 14px;
   vertical-align: top;
 }
 .app_comment .status {
-  padding-left: 10px;
+  padding-left: 14px;
   color: #555555;
   vertical-align: top;
 }
@@ -376,7 +388,6 @@ td.apps_edit_header {
   margin: 3px 5px;
   display: none;
 }
-
 
 .apps_edit_table .text_small {
   width: 50px;
@@ -1494,4 +1505,44 @@ div.apps_edit_dd .selector_container td.selector_dropdown {
   padding: 10px;
   text-align: center;
   color: #777777;
+}
+.apps_edit_checks_label {
+  color: #45688E;
+  line-height: 1.27em;
+  margin: 0px;
+  padding: 8px 0px 9px;
+  font-size: 1.09em;
+  font-weight: bold;
+}
+.apps_edit_check_link {
+  padding-top: 10px;
+}
+.apps_edit_textarea {
+  width: 589px;
+  height: 50px;
+}
+.apps_edit_more {
+  display: block;
+  background: #EFF1F3;
+  padding: 10px;
+  text-align: center;
+  color: #738392;
+}
+.apps_edit_more:hover {
+  text-decoration: none;
+  background: #E9EDF1;
+}
+.apps_edit_more_prg {
+  margin: 0px auto;
+}
+#apps_sms_saved {
+  padding-top: 15px;
+  color: #777;
+  opacity: 0;
+}
+.app_text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-wrap: break-word;
+  max-width: 530px;
 }

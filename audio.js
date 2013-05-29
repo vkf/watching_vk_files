@@ -460,6 +460,7 @@ var Audio = {
     if (l && parseInt(l.value)) query.lyrics = 1;
     if (s) query.sort = s.value;
     if (cur.autoComplete) query.autocomplete = cur.autoComplete;
+    if (nav.objLoc.claim) query.claim = nav.objLoc.claim;
     ajax.post(Audio.address, query, {onDone: function(res, preload, options) {
         removeClass(cur.searchCont, 'loading');
         var newVal = cur.searchStr;

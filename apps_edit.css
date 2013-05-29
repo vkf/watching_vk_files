@@ -295,6 +295,9 @@ td.apps_edit_header {
   line-height: 160%;
   margin: 0 -5px;
 }
+.app_cur_status .app_info_msg {
+  margin: 0;
+}
 .app_info_msg.check {
   background-color: #FFFFFF;
 }

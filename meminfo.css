@@ -231,4 +231,12 @@ table.history .cur_session {
   display: none;
 }
 
+#mi_interests_table td {
+  padding: 3px 0;
+}
+.mi_interest_bar {
+  background-color: #DAE2E8;
+  height: 16px;
+}
+
 

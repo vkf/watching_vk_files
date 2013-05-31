@@ -719,6 +719,16 @@ td.apps_edit_header {
   -webkit-border-radius: 3px;
   margin: 0 auto;
 }
+.apps_edit_img_box_wrap {
+  background: #edf2f5;
+  text-align: center;
+  width: 275px;
+  padding: 22px 0px 23px;
+  border-radius: 3px;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  margin: 0 auto;
+}
 
 .apps_edit_old_wrap {
   background: #edf2f5;

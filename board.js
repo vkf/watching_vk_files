@@ -232,7 +232,7 @@ var Board = {
     if (count >= 10) {
       return setTimeout(elfocus.pbind(cur.addField), 0);
     }
-    var insert = replaceEntities(cur.names[mid].replace('%s', 'post' + post)), pos;
+    var insert = replaceEntities(cur.names[mid].replace('{post_id}', 'post' + post)), pos;
     if (document.selection) {
       var range = document.selection.createRange();
       if (range.parentElement() == cur.addField) {

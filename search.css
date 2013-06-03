@@ -1282,3 +1282,8 @@ b.search_mob_onl {
 .search_item_img {
   width: 100px;
 }
+.search_inline_edit, .search_inline_edit:hover {
+  border-bottom: 1px dashed #2B587A;
+  cursor: pointer;
+  text-decoration: none;
+}

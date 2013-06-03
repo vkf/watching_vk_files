@@ -958,8 +958,11 @@ td.apps_edit_info_save {
 .apps_edit_to_new_btn {
   padding: 14px 0px 4px;
 }
-.apps_edit_new_len_info {
-  margin: 10px 0px 0px 0px
+.apps_edit_start_label {
+  padding: 4px 10px 0px 0px;
+}
+.is_rtl1 .apps_edit_start_label {
+  padding: 4px 0px 0px 10px;
 }
 
 #app_edit_cont.app_edit_ads {

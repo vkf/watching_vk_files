@@ -467,6 +467,9 @@ initUpload: function(cont, opts, lang, resObj) {
       if (cur.editLang) {
         params['edit_lang'] = cur.editLang;
       }
+      if (opts.errorObj == 'apps_banner_error') {
+        hide('apps_banner_update');
+      }
       ajax.post('editapp', extend(obj, params), {
         onDone: function(result, data) {
           if (opts['success_callback']) {

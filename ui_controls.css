@@ -422,6 +422,7 @@ a.dd_link,
   z-index: 1500;
   cursor: pointer;
   _margin-left: 1px;
+  z-index: 20;
 }
 .dd_menu_header div {
   color: #FFFFFF;
@@ -612,8 +613,30 @@ div.box_dark .result_list ul li.first.active {
 div.box_dark .selector input {
   padding: 0px!important;
 }
+.dd_menu_body {
+  -webkit-box-shadow: 0 3px 4px rgba(0, 0, 0, 0.3);
+  -moz-box-shadow: 0 3px 4px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 3px 4px rgba(0, 0, 0, 0.3);
+  z-index: 10;
+}
 .dd_cont_shown {
-  -webkit-box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-  -moz-box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  -webkit-box-shadow: 0 1px 5px rgba(0, 0, 0, 0.3);
+  -moz-box-shadow: 0 1px 5px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.3);
+}
+.dd_up .dd_menu_body {
+  position: absolute;
+  -webkit-box-shadow: 0 0px 5px rgba(0, 0, 0, 0.3);
+  -moz-box-shadow: 0 0px 5px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 0px 5px rgba(0, 0, 0, 0.3);
+}
+.dd_cont_shown.dd_up {
+  position: absolute;
+  -webkit-box-shadow: 0 0px 5px rgba(0, 0, 0, 0.3);
+  -moz-box-shadow: 0 0px 5px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 0px 5px rgba(0, 0, 0, 0.3);
+}
+.dd_cont_shown .dd_menu_header {
+  position: relative;
+  z-index: 20;
 }

@@ -2316,7 +2316,7 @@ createChildClass('DropdownMenu', UiControl, {
     }
     if (this.visible && this.menuToUp()){
       var bh = getSize(this.body)[1];
-      this.body.style.top = -bh+3+'px';
+      this.body.style.top = -bh+0+'px';
       addClass(this.container, 'dd_up');
     }
   },
@@ -2411,7 +2411,7 @@ createChildClass('DropdownMenu', UiControl, {
     // Set menu coordinates
     if (this.menuToUp()) {
       var bh = getSize(this.body)[1];
-      this.body.style.top = -bh+3+'px';
+      this.body.style.top = -bh+0+'px';
       addClass(this.container, 'dd_up');
     } else {
       var hh = getSize(this.header)[1];

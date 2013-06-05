@@ -1100,7 +1100,7 @@ var Apps = { // can be removed soon
         target: ddAppsCont,
         value: 0,
         fadeSpeed: 0,
-        containerClass: 'apps_summary_dd',
+        containerClass: 'apps_summary_dd dd_dark',
         onSelect: function(ev) {
           var ind = ev.target.index;
           return Apps.switchType(ind);

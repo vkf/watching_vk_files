@@ -2206,7 +2206,7 @@ createChildClass('DropdownMenu', UiControl, {
 
     this.body = ce('div', {
       className: 'dd_menu_body',
-      innerHTML: '<div class="dd_menu_shad_t2"></div><div class="dd_menu_shad_t"></div><div id="dd_rows_'+this.guid+'" class="dd_menu_rows"></div>'
+      innerHTML: '<table cellspacing="0" cellpadding="0"><tbody><tr><td class="dd_menu_shad_l"><div></div></td><td><div class="dd_menu_shad_t2"></div><div class="dd_menu_shad_t"></div><div id="dd_rows_'+this.guid+'" class="dd_menu_rows"></div><div class="dd_menu_shad_b"></div><div class="dd_menu_shad_b2"></div></td><td class="dd_menu_shad_r"><div> </div></td></tr></tbody></table>'
     });
 
     this.container.appendChild(this.header);
@@ -2289,7 +2289,7 @@ createChildClass('DropdownMenu', UiControl, {
     var headerWidth = getSize(this.header)[0];
     var bodyWidth = getSize(this.body)[0];
     if (headerWidth > bodyWidth){
-      setStyle(this.rows, 'width', (headerWidth) + 'px');
+      setStyle(this.rows, 'width', (headerWidth - 2) + 'px');
     }
 
     bodyWidth = getSize(this.body)[0];
@@ -2316,7 +2316,7 @@ createChildClass('DropdownMenu', UiControl, {
     }
     if (this.visible && this.menuToUp()){
       var bh = getSize(this.body)[1];
-      this.body.style.top = -bh+0+'px';
+      this.body.style.top = -bh+3+'px';
       addClass(this.container, 'dd_up');
     }
   },
@@ -2388,8 +2388,6 @@ createChildClass('DropdownMenu', UiControl, {
     if (fade || !this.options.showHover) hide(this.header);
     else addClass(this.header, 'dd_header_hover');
     hide(this.body);
-
-    removeClass(this.container, 'dd_cont_shown');
     if (this.options.onHide) this.options.onHide();
   },
 
@@ -2403,7 +2401,6 @@ createChildClass('DropdownMenu', UiControl, {
     clearTimeout(this.mouseTimer);
     show(this.header);
     show(this.body);
-    addClass(this.container, 'dd_cont_shown');
     if (this.options.showHover) removeClass(this.header, 'dd_header_hover');
 
     this.visible = true;
@@ -2411,7 +2408,7 @@ createChildClass('DropdownMenu', UiControl, {
     // Set menu coordinates
     if (this.menuToUp()) {
       var bh = getSize(this.body)[1];
-      this.body.style.top = -bh+0+'px';
+      this.body.style.top = -bh+3+'px';
       addClass(this.container, 'dd_up');
     } else {
       var hh = getSize(this.header)[1];

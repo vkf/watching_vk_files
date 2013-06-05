@@ -689,6 +689,13 @@ a:hover #head_play_btn.playing.down.over {
 .head_nav a.top_nav_link span {
   color: #FFF;
 }
+.head_nav a.top_nav_link span#head_music_text {
+  color: #E8EFF7;
+}
+.head_nav a.top_nav_link:hover span#head_music_text,
+.head_nav a.top_nav_link.over span#head_music_text {
+  color: #FFF;
+}
 
 #page_body {
   font-size: 11px;

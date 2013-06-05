@@ -138,13 +138,10 @@ var searcher = {
         }
         if (changeSection) {
           filters_el.innerHTML = filters || '';
-          if (ge('side_ads_wrap')) {
-            ge('side_ads_wrap').innerHTML = ads || '';
-          } else {
-            val('left_ads', ads || '');
-            toggle('left_ads', !!ads);
-          }
           ge('search_query').focus();
+        }
+        if (changeSection || ads) {
+          __adsSet(ads);
         }
         searcher.applyOptions(options, changeSection);
         if (changeSection && ge('search_section_tabs')) {
@@ -432,12 +429,6 @@ var searcher = {
       // Decomment
       // disableAutoMore: true,
     });
-    if (ge('side_ads')) {
-      clearTimeout(cur.hideAdTimeout);
-      cur.hideAdTimeout = setTimeout(function() {
-        hide('left_ads');
-      }, 500);
-    }
     var hist_len = globalHistory.length;
     if (hist_len && globalHistory[hist_len - 1] && globalHistory[hist_len - 1].loc.indexOf('search')) {
       cur.search_return_to = globalHistory[hist_len - 1].loc;
@@ -521,7 +512,6 @@ var searcher = {
       text: getLang('search_back_to'),
       show: [function () {
         hide('header');
-        if (ge('side_ads')) hide('left_ads');
         var hist_len = globalHistory.length;
         if (hist_len && globalHistory[hist_len - 1] && globalHistory[hist_len - 1].loc.indexOf('search')) {
           cur.search_return_to = globalHistory[hist_len - 1].loc;
@@ -534,8 +524,6 @@ var searcher = {
         }
       }],
       hide: [function () {
-        clearTimeout(cur.hideAdTimeout);
-        show('left_ads');
         removeEvent(searcher.scrollnode, 'scroll', searcher.scrollCheck);
         removeEvent(window, 'resize', searcher.onResize);
         iSearch.destroy();

@@ -362,7 +362,8 @@
 .is_2x #im_media_preview .im_x,
 .is_2x #im_media_dpreview .im_x,
 .is_2x #im_media_mpreview .im_x,
-.is_2x .owner_photo_bubble_delete {
+.is_2x .owner_photo_bubble_delete,
+.is_2x .app_delete_el {
   background-image: url(/images/notifier_close_2x.png);
   background-size: 7px 7px;
 }
@@ -532,9 +533,9 @@
   background-image: url(/images/typing_2x.gif?1);
   background-size: 15px 11px;
 }
-.is_2x .apps_featured_slide {
-  background-image: url(/images/pics/apps_slide_2x.png);
-  background-size: 6px 15px;
+.is_2x .apps_featured_icon {
+  background-image: url(/images/icons/apps_featured_arrow_2x.png);
+  background-size: 26px 21px;
 }
 .is_2x .page_doc_icon,
 .is_2x .docs_item_icon,
@@ -824,4 +825,14 @@
 .is_2x .olympics_bar_img.sochi {
   background-image: url(/images/sochi2014_2x.png);
   background-size: 50px 33px;
+}
+.is_2x .app_new_sticker {
+  background-image: url(/images/icons/new_app_en_2x.png);
+  background-size: 60px 60px;
+}
+.is_2x .apps_sticker_ru {
+  background-image: url(/images/icons/new_app_ru_2x.png);
+}
+.is_2x .apps_sticker_ua {
+  background-image: url(/images/icons/new_app_ua_2x.png);
 }

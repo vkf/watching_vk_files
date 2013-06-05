@@ -2206,7 +2206,7 @@ createChildClass('DropdownMenu', UiControl, {
 
     this.body = ce('div', {
       className: 'dd_menu_body',
-      innerHTML: '<table cellspacing="0" cellpadding="0"><tbody><tr><td class="dd_menu_shad_l"><div></div></td><td><div class="dd_menu_shad_t2"></div><div class="dd_menu_shad_t"></div><div id="dd_rows_'+this.guid+'" class="dd_menu_rows"></div><div class="dd_menu_shad_b"></div><div class="dd_menu_shad_b2"></div></td><td class="dd_menu_shad_r"><div> </div></td></tr></tbody></table>'
+      innerHTML: '<div class="dd_menu_shad_t2"></div><div class="dd_menu_shad_t"></div><div id="dd_rows_'+this.guid+'" class="dd_menu_rows"></div>'
     });
 
     this.container.appendChild(this.header);
@@ -2289,7 +2289,7 @@ createChildClass('DropdownMenu', UiControl, {
     var headerWidth = getSize(this.header)[0];
     var bodyWidth = getSize(this.body)[0];
     if (headerWidth > bodyWidth){
-      setStyle(this.rows, 'width', (headerWidth - 2) + 'px');
+      setStyle(this.rows, 'width', (headerWidth) + 'px');
     }
 
     bodyWidth = getSize(this.body)[0];
@@ -2388,6 +2388,8 @@ createChildClass('DropdownMenu', UiControl, {
     if (fade || !this.options.showHover) hide(this.header);
     else addClass(this.header, 'dd_header_hover');
     hide(this.body);
+
+    removeClass(this.container, 'dd_cont_shown');
     if (this.options.onHide) this.options.onHide();
   },
 
@@ -2401,6 +2403,7 @@ createChildClass('DropdownMenu', UiControl, {
     clearTimeout(this.mouseTimer);
     show(this.header);
     show(this.body);
+    addClass(this.container, 'dd_cont_shown');
     if (this.options.showHover) removeClass(this.header, 'dd_header_hover');
 
     this.visible = true;

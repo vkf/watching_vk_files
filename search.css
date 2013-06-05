@@ -158,12 +158,6 @@ table.search_table {
   background: url('/images/icons/wall_fixed_more_arrows.gif') 1px 2px no-repeat;
 }
 
-/* Filters */
-#side_ads {
-  border-top: 1px solid #DAE2E8;
-  margin-top: 10px;
-  padding: 0 15px;
-}
 #filters .filter_open {
  background: url(/images/filterset_on.gif) 8px 8px no-repeat;
 }
@@ -1286,4 +1280,8 @@ b.search_mob_onl {
   border-bottom: 1px dashed #2B587A;
   cursor: pointer;
   text-decoration: none;
+}
+.search_inline_label {
+  padding: 10px 0 5px 0;
+  color: #777;
 }

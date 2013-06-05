@@ -418,28 +418,24 @@ a.dd_link,
    z-index: 1500;
 }
 .dd_menu_header {
-  border: 1px solid #3B6798;
-  position: absolute;
+  border: 1px solid #6D8FB3;
   z-index: 1500;
   cursor: pointer;
   _margin-left: 1px;
 }
 .dd_menu_header div {
-  border-color: #7E9CBC #5C82AB #6D8FB3;
-  border-style: solid;
-  border-width: 1px;
   color: #FFFFFF;
-  padding: 2px 5px;
+  padding: 3px 6px;
   white-space: nowrap;
   padding-right: 17px;
   line-height: 1.27em;
   *line-height: 1.18em;
   *padding-right: 16px;
-  background: #6D8FB3 url(/images/flydead.gif) no-repeat right -15px;
+  background: #6D8FB3 url(/images/flydead.gif) no-repeat right -14px;
   *background-position: -14px right;
 }
 .dd_menu_header.leftArrow div {
-  background: #6D8FB3 url(/images/flydead.gif) no-repeat 1px -15px;
+  background: #6D8FB3 url(/images/flydead.gif) no-repeat 1px -14px;
   padding-right: 5px;
   padding-left: 16px;
   *background-position: 14px left;
@@ -450,7 +446,7 @@ a.dd_link,
   filter: alpha(opacity=60);
 }
 .dd_header_hover div {
-  background: #DAE1E8 url(/images/flydead.gif) no-repeat right 3px;
+  background: #DAE1E8 url(/images/flydead.gif) no-repeat right 4px;
   *background-position: 4px right;
   color: #2B587A;
   border-color: #DAE1E8;
@@ -459,13 +455,9 @@ x:-moz-any-link {
   padding-top: 1px;
 }
 .dd_menu_body {
-  position: absolute;
   z-index: 1499;
-  margin-left: -1px;
-  _margin-left: 0px;
 }
 .dd_menu_rows {
-  border: 1px solid #96AABE;
   margin: 0;
   background: #FFFFFF;
   position: relative;
@@ -493,32 +485,6 @@ x:-moz-any-link {
   -webkit-column-gap: 0;
   break-inside: avoid;
   -webkit-column-break-inside: avoid;
-}
-.dd_menu_shad_l div,
-.dd_menu_shad_r div {
-  width: 1px
-}
-.dd_menu_shad_l {
-  background: #000000;
-  filter: alpha(opacity=6);
-  opacity: 0.06;
-  overflow: hidden;
-  width: 1px;
-}
-.dd_menu_shad_b,
-.dd_menu_shad_b2 {
-  background: #000000;
-  height: 2px;
-  margin-top: -1px;
-  filter: alpha(opacity=7);
-  opacity: 0.07;
-  overflow: hidden;
-  position: relative;
-  z-index: 148;
-}
-.dd_menu_shad_b2 {
-  filter: alpha(opacity=5);
-  opacity: 0.05;
 }
 .dd_menu_shad_r {
   background: #000000;
@@ -645,4 +611,9 @@ div.box_dark .result_list ul li.first.active {
 }
 div.box_dark .selector input {
   padding: 0px!important;
+}
+.dd_cont_shown {
+  -webkit-box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  -moz-box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
 }

@@ -687,7 +687,7 @@ var IM = {
     });
     cur.imSortedMedias[peer] = res;
   },
-  emojiRegEx: /([\uE000-\uF8FF\u270A-\u2764\u2122\u25C0\u25FB-\u25FE\u263a\u2648-\u2653\u2660-\u2668\u267B\u267F\u2693\u261d\u26A0-\u26FA\u2708]|\uD83C[\uDD00-\uDFFF]|[\u2600\u26C4\u26BE\u23F3\u2764]|\uD83D[\uDC00-\uDFFF]|\uD83C[\uDDE8-\uDDFA]\uD83C[\uDDEA-\uDDFA])/g,
+  emojiRegEx: /([\uE000-\uF8FF\u270A-\u2764\u2122\u25C0\u25FB-\u25FE\u2615\u263a\u2648-\u2653\u2660-\u2668\u267B\u267F\u2693\u261d\u26A0-\u26FA\u2708]|\uD83C[\uDC00-\uDFFF]|[\u2600\u26C4\u26BE\u23F3\u2764]|\uD83D[\uDC00-\uDFFF]|\uD83C[\uDDE8-\uDDFA]\uD83C[\uDDEA-\uDDFA])/g,
   getPlainText: function() {
     var txt = IM.editableVal(ge('im_editable' + cur.peer));
     txt = txt.replace(IM.emojiRegEx, '');

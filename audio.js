@@ -376,8 +376,8 @@ var Audio = {
       for (i in audios) {
         var audio = audios[i].slice();
         if (cur.selection) {
-          audio[5] = audio[5].replace(cur.selection.re, cur.selection.val);
-          audio[6] = audio[6].replace(cur.selection.re, cur.selection.val);
+          audio[5] = audio[5].replace(cur.selection.re, cur.selection.val).replace(/&#(\d*)<span>(\d+)<\/span>(\d*);/g, "&#$1$2$3;");
+          audio[6] = audio[6].replace(cur.selection.re, cur.selection.val).replace(/&#(\d*)<span>(\d+)<\/span>(\d*);/g, "&#$1$2$3;");
         }
         html.push(this.drawAudio(audio));
         cur.shownAudios += 1;

@@ -422,7 +422,7 @@ var vkApp = function(cont, options, params, onInit) {
     },
     setTitle: function(text) {
       if (self.inlineApp) return;
-      text.replace(/[<>]+/gi, '');
+      text = text.replace(/[<>]+/gi, '');
       document.title = getLang('global_vkontakte')  + (text ? (' | ' + text) : '');
     },
     resizeWindow: function(width, height) {
@@ -1024,12 +1024,8 @@ var Apps = { // can be removed soon
     if (cur.recJSON) {
       cur.recCount = cur.recJSON.length;
     }
-    // cur.disableAutoMore = true;
-    //cur.aSearch.value = '';
+
     placeholderSetup(cur.aSearch, {back: true});
-    /*if (cur.section == 'catalog') {
-      appsISearch.init(cur.aSearch);
-    }*/
 
     Apps.scrollnode = browser.msie6 ? pageNode : window;
     window.scrollTop = bodyNode.scrollTop = pageNode.scrollTop = htmlNode.scrollTop = 0;
@@ -1098,6 +1094,19 @@ var Apps = { // can be removed soon
       Apps.setScores();
     }
     cur.feedHideEls = [];
+    var ddAppsCont = ge('apps_cat_summary_type');
+    if (ddAppsCont) {
+      cur.appsTypeDD = new DropdownMenu(cur.appsTypes, {
+        target: ddAppsCont,
+        value: 0,
+        fadeSpeed: 0,
+        containerClass: 'apps_summary_dd',
+        onSelect: function(ev) {
+          var ind = ev.target.index;
+          return Apps.switchType(ind);
+        }
+      });
+    }
   },
 
   initUpdates: function(opts) {
@@ -1147,28 +1156,30 @@ var Apps = { // can be removed soon
     var feedCount = feedEls.length;
     var time = 300;
 
-    if (feedCount && appsCount <= feedCount) {
+    if (feedCount && feedCount >= 3) {
       var last = feedEls.pop();
+      debugLog('last', last);
       if (cont && last) {
         cont.removeChild(last);
       }
-      /*setStyle(last, {overflow: 'hidden'});
-      animate(last, {height: 0}, {duration: time - 50, transition: Fx.Transitions.easeOutCubic}, function() {
-      });*/
+      var preLast = feedEls.pop();
+      addClass(preLast, 'apps_feed_last');
       cur.feedHideEls.push(last);
     }
-    //el.style.backgroundColor = '#FEFAE4';
-    //animate(el, {backgroundColor: '#FFF'}, 6000);
+
     var c = ce('div', {className: 'apps_feed_animate_cont'});
     c.appendChild(el);
     addClass(el, 'apps_feed_animate_el');
     cont.insertBefore(c, cont.firstChild);
 
-    animate(c, {height: 40}, {duration: time, transition: Fx.Transitions.easeOutCubic}, function() {
+    animate(c, {height: 51}, {duration: time, transition: Fx.Transitions.easeOutCubic}, function() {
       removeClass(el, 'apps_feed_animate_el');
       cont.insertBefore(el, c);
       re(c);
     });
+    if (window.tooltips) {
+      tooltips.hideAll();
+    }
     //var size = getSize(cont);
     //setStyle(cont, {height: size[1], overflow: 'hidden', });
     cur.el = el;
@@ -1406,13 +1417,16 @@ var Apps = { // can be removed soon
       Apps.showRows(true);
     }
 
-    /*if (isVisible(cur.showRecMore) && st + ch + 400 > cur.showRecMore.offsetTop) {
-      Apps.showMoreRecommendations();
-    }*/
-
     if (isVisible(cur.sShowMore) && st + ch + 400 > cur.sShowMore.offsetTop) {
       Apps.loadRows();
     }
+
+    /*if (cur.moreNewScroll) {
+      var moreNew = ge('app_new_more');
+      if (isVisible(moreNew) && cur.section == 'catalog' && st + ch + 400 > moreNew.offsetTop) {
+        Apps.showMoreNew(moreNew);
+      }
+    }*/
   },
 
   indexAll: function(callback) {
@@ -1778,17 +1792,20 @@ this.loadRows();
     }).bind(this), 300);
   },
 
-  catalogSearch: function(val, offset, callback) {
+  catalogSearch: function(val, offset, opts) {
     if (val[val.length - 1] == ' ') {
       val[val.length - 1] = '_';
     }
+    var opts = opts || {};
     setStyle(cur.clearSearch, {opacity: .6});
     var exclude = [];
-    if (cur.appsList) {
-      var lst = cur.appsList[cur.curList];
-      if (lst) {
-        for (var i in lst) {
-          exclude.push(lst[i][0]);
+    if (val) {
+      if (cur.appsList) {
+        var lst = cur.appsList[cur.curList];
+        if (lst) {
+          for (var i in lst) {
+            exclude.push(lst[i][0]);
+          }
         }
       }
     }
@@ -1809,8 +1826,8 @@ this.loadRows();
     ajax.post(Apps.address, query, {
       onDone: function(res, preload, options) {
         if (cur.module != 'apps') return;
-        if (callback) {
-          callback();
+        if (opts.callback) {
+          opts.callback();
         }
         Apps.hideSummaryProgress();
         var newVal = cur.searchStr;
@@ -1862,16 +1879,19 @@ this.loadRows();
         }
         Apps.scrollCheck();
         delete nav.objLoc.section;
-        nav.setLoc(extend(nav.objLoc, {sort: cur.searchSort, type: cur.searchType, q: val}));
+
+        if (cur.searchSort || nav.objLoc.sort || cur.searchType || nav.objLoc.type || val || nav.objLoc.q) {
+          nav.setLoc(extend(nav.objLoc, {sort: cur.searchSort, type: cur.searchType, q: val}));
+        }
       },
       onFail: function() {
         Apps.hideSummaryProgress();
       },
-      showProgress: function () {
+      showProgress: opts.showProgress || function () {
         cur.isAppsLoading = true;
         addClass(cur.searchCont, 'loading');
       },
-      hideProgress: function () {
+      hideProgress: opts.hideProgress || function () {
         cur.isAppsLoading = false;
         removeClass(cur.searchCont, 'loading');
       },
@@ -2114,11 +2134,11 @@ this.loadRows();
           cur.apps[aid].deleted = true;
           if (cur.section == 'catalog' && force == 2) {
             var row = ge('delete_row' + aid);
-            var new_row = geByClass1('apps_recent_row_hidden', ge('apps_recent_list'));
+            var newRow = geByClass1('apps_recent_row_hidden', ge('apps_recent_list'));
             if (row) {
               row = row.parentNode;
-              animate(new_row, genFx('show', 1), 200, removeClass.pbind(new_row, 'apps_recent_row_hidden'));
-              animate(row, genFx('hide', 1), 200, re.pbind(row));
+              removeClass(newRow, 'apps_recent_row_hidden')
+              hide(row);
             }
             ge('apps_recent_list').appendChild(cf(text));
             if (data) {
@@ -2320,52 +2340,29 @@ this.loadRows();
       //show('apps_submenu_type');
     }
 
-    this.catalogSearch(cur.searchStr, cur.searchOffset, function() {
+    this.catalogSearch(cur.searchStr, cur.searchOffset, {callback: function() {
       hide('submenu_sort');
-    });
+    }});
   },
 
   switchType: function(type, obj) {
     cur.searchType = type;
     cur.searchOffset = 0;
-    //Apps.showSummaryProgress();
-    removeClass(geByClass1('apps_section_act', ge('apps_submenu_type')), 'apps_section_act');
-
-    if (type) {
-      addClass(ge('submenu_apps'), 'apps_section_act');
-      //show('apps_submenu_type');
-    } else {
-      addClass(ge('submenu_games'), 'apps_section_act');
-      //show('apps_submenu_type');
-    }
-
-    removeClass(geByClass1('apps_section_act', ge('apps_submenu_type')), 'apps_section_act');
-
-    /*var custom = ge('submenu_custom');
-    custom.innerHTML = '<img src="/images/upload.gif" />';
-    show(custom);*/
-    show('submenu_type');
-
     if (type > 9) {
       scrollToY(getXY(cur.sContent)[1] - 50, 150);
 
       cur.categoryStr = obj.innerHTML;
-    } else {
-      if (type) {
-        addClass(ge('submenu_apps'), 'apps_section_act');
-      } else {
-        addClass(ge('submenu_games'), 'apps_section_act');
-      }
     }
 
-    this.catalogSearch(cur.searchStr, cur.searchOffset, function() {
-      hide('submenu_type');
-      //if (type > 9) {
-        //custom.innerHTML = cur.categoryStr;
-       // addClass(custom, 'apps_section_act');
-      /*} else {
-        hide(custom)
-      }*/
+    var typeCont = ge('apps_cat_summary');
+    this.catalogSearch(cur.searchStr, cur.searchOffset, {
+      showProgress: function() {
+        debugLog('here', typeCont);
+        addClass(typeCont, 'apps_summary_loading');
+      },
+      hideProgress: function() {
+        removeClass(typeCont, 'apps_summary_loading');
+      }
     });
   },
 
@@ -2539,7 +2536,9 @@ this.loadRows();
 
   rowActive: function(aid, tt) {
     Apps._animDelX(aid, 1, 1);
-    if (tt) showTooltip(ge('delete_row' + aid), {text: tt, showdt: 500, black: 1});
+    if (tt) {
+      showTooltip(ge('delete_row' + aid), {text: tt, showdt: 500, black: 1, shift: [13, 4, 8]});
+    }
   },
   rowInactive: function(aid) {
     Apps._animDelX(aid, 0.5, 0);
@@ -2945,7 +2944,7 @@ this.loadRows();
     });
   },
 
-  featuredSlide: function(ev) {
+  featuredSlide: function(ev, left) {
     if (cur.featuredAnimate) return cancelEvent(ev);
     var cont = ge('apps_featured_inner');
     if (window.curNotifier && curNotifier.idle_manager && curNotifier.idle_manager.is_idle && !(ev && ev.button)) {
@@ -2955,12 +2954,18 @@ this.loadRows();
       clearInterval(cur.featuredInterval);
     }
     cur.featuredAnimate = true;
-    cssAnim(cont, {marginLeft: -581}, {duration: 400, func: 'ease-out'}, function() {
-      for (var i = 0; i<3; i++) {
-        cont.appendChild(cont.firstChild);
-      }
-      cont.style.marginLeft = 0;
-      cur.featuredAnimate = false;
+    if (left) {
+      cont.insertBefore(cont.lastChild, cont.firstChild);
+      cont.style.marginLeft = '-606px';
+    }
+    setTimeout(function() {
+      cssAnim(cont, {marginLeft: left ? 0 : -606}, {duration: 300, func: 'ease-in-out'}, function() {
+        if (!left) {
+          cont.appendChild(cont.firstChild);
+          cont.style.marginLeft = '0px';
+        }
+        cur.featuredAnimate = false;
+      });
     });
     Apps.startFeatured();
     return cancelEvent(ev);
@@ -3170,8 +3175,12 @@ this.loadRows();
       onDone: function(recent, feed, newOffset, feedOffset, showMore) {
         cur.recentOffset = newOffset;
         cur.feedOffset = feedOffset;
-        ge('apps_recent_list').appendChild(cf(recent));
         var feedCont = ge('apps_feed_list');
+        var els = geByClass('apps_feed_last', feedCont);
+        for(var i in els) {
+          removeClass(els[i], 'apps_feed_last');
+        }
+        ge('apps_recent_list').appendChild(cf(recent));
         var nextEl;
         while (nextEl = cur.feedHideEls.pop()) {
           feedCont.appendChild(nextEl);
@@ -3188,6 +3197,65 @@ this.loadRows();
         obj.innerHTML = cur.recentBack;
       }
     });
+  },
+
+  showMoreNew: function(obj) {
+    if (!cur.blockBack) {
+      cur.blockBack = obj.innerHTML;
+    }
+    if (cur.loadingNew) {
+      return false;
+    }
+    if (!cur.shownNew) {
+      cur.shownNew = 1;
+      show('apps_new_hidden');
+    }
+    cur.loadingNew = 1;
+    var onMoreLoaded = function(rows, newOffset, newCount) {
+      cur.newOffset = newOffset;
+      ge('apps_cat_new').appendChild(cf(rows));
+      cur.loadingNew = 0;
+      if (newOffset >= newCount) {
+        hide(obj);
+      }
+      cur.morePreloaded = -1;
+      ajax.post('al_apps.php', {act: 'more_new', offset: cur.newOffset}, {
+        onDone: function(rows, newOffset, newCount) {
+          if (cur.morePreloaded == -2) {
+            onMoreLoaded(rows, newOffset, newCount);
+          } else {
+            cur.morePreloaded = [rows, newOffset, newCount];
+          }
+        },
+        onFail: function() {
+          cur.morePreloaded = false;
+          return true;
+        }
+      });
+    };
+
+    if (cur.morePreloaded) {
+      if (cur.morePreloaded == -1 || cur.morePreloaded == -2) {
+        cur.morePreloaded = -2;
+      } else {
+        onMoreLoaded.apply(onMoreLoaded, cur.morePreloaded);
+      }
+      return;
+    }
+
+    ajax.post('al_apps.php', {act: 'more_new', offset: cur.newOffset}, {
+      onDone: onMoreLoaded,
+      showProgress: function() {
+        obj.innerHTML = '<img src="/images/upload.gif" />';
+      },
+      hideProgress: function() {
+        obj.innerHTML = cur.blockBack;
+      },
+      onFail: function() {
+        cur.loadingNew = 0;
+      }
+    });
+    cur.moreNewScroll = true;
   },
 
   updateOnline: function() {

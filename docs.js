@@ -203,7 +203,7 @@ getDocHTML: function(item) {
   }
   var dateStr = item[3];
   var oid = item[4];
-  var url = '/doc'+oid+'_'+id+'?dl='+cur.hash;
+  var url = '/doc'+oid+'_'+id;
   var actions = '';
 
 
@@ -463,7 +463,7 @@ downloadItem: function(oid, did, event) {
   var href = icon.href;
   var ext = trim(icon.getAttribute('ext'));
   if ('jpg|gif|png|pdf|doc|docx|xls|xlsx|rtf'.indexOf(ext) == -1) {
-    location.href = href+'&wnd=1';
+    location.href = href+(href.match('?') ? '&' : '?')+'wnd=1';
   } else {
     window.open(href);
   }

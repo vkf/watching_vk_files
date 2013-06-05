@@ -566,7 +566,7 @@ var Audio = {
     if (!Audio.fixedScroll || !cur.audioEl) return false;
     var headH = cur.audioEl.head.clientHeight, audioNavH = cur.audioEl.bar.offsetHeight,
         contentY = headH + audioNavH,
-        st = scrollGetY(), wh = window.lastWindowHeight || 0, pos = 0,
+        st = Math.max(0, scrollGetY()), wh = window.lastWindowHeight || 0, pos = 0,
         filt = ge('side_panel'), filtPos = getXY(filt)[1], filtY = getSize(filt)[1],
         sf = ge('side_filters'), sfPos = (getStyle(sf, 'position') == 'fixed') ? parseInt(getStyle(sf, 'top')) : getXY(sf)[1], sfY = getSize(sf)[1],
         bottomPad = Math.max(0, st + wh - filtY - contentY),
@@ -583,7 +583,6 @@ var Audio = {
     cur.filterLastPos = pos;
     cur.lastSt = st;
     setStyle(sf, {top: pos + 'px'});
-
 
     if (!browser.mozilla && !browser.msie && cur.lastWW !== lastWindowWidth) {
       cur.lastWW = lastWindowWidth;

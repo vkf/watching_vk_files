@@ -317,6 +317,7 @@ extend(WkEditor.prototype, {
         this.pbox = this.showBox('al_photos.php', {
           act: 'choose_photo',
           al_wiki_editor: 1,
+          to_id: cur.oid,
           scrollbar_width: window.sbWidth()
         }, {
           stat: ['page.css', 'page.js'],
@@ -329,6 +330,7 @@ extend(WkEditor.prototype, {
         this.vbox = this.showBox('video.php', {
           act: 'a_choose_video_box',
           al_wiki_editor: 1,
+          to_id: cur.oid,
           scrollbar_width: window.sbWidth()
         }, {
           stat: ['page.css', 'page.js'],
@@ -340,6 +342,7 @@ extend(WkEditor.prototype, {
         this.abox = this.showBox('audio.php', {
           act: 'a_choose_audio_box',
           al_wiki_editor: 1,
+          to_id: cur.oid,
           scrollbar_width: window.sbWidth()
         }, {
           stat: ['page.css', 'page.js'],

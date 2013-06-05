@@ -922,6 +922,10 @@ selectTemplate: function(tid) {
       media.chooseMedia(template.attachs[i][0], template.attachs[i][1], template.attachs[i][2]);
     }
   }
+  if (cur.canUseDrafts) {
+    clearTimeout(cur.saveDraftTO);
+    Tickets.saveDraft(cur.ticket_id);
+  }
   return false;
 },
 

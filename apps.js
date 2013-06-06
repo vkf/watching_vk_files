@@ -2965,6 +2965,12 @@ this.loadRows();
           cont.style.marginLeft = '0px';
         }
         cur.featuredAnimate = false;
+        if (cur.needFeaturedStats && scrollGetY() < getXY(ge('apps_featured_wrap'))[1]) {
+          var aid = (cont.firstChild.id || '').replace('featured_app', '');
+          if (aid) {
+            ajax.post('apps', {act: 'a_featured_viewed', aid: aid, hash: cur.featuredHash}, {cache: 1});
+          }
+        }
       });
     });
     Apps.startFeatured();

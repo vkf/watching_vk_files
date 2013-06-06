@@ -814,3 +814,6 @@ textarea.dev_poll_code {
   padding: 6px;
   font-size: 1em;
 }
+.dev_diff {
+  padding: 0px 0px 10px 0px;
+}

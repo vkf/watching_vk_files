@@ -11,7 +11,7 @@ init: function(opts) {
     if (n[0].substr(0, 4) == 'dev/' || (n[0] == 'dev' && n.act) && cur.page) {
       var page = n[0].substr(4);
       if (page) {
-        Dev.switchPage(page, n.edit);
+        Dev.switchPage(page, n.edit, n);
         return false;
       }
     }
@@ -65,7 +65,7 @@ initPage: function(opts) {
 
 },
 
-switchPage: function(page, edit) {
+switchPage: function(page, edit, opts) {
   cur.page = page;
   var pageRaw = page.split('.');
   Dev.switchSection(pageRaw[0], false, true)
@@ -78,13 +78,17 @@ switchPage: function(page, edit) {
   }
 
   var actsCont = ge('dev_page_acts');
-  ajax.post('/dev/'+page, {preload: 1, edit: edit ? 1 : 0}, {
+  var pageOpts = {preload: 1, edit: edit ? 1 : 0};
+  if (opts && opts.translate) {
+    pageOpts.translate = opts.translate;
+  }
+  ajax.post('/dev/'+page, pageOpts, {
     onDone: function(title, text, acts, edit_sections, isPage, opts, js) {
       ge('dev_header_name').innerHTML = title;
       ge('dev_page_cont').innerHTML = text;
       ge('dev_page_acts').innerHTML = acts;
       ge('dev_page_sections').innerHTML = edit_sections;
-      nav.setLoc('dev/'+page+(edit ? '?edit=1' : ''));
+      nav.setLoc('dev/'+page+(edit ? '?edit=1' : '')+(pageOpts.translate ? '&translate='+pageOpts.translate : ''));
       if (isPage) {
         hide('dev_method_narrow');
         show('dev_page_narrow');
@@ -153,6 +157,9 @@ getParamName: function(obj) {
 
 saveDoc: function(hash, btn) {
   var params = {act: 'a_save_page', hash: hash, page: cur.page, type: cur.type};
+  if (nav.objLoc.translate) {
+    params.translate = parseInt(nav.objLoc.translate);
+  }
   var textareas = geByClass('dev_textarea', ge('dev_page'));
   for (var i in textareas) {
     params[Dev.getParamName(textareas[i])] = val(textareas[i]);

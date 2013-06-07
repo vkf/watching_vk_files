@@ -200,8 +200,12 @@
   height: 75px;
   width: 75px;
 }
-.app_subdimage img {
-  border-radius: 5px;
+.app_subdimage .app_img {
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+  width: 75px;
+  height: 75px;
 }
 .app_subicon {
   margin-right: 5px;

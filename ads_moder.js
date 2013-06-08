@@ -612,4 +612,36 @@ AdsModer.cancelClicks = function(webSiteId, day, hash, box) {
   }
 }
 
+AdsModer.historyGet = function(elem, notNavigationParam) {
+  while (elem && elem.nodeName.toLowerCase() !== 'form') {
+    elem = elem.parentNode;
+  }
+  if (!elem) {
+    return;
+  }
+  var values = serializeForm(elem);
+  var params = values.other_params;
+  delete values.other_params;
+  for (var i in values) {
+    if (values[i]) {
+      params = '&' + i + '=' + values[i] + params;
+    }
+  }
+  nav.go('/adsmoder?act=history' + params);
+}
+
+AdsModer.historyToggleFilters = function() {
+  var filtersContainerElem = ge('ads_moder_history');
+  var filtersElems = geByClass('ads_navigation_link', filtersContainerElem);
+  for (var i = 0; elem = filtersElems[i]; i++) {
+      if (hasClass(elem, 'current')) {
+          continue
+      }
+      elem = elem.parentNode;
+      if (elem.nodeName.toLowerCase() !== 'span') {
+          continue
+      }
+      toggleClass(elem, 'unshown');
+  }
+}
 try{stManager.done('ads_moder.js');}catch(e){}

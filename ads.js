@@ -114,6 +114,14 @@ Ads.escapeValue = function(value) {
   return value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
+Ads.onInputEvent = function(event, func) {
+  if (event.keyCode == KEY.RETURN) {
+    func();
+    return false;
+  }
+  return true;
+}
+
 Ads.onSubLinkEvent = function(event) {
   event = normEvent(event);
   var elem = event.target

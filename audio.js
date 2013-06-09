@@ -749,7 +749,7 @@ var Audio = {
         str += ' '+(parseLatin(str) || '');
         str = trim(escapeRE(str.replace(/\)/g, '')).split('&').join('&amp;'));
         cur.selection = {
-          re: new RegExp('('+str.replace(cur.audiosIndex.delimiter, '|').replace(/(^\||\|$)/g, '')+')', 'gi'),
+          re: new RegExp('('+str.replace(cur.audiosIndex.delimiter, '|').replace(/(^\||\|$|\?)/g, '')+')', 'gi'),
           val: '<span>$1</span>'
         };
       }

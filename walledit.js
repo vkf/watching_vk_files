@@ -129,7 +129,7 @@ var WallEdit = {
       elfocus('wpe_text');
     }, 0);
   },
-  cancelEditPost: function(data, html) {
+  cancelEditPost: function(data, html, fronly) {
     if (!cur.editingPost) return;
     var post = cur.editingPost[0],
         node = ge(cur.editingPost[1]),
@@ -162,8 +162,17 @@ var WallEdit = {
       val(node, data);
       val(info, ' - ' + (opts && opts.reply ? getLang('wall_reply_saved') : getLang('wall_post_saved')));
       var dcont = geByClass1('rel_date', acts);
-      if (postponeDate && html && dcont) {
-        dcont.innerHTML = html;
+      if (postponeDate) {
+        if (html && dcont) {
+          dcont.innerHTML = html;
+        }
+        var fronlyEl = geByClass1('page_fronly', node.parentNode);
+        if (fronly && !fronlyEl) {
+          if (info.nextSibling) info.parentNode.insertBefore(se(fronly), info.nextSibling);
+          else info.parentNode.appendChild(se(fronly));
+        } else if (!fronly && fronlyEl) {
+          re(fronlyEl);
+        }
       }
       setTimeout(animate.pbind(info, {opacity: 0}, 500, re.pbind(info)), 1500);
       if (post.match(/^-?\d+photo_/)) {

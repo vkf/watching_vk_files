@@ -219,7 +219,8 @@ input.share_input {
   height: 11px;
   margin-left: 8px;
 }
-.is_2x .share_dd_arr {
+.is_2x .share_dd_arr,
+.is_2x .share_dd .dd_menu_header .share_dd_arr {
   background-image: url(/images/flydead_2x.gif);
   background-size: 14px 90px;
 }

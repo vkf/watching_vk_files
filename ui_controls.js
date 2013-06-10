@@ -2294,7 +2294,7 @@ createChildClass('DropdownMenu', UiControl, {
 
     bodyWidth = getSize(this.body)[0];
     var windowWidth = document.documentElement.clientWidth;
-    var bodyRight = ((left > bodyWidth && left + bodyWidth > windowWidth) ? (-headerWidth - 1) + 'px' : 'auto');
+    var bodyRight = ((left + bodyWidth > windowWidth && left + headerWidth > bodyWidth) ? (-headerWidth - 1) + 'px' : 'auto');
     setStyle(this.body, 'right', bodyRight);
   },
   moveToTarget: function() {

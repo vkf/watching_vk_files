@@ -926,8 +926,8 @@ body.mobfixed #mv_layer_wrap {
   color: #777;
 }
 .mv_embed_privacy {
+  padding-top: 15px;
   line-height: 150%;
-  font-size: 12px;
 }
 
 div.mv_composer_dd .wdd_lwrap {

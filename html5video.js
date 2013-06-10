@@ -657,6 +657,9 @@ var html5video = {
     if (!vars.oid || !vars.vid || !window.videoview || !videoview.getVideoCode) {
       return;
     }
+    if (fullScreenApi.isFullScreen()) {
+      html5video.toggleFullscreen();
+    }
     videoview.getVideoCode(vars.oid, vars.vid);
   },
 

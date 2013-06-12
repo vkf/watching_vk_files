@@ -95,6 +95,7 @@ switchPage: function(page, edit, opts) {
       ge('dev_page_acts').innerHTML = acts;
       ge('dev_page_sections').innerHTML = edit_sections;
       delete pageOpts.preload;
+      delete cur.verDD;
       nav.setLoc('dev/'+page+nav.toStr(pageOpts));
       if (isPage) {
         hide('dev_method_narrow');
@@ -284,6 +285,9 @@ methodRun: function(hash, btn) {
   }
   if (cur.edit) {
     params['_edit'] = '1';
+  }
+  if (cur.verDD) {
+    params['param_v'] = cur.verDD.val();
   }
   ajax.post('dev', params, {
     onDone: function(code) {

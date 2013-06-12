@@ -239,7 +239,7 @@ input.dev_input_simular {
   width: 520px;
   padding: 16px 10px 16px 16px;
 }
-#dev_edit_text {
+#dev_edit_text, #dev_edit_text_en, #dev_edit_ver_text, #dev_edit_ver_text_en {
   width: 507px;
   line-height: 160%;
 }
@@ -816,4 +816,26 @@ textarea.dev_poll_code {
 }
 .dev_diff {
   padding: 0px 0px 10px 0px;
+}
+.dev_version_text {
+  margin-top: 4px;
+}
+.dev_version_num {
+  font-weight: bold;
+  width: 40px;
+}
+.dev_versions_info {
+  width: 450px;
+}
+.dev_version {
+  padding: 10px 4px;
+}
+.dev_versions_methods {
+  padding-bottom: 4px;
+}
+.dev_versions_field {
+  color: #777777;
+}
+.dev_version_edit_block {
+  margin-bottom: 10px;
 }

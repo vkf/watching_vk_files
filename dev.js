@@ -78,9 +78,15 @@ switchPage: function(page, edit, opts) {
   }
 
   var actsCont = ge('dev_page_acts');
-  var pageOpts = {preload: 1, edit: edit ? 1 : 0};
+  var pageOpts = {preload: 1};
   if (opts && opts.translate) {
     pageOpts.translate = opts.translate;
+  }
+  if (opts && opts.ver) {
+    pageOpts.ver = opts.ver;
+  }
+  if (edit) {
+    pageOpts.edit = 1;
   }
   ajax.post('/dev/'+page, pageOpts, {
     onDone: function(title, text, acts, edit_sections, isPage, opts, js) {
@@ -88,7 +94,8 @@ switchPage: function(page, edit, opts) {
       ge('dev_page_cont').innerHTML = text;
       ge('dev_page_acts').innerHTML = acts;
       ge('dev_page_sections').innerHTML = edit_sections;
-      nav.setLoc('dev/'+page+(edit ? '?edit=1' : '')+(pageOpts.translate ? '&translate='+pageOpts.translate : ''));
+      delete pageOpts.preload;
+      nav.setLoc('dev/'+page+nav.toStr(pageOpts));
       if (isPage) {
         hide('dev_method_narrow');
         show('dev_page_narrow');
@@ -833,6 +840,31 @@ showColorBox: function(obj, num, ev) {
 
   cur.colorInited = true;
   return cancelEvent(ev);
+},
+
+
+addVersion: function(hash) {
+  var params = {
+    act: 'a_save_version',
+    ver: val('dev_edit_number'),
+    methods: val('dev_edit_methods'),
+    text: val('dev_edit_ver_text'),
+    text_en: val('dev_edit_ver_text_en'),
+    hash: hash
+  }
+  ajax.post('dev.php', params, {
+    onDone: function() {
+      nav.go('/dev/versions')
+    },
+    onFail: function(obj) {
+      obj = ge(obj);
+      if (obj) {
+        notaBene(obj);
+        return true;
+      }
+    }
+  });
+
 },
 
 _eof:1};try{stManager.done('dev.js');}catch(e){}

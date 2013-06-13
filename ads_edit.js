@@ -2104,12 +2104,13 @@ AdsViewEditor.prototype.updatePreview = function(previewParamName) {
       }
       break;
     case 'community_join':
-      if (this.params.cost_type.value == 3 && this.params.link_type.value != 4) {
+      var isAppGame = (this.params.link_type.value == 4 && this.params.link_id.app_game_links_ids[this.params.link_id.value]);
+      if (this.params.cost_type.value == 3 && (this.params.link_type.value != 4 || isAppGame)) {
         switch (this.params.link_type.value) {
            case 1:  this.preview[previewParamName].innerHTML = getLang('global_group_join'); break;
            case 2:  this.preview[previewParamName].innerHTML = getLang('global_event_join'); break;
            case 6:  this.preview[previewParamName].innerHTML = getLang('global_public_join'); break;
-           case 4:  this.preview[previewParamName].innerHTML = getLang('global_app_join'); break;
+           case 4:  this.preview[previewParamName].innerHTML = (isAppGame ? getLang('global_app_game_join') : getLang('global_app_join')); break;
            default: this.preview[previewParamName].innerHTML = ''; break;
         }
         show(this.preview[previewParamName]);
@@ -2367,6 +2368,7 @@ AdsViewEditor.prototype.onParamUpdate = function(paramName, paramValue, forceDat
         this.updateUiParam('cost_per_click');
         this.updatePreview('link');
         this.updatePreview('domain');
+        this.updatePreview('community_join');
         this.updateTips();
         this.updatePhotoData();
 

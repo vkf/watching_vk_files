@@ -1058,7 +1058,8 @@ var Apps = { // can be removed soon
     if (!cur.preload) {
       extend(query, {preload: 1});
     }
-    ajax.post(Apps.address, query, {ads: (!!cur.preload), onDone: (function(data, opts, preload) {
+    debugLog('WHY', Apps.address, query);
+    ajax.post(Apps.address, query, {/*ads: (!!cur.preload), */onDone: (function(data, opts, preload) {
       if (opts) {
         opts = eval('('+opts+')');
         extend(opts.summaryLang, cur.summaryLang);

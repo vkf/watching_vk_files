@@ -1082,6 +1082,32 @@
   line-height: 1.36em;
   font-size: 0.9em;
 }
+.audio_popular_owner {
+  padding: 6px 11px 7px 11px;
+}
+.audio_popular_status {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -o-text-overflow: ellipsis;
+  width: 100px;
+}
+.audio_popular_owner:hover {
+  text-decoration: none;
+  background: #E1E7ED;
+}
+.audio_popular_owner_icon {
+  width: 12px;
+  height: 12px;
+  margin-left: 5px;
+  background: url(/images/icons/audio_icons.png?4) no-repeat scroll -202px -51px;
+  opacity: 0.7;
+}
+.audio_popular_owner_cnt {
+  white-space: nowrap;
+  position: relative;
+  margin-right: -6px;
+}
 .audio_friend_status {
   color: #777;
 }

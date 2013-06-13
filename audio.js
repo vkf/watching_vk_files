@@ -18,6 +18,7 @@ var Audio = {
       albumFiltered: ge('album_filtered'),
       searchFilters: ge('audio_search_filters'),
       popularFilters: ge('audio_popular_filters'),
+      popularOwners: ge('audio_popular_owners'),
       audioFriends: ge('audio_friends'),
       audioAlbums: ge('audio_albums'),
       audioAlbumsWrap: ge('audio_albums_wrap'),
@@ -685,7 +686,7 @@ var Audio = {
         if (!c && cur.allAudiosIndex == 'all' && cur.oid <= 0) addClass(cur.audioWrap, 'audio_no_recs');
       }
       if (el) addClass(el, 'selected');
-      hide(cur.popularFilters);
+      hide(cur.popularFilters, cur.popularOwners);
       cur.searchStr = str;
       this.searchAudios(str, cur.allAudiosIndex, force);
 
@@ -1065,7 +1066,7 @@ var Audio = {
     });
     if (curSel) addClass(curSel, 'selected');
     removeClass(cur.albumFiltered, 'selected');
-    hide(cur.popularFilters, cur.searchFilters);
+    hide(cur.popularFilters, cur.popularOwners, cur.searchFilters);
     if (album_id == 0 && !showAlbums && (cur.oid == vk.id)) {
       hide(cur.audioAlbums);
       show(cur.audioFriends);
@@ -1205,7 +1206,7 @@ var Audio = {
     var rec_filter = ge('recommendations');
     addClass(rec_filter, 'selected');
     removeClass(cur.albumFiltered, 'selected');
-    hide(cur.searchFilters, cur.popularFilters);
+    hide(cur.searchFilters, cur.popularFilters, cur.popularOwners);
     if (cur.oid == vk.id) {
       show(cur.audioFriends);
       hide(cur.audioAlbums);
@@ -1442,8 +1443,14 @@ var Audio = {
       delete cur.topType;
     }
     ajax.post(Audio.address, query, {
-      onDone: function(rows, preload, json, preload_json, options) {
+      onDone: function(rows, preload, json, preload_json, options, ownersRows) {
         delete cur.loadingPopular;
+        if (ownersRows) {
+          val('audio_popular_owners_rows', ownersRows);
+          show(cur.popularOwners);
+        } else {
+          hide(cur.popularOwners);
+        }
         if (cur.lastAct != 'popular') return;
         if (options.popularCount === 0 && offset) {
           cur.noPopular = true;

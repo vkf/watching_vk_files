@@ -502,7 +502,7 @@ var Video = {
       }
       cur.videoList[sec] = v;
       cur.selection = {
-        re: new RegExp('('+str.replace(cur.vIndex.delimiter, '|').replace(/^\||\|$/g, '').replace(/([\+\*\)\(])/g, '\\$1')+')', 'gi'),
+        re: new RegExp('('+str.replace('|', '').replace(cur.vIndex.delimiter, '|').replace(/^\||\|$/g, '').replace(/([\+\*\)\(])/g, '\\$1')+')', 'gi'),
         val: '<em>$1</em>'
       };
       Video.searchAlbums(str);
@@ -1394,7 +1394,6 @@ var Video = {
     if (!cur.shownOptions) return;
     cur.shownOptions = false;
     removeClass(cur.videoSearch, 'video_search_extended');
-
   }
 }
 

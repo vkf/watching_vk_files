@@ -501,10 +501,14 @@ var Video = {
         sec += '_opt_hd'+cur.vHD;
       }
       cur.videoList[sec] = v;
-      cur.selection = {
-        re: new RegExp('('+str.replace('|', '').replace(cur.vIndex.delimiter, '|').replace(/^\||\|$/g, '').replace(/([\+\*\)\(])/g, '\\$1')+')', 'gi'),
-        val: '<em>$1</em>'
-      };
+      if (!str.replace(/\|/g, '').length) {
+        cur.selection = false;
+      } else {
+        cur.selection = {
+          re: new RegExp('('+str.replace(/\|/g, '').replace(cur.vIndex.delimiter, '|').replace(/^\||\|$/g, '').replace(/([\+\*\)\(])/g, '\\$1')+')', 'gi'),
+          val: '<em>$1</em>'
+        };
+      }
       Video.searchAlbums(str);
       var len = v.length;
       if (len < 10) {

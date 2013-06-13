@@ -982,8 +982,17 @@ div.target .sponsored_header {
 #search_content .audio .duration {
   line-height: 0.9em;
 }
+#search_content .audio.claimed .area .duration,
 #search_content .audio.over .area .duration {
   display: none;
+}
+#search_content .audio .actions .loading {
+  background: url(/images/upload.gif) 50% 50% no-repeat;
+  cursor: default;
+  text-align: center;
+  height: 16px;
+  width: 36px;
+  padding: 6px;
 }
 #search_content .area .actions {
   visibility: hidden;
@@ -992,6 +1001,7 @@ div.target .sponsored_header {
   display: block;
   padding: 6px;
 }
+#search_content .audio.claimed .actions,
 #search_content .audio.over .actions {
   visibility: visible;
 }

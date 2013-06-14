@@ -2956,6 +2956,7 @@ AdsTargetingEditor.prototype.init = function(options, viewEditor, criteria, crit
 
   this.options = extend({}, this.options, options);
 
+  // defaultData exists if data may be not equal defaultData
   this.criteria = {
     country:                {value: 0,  data: []},
     cities:                 {value: '', data: [], defaultData: [], selectedData: []},
@@ -2968,7 +2969,7 @@ AdsTargetingEditor.prototype.init = function(options, viewEditor, criteria, crit
     statuses:               {value: '', data: []},
 
     interests:              {value: '', data: [], defaultData: []},
-    interest_categories:    {value: '', data: [], defaultData: []},
+    interest_categories:    {value: '', data: []},
     group_types:            {value: '', data: []},
     groups:                 {value: '', data: [], defaultData: [], selectedData: [], defaultDataOriginal: [], link_object_id: 0, link_object_item: null, link_object_processed: true},
     apps:                   {value: '', data: [], defaultData: [], selectedData: [], defaultDataOriginal: [], link_object_id: 0, link_object_item: null, link_object_processed: true},
@@ -2988,7 +2989,8 @@ AdsTargetingEditor.prototype.init = function(options, viewEditor, criteria, crit
     positions:              {value: '', data: [], defaultData: [], selectedData: []},
 
     operators:              {value: '', data: [], defaultData: [], selectedData: []},
-    browsers:               {value: '', data: []},
+    browsers:               {value: '', data: [],                  selectedData: []},
+    operating_systems:      {value: '', data: []},
     pays_money:             {value: 0,  data: []},
     retargeting_groups:     {value: '', data: []},
     retargeting_groups_not: {value: '', data: []},
@@ -3193,6 +3195,7 @@ AdsTargetingEditor.prototype.initUiCriterion = function(criterionName) {
     case 'positions':
     case 'operators':
     case 'browsers':
+    case 'operating_systems':
     case 'retargeting_groups':
     case 'retargeting_groups_not':
       targetElem = ge(this.options.targetIdPrefix + criterionName);
@@ -3400,6 +3403,7 @@ AdsTargetingEditor.prototype.getUiCriterionDefaultData = function(criterionName)
     case 'schools':
     case 'operators':
     case 'browsers':
+    case 'operating_systems':
     case 'pays_money':
     case 'retargeting_groups':
       return this.criteria[criterionName].data || [];
@@ -3554,7 +3558,7 @@ AdsTargetingEditor.prototype.getUiCriterionIntroText = function(criterionName) {
     case 'cities_not':          return getLang('ads_starttypingname_city_region');
     case 'statuses':            return getLang('ads_select_marital');
     case 'interests':           return getLang('ads_starttypingname_interest');
-    case 'interest_categories': return getLang('ads_starttypingname_interest_categories');
+    case 'interest_categories': return getLang('ads_select_interest_category');
     case 'group_types':         return getLang('ads_starttypingname_group');
     case 'groups':              return getLang('ads_type_group_public');
     case 'apps':                return getLang('ads_type_app_site');
@@ -3595,6 +3599,7 @@ AdsTargetingEditor.prototype.getUiCriterionIntroText = function(criterionName) {
     case 'positions':              return getLang('ads_starttypingname_position');
     case 'operators':              return getLang('ads_select_mobile_operator');
     case 'browsers':               return getLang('ads_select_internet_browser');
+    case 'operating_systems':      return getLang('ads_select_operating_system');
     case 'retargeting_groups':     return getLang('ads_select_retargeting_group');
     case 'retargeting_groups_not': return getLang('ads_select_retargeting_group');
     default:                       return '';
@@ -3622,7 +3627,7 @@ AdsTargetingEditor.prototype.getUiCriterionPlaceholderText = function(criterionN
     case 'cities_not':             return getLang('ads_starttypingname_city_region');
     case 'statuses':               return getLang('ads_select_marital');
     case 'interests':              return getLang('ads_starttypingname_interest');
-    case 'interest_categories':    return getLang('ads_starttypingname_interest_categories');
+    case 'interest_categories':    return getLang('ads_select_interest_category');
     case 'group_types':            return getLang('ads_starttypingname_group');
     case 'groups':                 return getLang('ads_type_group_public');
     case 'apps':                   return getLang('ads_type_app_site');
@@ -3635,6 +3640,7 @@ AdsTargetingEditor.prototype.getUiCriterionPlaceholderText = function(criterionN
     case 'positions':              return getLang('ads_starttypingname_position');
     case 'operators':              return getLang('ads_select_mobile_operator');
     case 'browsers':               return getLang('ads_select_internet_browser');
+    case 'operating_systems':      return getLang('ads_select_operating_system');
     case 'retargeting_groups':     return getLang('ads_select_retargeting_group');
     case 'retargeting_groups_not': return getLang('ads_select_retargeting_group');
     default:                       return '';
@@ -3660,6 +3666,7 @@ AdsTargetingEditor.prototype.getUiCriterionNoResultText = function(criterionName
     case 'positions':              return getLang('ads_notfound_position');
     case 'operators':              return getLang('ads_notfound_mobile_operator');
     case 'browsers':               return getLang('ads_notfound_internet_browser');
+    case 'operating_systems':      return getLang('ads_notfound_operating_system');
     case 'retargeting_groups':     return getLang('ads_notfound_retargeting_groups');
     case 'retargeting_groups_not': return getLang('ads_notfound_retargeting_groups');
     default:                       return '';

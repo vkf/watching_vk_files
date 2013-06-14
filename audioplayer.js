@@ -22,7 +22,7 @@ var audioPlayer = {
   shareMusic: function() {
     var mus = ((window._pads && _pads.shown == 'mus' && audioPlayer.isPlaylistGlobal() ? ls.get('audio_id') : null) || currentAudioId() || (audioPlayer.lastSong && audioPlayer.lastSong.aid) || (cur.defaultTrack && cur.defaultTrack.id) || window.audioPlaylist && audioPlaylist.start || '').match(/^(-?\d+_\d+)(?:_(s-?\d+(?:_h-?\d+)?))?/);
     if (!mus) return;
-    return !showBox('like.php', {act: 'publish_box', object: 'audio' + mus[1], list: mus[2] || '', to: 'mail'}, {stat: ['page.js', 'page.css', 'wide_dd.js', 'wide_dd.css', 'sharebox.js']});
+    return !showBox('like.php', {act: 'publish_box', object: 'audio' + mus[1], list: mus[2] || ('s' + vk.id), to: 'mail'}, {stat: ['page.js', 'page.css', 'wide_dd.js', 'wide_dd.css', 'sharebox.js']});
   },
   initPlayer: function(id) {
     var _a = audioPlayer;

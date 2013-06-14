@@ -102,24 +102,26 @@ var Page = {
     stManager.add(['audioplayer.css', 'audioplayer.js']);
     ajax.post('audio', {act: 'play_audio_status', id: audioId, hash: hash}, extend({
       onDone: function(info, data, uid) {
-        if (data && uid && window.audioPlayer) {
-          audioPlayer.statusData = audioPlayer.statusData || {};
-          audioPlayer.statusData[uid] = data;
-        }
-        if (!info) return;
+        if (uid != vk.id) {
+          if (data && uid && window.audioPlayer) {
+            audioPlayer.statusData = audioPlayer.statusData || {};
+            audioPlayer.statusData[uid] = data;
+          }
+          if (!info) return;
 
-        if (!window.audioPlaylist) {
-          window.audioPlaylist = {};
+          if (!window.audioPlaylist) {
+            window.audioPlaylist = {};
+          }
+          audioPlaylist[audioId] = info;
+          audioPlaylist.start = audioId;
+          if (!audioPlaylist.searchStr) {
+            window.lastPlaylist = clone(audioPlaylist);
+          }
+          if (window.audioPlayer) {
+            audioPlayer.setPadPlaylist();
+          }
+          delete audioPlaylist.searchStr;
         }
-        audioPlaylist[audioId] = info;
-        audioPlaylist.start = audioId;
-        if (!audioPlaylist.searchStr) {
-          window.lastPlaylist = clone(audioPlaylist);
-        }
-        if (window.audioPlayer) {
-          audioPlayer.setPadPlaylist();
-        }
-        delete audioPlaylist.searchStr;
         playAudioNew(audioId);
       }
     }, ajaxOpts || {}));

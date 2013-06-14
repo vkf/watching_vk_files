@@ -11,6 +11,9 @@
   z-index: 500;
   display: none;
 }
+#mv_layer_wrap.fixed {
+  -webkit-transform: translateZ(0);
+}
 @-moz-document url-prefix() {
   #mv_layer {
     overflow: hidden;

@@ -67,16 +67,40 @@ var Page = {
       });
     }, getLang('global_cancel'));
   },
+  shareCurrent: function() {
+    var curAudio = geByClass1('current_audio', ge('page_current_info'));
+    if (!curAudio) nav.reload(); // :(
+
+    curAudio = curAudio.getAttribute('data-audio');
+    if (!curAudio) nav.reload(); // :(
+
+    curAudio = curAudio.split('_');
+    if (curAudio.length < 3 || curAudio[2].substr(0, 1) != 's') nav.reload(); // :(
+
+    return !showBox('like.php', {act: 'publish_box', object: 'audio' + curAudio[0] + '_' + curAudio[1], list: curAudio[2] + ((curAudio[3] && curAudio[3].charAt(0) == 'h') ? '_' + curAudio[3] : '')}, {stat: ['page.js', 'page.css', 'wide_dd.js', 'wide_dd.css', 'sharebox.js']});
+  },
   playCurrent: function(el, audioId, hash) {
+    var prg = geByClass1('current_audio_prg', el.parentNode) || el.parentNode.appendChild(ce('span', {className: 'progress_inline current_audio_prg'}));
+    return Page.playLive(audioId, hash, {
+      showProgress: function() {
+        show(prg);
+        addClass(el, 'prg');
+      },
+      hideProgress: function() {
+        hide(prg);
+        removeClass(el, 'prg');
+      }
+    });
+  },
+  playLive: function(audioId, hash, ajaxOpts) {
     var _a = window.audioPlayer, aid = currentAudioId();
     if (_a) _a.gpDisabled = false;
-    if (ge('audio' + audioId)) {
-      return (aid == audioId && !_a.player.paused()) ? false : playAudioNew(audioId);
+    if (aid == audioId) {
+      return _a.player.paused() ? playAudioNew(audioId) : false;
     }
 
-    var prg = geByClass1('current_audio_prg', el.parentNode) || el.parentNode.appendChild(ce('span', {className: 'progress_inline current_audio_prg'}));
     stManager.add(['audioplayer.css', 'audioplayer.js']);
-    ajax.post('audio', {act: 'play_audio_status', id: audioId, hash: hash}, {
+    ajax.post('audio', {act: 'play_audio_status', id: audioId, hash: hash}, extend({
       onDone: function(info, data, uid) {
         if (data && uid && window.audioPlayer) {
           audioPlayer.statusData = audioPlayer.statusData || {};
@@ -97,16 +121,8 @@ var Page = {
         }
         delete audioPlaylist.searchStr;
         playAudioNew(audioId);
-      },
-      showProgress: function() {
-        show(prg);
-        addClass(el, 'prg');
-      },
-      hideProgress: function() {
-        hide(prg);
-        removeClass(el, 'prg');
       }
-    });
+    }, ajaxOpts || {}));
   },
   audioStatusUpdate: function(hash) {
     var exp = isChecked('currinfo_audio'), _a = window.audioPlayer, aid = currentAudioId();
@@ -3688,13 +3704,13 @@ var Wall = {
 
 
         case 'upd_ci':
-          var edit = ge('current_info'), info = ev[2], el = edit || ge('page_current_info');
+          var edit = ge('current_info'), info = ev[2], el = edit || ge('page_current_info'), dataAudio = ' data-audio="' + ev[4] + '"';
           switch (ev[3]) {
             case 'audio':
               var curCntEl = geByClass1('current_audio_cnt');
               if (curCntEl && curCntEl.tt) curCntEl.tt.hide();
-              var attr = edit ? '' : (' onmouseover="showTooltip(this, {forcetoup: true, text: \'' + cur.options.ciAudioTip + '\', black: 1, shift: [13, 0, 0]})" onclick="Page.playCurrent(this, this.getAttribute(\'data-audio\'), \'' + cur.options.ciAudioHash + '\')" data-audio="' + ev[4] + '"');
-              info = '<a class="current_audio fl_l"' + attr + '><div class="label fl_l"></div>' + info + '</a>';
+              var attr = edit ? '' : (' onmouseover="showTooltip(this, {forcetoup: true, text: \'' + cur.options.ciAudioTip + '\', black: 1, shift: [13, 0, 0]})" onclick="Page.playCurrent(this, this.getAttribute(\'data-audio\'), \'' + cur.options.ciAudioHash + '\')"');
+              info = '<a class="current_audio fl_l"' + attr + dataAudio + '><div class="label fl_l"></div>' + info + '</a>';
               var ci_cnt = intval(ev[5] || ''), ci_cnt_class = ci_cnt ? '' : ' hidden';
               info += '<div class="current_audio_cnt' + ci_cnt_class + ' fl_r" onmouseover="Page.audioListenersOver(this, cur.oid)" onclick="Page.showAudioListeners(cur.oid, event)"><div class="value fl_l">' + ci_cnt + '</div><div class="label fl_r"></div></div>';
             break;

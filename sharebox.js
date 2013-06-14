@@ -190,6 +190,9 @@ var ShareBox = {
   },
   rbChanged: function() {
     var v = radioBtns['like_share'].val;
+    if (cur.lang.title_for_all) {
+      val('dark_box_topic', cur.lang[(v < 2) ? 'title_for_all' : 'title_for_mail']);
+    }
     switch (v) {
       case 0:
         if (!cur.sbHidden) {

@@ -20,9 +20,9 @@ var audioPlayer = {
   },
   songInfos: {},
   shareMusic: function() {
-    var mus = ((window._pads && _pads.shown == 'mus' && audioPlayer.isPlaylistGlobal() ? ls.get('audio_id') : null) || currentAudioId() || (audioPlayer.lastSong && audioPlayer.lastSong.aid) || (cur.defaultTrack && cur.defaultTrack.id) || window.audioPlaylist && audioPlaylist.start || '').match(/^(-?\d+_\d+)/);
+    var mus = ((window._pads && _pads.shown == 'mus' && audioPlayer.isPlaylistGlobal() ? ls.get('audio_id') : null) || currentAudioId() || (audioPlayer.lastSong && audioPlayer.lastSong.aid) || (cur.defaultTrack && cur.defaultTrack.id) || window.audioPlaylist && audioPlaylist.start || '').match(/^(-?\d+_\d+)(?:_(s-?\d+(?:_h-?\d+)?))?/);
     if (!mus) return;
-    return !showBox('like.php', {act: 'publish_box', object: 'audio' + mus[1], to: 'mail'}, {stat: ['page.js', 'page.css', 'wide_dd.js', 'wide_dd.css', 'sharebox.js']});
+    return !showBox('like.php', {act: 'publish_box', object: 'audio' + mus[1], list: mus[2] || '', to: 'mail'}, {stat: ['page.js', 'page.css', 'wide_dd.js', 'wide_dd.css', 'sharebox.js']});
   },
   initPlayer: function(id) {
     var _a = audioPlayer;
@@ -633,7 +633,7 @@ var audioPlayer = {
     if (cur.module == 'search' && nav.objLoc['c[section]'] == 'audio' && !nav.objLoc['c[q]']) params.top = 1;
     if (cur.module == 'audio' && nav.objLoc['act'] == 'popular' && !nav.objLoc['q']) params.top_audio = 1;
     if (cur.module == 'audio' && nav.objLoc['act'] == 'feed' && !nav.objLoc['q']) params.feed_audio = 1;
-    if ((aid + '').match(/^-?\d+_\d+_s(-?\d+)$/) && window.audioPlaylist && audioPlaylist[aid]) params.status = 1;
+    if ((aid + '').match(/^-?\d+_\d+_s(-?\d+)(?:_|$)/) && window.audioPlaylist && audioPlaylist[aid]) params.status = 1;
     if (_a.isAudioFriend(ids[0], aid)) params.friend = ids[0];
     if ((cur.module == 'groups' || cur.module == 'public' || cur.module == 'audio') && cur.oid == ids[0] && cur.oid < 0) params.group = 1;
     if ((cur.module == 'audio' || cur.module == 'feed') && nav.objLoc['q'] || cur.module == 'search' && nav.objLoc['c[q]']) params.search = 1;
@@ -1040,7 +1040,7 @@ var audioPlayer = {
   onPlayFinish: function() {
     var _a = audioPlayer;
     _a.playbackSent = _a.statusSent = 0;
-    var next_id, cur_id = currentAudioId(), m = (cur_id + '').match(/^-?\d+_\d+_s(-?\d+)$/);
+    var next_id, cur_id = currentAudioId(), m = (cur_id + '').match(/^-?\d+_\d+_s(-?\d+)(?:_|$)/);
     if (cur.startedAids) delete cur.startedAids[cur_id];
     if (_a.repeat) {
       next_id = cur_id;
@@ -1591,7 +1591,7 @@ var audioPlayer = {
       aid = currentAudioId();
     }
     if (aid) {
-      var m = aid.match(/^-?\d+_\d+_s(-?\d+)$/);
+      var m = aid.match(/^-?\d+_\d+_s(-?\d+)(?:_|$)/);
       if (m && m[1] && _a.statusData && _a.statusData[m[1]]) {
         return false;
       }

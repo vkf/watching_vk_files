@@ -5400,3 +5400,16 @@ button.wall_block_app_btn {
 .wall_browse_images {
   padding-top: 4px;
 }
+
+.status_audio_shared {
+  padding: 8px 2px 2px;
+  font-size: 0.9em;
+  color: #777;
+  overflow: hidden;
+
+  -o-text-overflow: ellipsis;
+  text-overflow: ellipsis;
+}
+.status_audio_shared_lnk {
+  color: #777;
+}

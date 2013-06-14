@@ -96,7 +96,7 @@ var Page = {
     var _a = window.audioPlayer, aid = currentAudioId();
     if (_a) _a.gpDisabled = false;
     if (aid == audioId) {
-      return _a.player.paused() ? playAudioNew(audioId) : false;
+      return playAudioNew(audioId);
     }
 
     stManager.add(['audioplayer.css', 'audioplayer.js']);

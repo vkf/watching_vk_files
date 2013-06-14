@@ -2968,6 +2968,7 @@ AdsTargetingEditor.prototype.init = function(options, viewEditor, criteria, crit
     statuses:               {value: '', data: []},
 
     interests:              {value: '', data: [], defaultData: []},
+    interest_categories:    {value: '', data: [], defaultData: []},
     group_types:            {value: '', data: []},
     groups:                 {value: '', data: [], defaultData: [], selectedData: [], defaultDataOriginal: [], link_object_id: 0, link_object_item: null, link_object_processed: true},
     apps:                   {value: '', data: [], defaultData: [], selectedData: [], defaultDataOriginal: [], link_object_id: 0, link_object_item: null, link_object_processed: true},
@@ -3179,6 +3180,7 @@ AdsTargetingEditor.prototype.initUiCriterion = function(criterionName) {
     case 'cities_not':
     case 'statuses':
     case 'interests':
+    case 'interest_categories':
     case 'group_types':
     case 'groups':
     case 'apps':
@@ -3389,6 +3391,7 @@ AdsTargetingEditor.prototype.getUiCriterionDefaultData = function(criterionName)
       return this.criteria['retargeting_groups'].data || [];
     case 'country':
     case 'statuses':
+    case 'interest_categories':
     case 'group_types':
     case 'religions':
     case 'districts':
@@ -3548,14 +3551,15 @@ AdsTargetingEditor.prototype.updateUiCriterionVisibility = function(criterionNam
 AdsTargetingEditor.prototype.getUiCriterionIntroText = function(criterionName) {
   switch (criterionName) {
     case 'cities':
-    case 'cities_not':  return getLang('ads_starttypingname_city_region');
-    case 'statuses':    return getLang('ads_select_marital');
-    case 'interests':   return getLang('ads_starttypingname_interest');
-    case 'group_types': return getLang('ads_starttypingname_group');
-    case 'groups':      return getLang('ads_type_group_public');
-    case 'apps':        return getLang('ads_type_app_site');
-    case 'apps_not':    return getLang('ads_type_app_site');
-    case 'religions':   return getLang('ads_select_religion');
+    case 'cities_not':          return getLang('ads_starttypingname_city_region');
+    case 'statuses':            return getLang('ads_select_marital');
+    case 'interests':           return getLang('ads_starttypingname_interest');
+    case 'interest_categories': return getLang('ads_starttypingname_interest_categories');
+    case 'group_types':         return getLang('ads_starttypingname_group');
+    case 'groups':              return getLang('ads_type_group_public');
+    case 'apps':                return getLang('ads_type_app_site');
+    case 'apps_not':            return getLang('ads_type_app_site');
+    case 'religions':           return getLang('ads_select_religion');
     case 'districts':
       var citiesOnlyIds = this.getCitiesOnly();
       if (!citiesOnlyIds) {
@@ -3618,6 +3622,7 @@ AdsTargetingEditor.prototype.getUiCriterionPlaceholderText = function(criterionN
     case 'cities_not':             return getLang('ads_starttypingname_city_region');
     case 'statuses':               return getLang('ads_select_marital');
     case 'interests':              return getLang('ads_starttypingname_interest');
+    case 'interest_categories':    return getLang('ads_starttypingname_interest_categories');
     case 'group_types':            return getLang('ads_starttypingname_group');
     case 'groups':                 return getLang('ads_type_group_public');
     case 'apps':                   return getLang('ads_type_app_site');
@@ -3642,6 +3647,7 @@ AdsTargetingEditor.prototype.getUiCriterionNoResultText = function(criterionName
     case 'cities_not':             return getLang('ads_notfound_city');
     case 'statuses':               return getLang('ads_notfound_marital');
     case 'interests':              return getLang('ads_notfound_interest');
+    case 'interest_categories':    return getLang('ads_notfound_interest_category');
     case 'group_types':
     case 'groups':                 return getLang('ads_notfound_group');
     case 'apps':                   return getLang('ads_notfound_app');

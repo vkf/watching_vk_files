@@ -1174,12 +1174,13 @@ var audioPlayer = {
   },
 
   genPlaylist: function(list, copyToMain, allMy) {
-    var res = clone(list);
-    if (!res || !res.length) return;
-    for (var i in res) {
-      if (res[i][11] && parseInt(res[i][11])) {
-        res.splice(i, 1);
+    var res = [];
+    if (!list || !list.length) return;
+    for (var i in list) {
+      if (list[i][11] && parseInt(list[i][11])) {
+        continue;
       }
+      res.push(list[i]);
     }
     if (!res.length) return;
     if (res[0]._order !== undefined) {

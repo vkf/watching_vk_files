@@ -211,7 +211,7 @@ var Audio = {
         if (cur.onSilentLoad) {
           cur.onSilentLoad();
         }
-        if (!cur.q) {
+        if (!cur.q || cur.club) {
           if (cur.curSection == 'recommendations' || cur.curSection == 'popular' || cur.curSection == 'feed') {
             if (cur[cur.curSection+'Audios']) {
               var k = 0;

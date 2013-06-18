@@ -1544,7 +1544,11 @@ var Audio = {
           cur.aContent.innerHTML = rows;
         }
 
-        cur.preloadJSON = eval('('+preload_json+')');
+        if (preload_json) {
+          cur.preloadJSON = eval('('+preload_json+')');
+        } else {
+          cur.preloadJSON = {};
+        }
         cur.sPreload.innerHTML = '';
         var au = ce('div', {innerHTML: preload});
         while (au.firstChild) {

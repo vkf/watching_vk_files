@@ -5269,7 +5269,7 @@ function initAddMedia(lnk, previewId, mediaTypes, opts) {
         }
         var valid = true;
         if (matches[4].match(/(^|\.|\/\/)vkontakte\.ru|vk\.com/)) {
-          valid = query.match(/(#photo|^\/(photo|video|album|page|audio|doc)|z=(album|photo|video)|w=(page))(-?\d+_)?\d+|\.(jpg|png|gif)$/) ? true : false;
+          valid = query.match(/(#photo|^\/(photo|video|album|page|audio|doc)|z=(album|photo|video)|w=(page))(-?\d+_)?\d+|\.(jpg|png|gif)$|^http:\/\/instagram\.com\/p\/.+/) ? true : false;
         }
         if (valid) {
          addMedia.checkURL(initialUrl);

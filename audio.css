@@ -1805,3 +1805,79 @@
   line-height: 1.81em;
   padding: 8px 30px;
 }
+.audio_summary {
+  padding: 0px 0px 2px;
+  margin: 0px 13px 0px 0px;
+  color: #45688E;
+  border-bottom: 1px solid #DAE1E8;
+  font-weight: bold;
+  font-size: 1.1em;
+}
+.audio_owner {
+  padding: 0px 8px 0px 0px;
+  margin-bottom: 8px;
+  display: inline-block;
+  *display: inline;
+  zoom: 1;
+  position: relative;
+}
+.audio_owner_name {
+  background: #000000;
+  background: rgba(0, 0, 0, 0.5);
+  color: #FFFFFF;
+  position: absolute;
+  bottom: 0px;
+  width: 92px;
+  padding: 4px 4px;
+  text-align: center;
+  overflow: hidden;
+}
+.audio_owner_img {
+  vertical-align: top;
+}
+.audio_cat_list {
+  padding: 10px 6px;
+}
+.audio_genre_showmore {
+  display: block;
+  text-align: center;
+  padding: 10px 6px;
+  color: #738392;
+  background: #EFF1F3;
+  margin: 2px 13px 6px 0px;
+}
+.audio_genre_showmore:hover {
+  text-decoration: none;
+  background: #E9EDF1;
+  color: #616e7e;
+}
+.audio_owner_info {
+  text-align: center;
+  padding-bottom: 0px;
+}
+.audio_owner_info_img {
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+}
+.audio_owner_info_name {
+  margin-top: 4px;
+  text-align: center;
+  font-weight: bold;
+}
+.audio_catalog_more_loading,
+.audio_catalog_hide_more {
+  display: none;
+}
+.audio_performer_loading .audio_catalog_more_loading {
+  display: block;
+}
+.audio_performer_shown .audio_catalog_hide_more {
+  display: block;
+}
+.audio_performer_shown .audio_catalog_more {
+  display: none;
+}
+.audio_performer_loading .audio_catalog_more {
+  display: none;
+}

@@ -81,61 +81,18 @@ var Audio = {
     Audio.scrollnode = browser.msie6 ? pageNode : window;
     Audio.fixedScroll = !(browser.msie && browser.version < 8 || browser.mobile);
     window.scrollTop = bodyNode.scrollTop = pageNode.scrollTop = htmlNode.scrollTop = 0;
-    addEvent(Audio.scrollnode, 'scroll', Audio.scrollCheck);
-    addEvent(window, 'resize', Audio.scrollCheck);
-    addEvent(cur.aSearch, 'blur', Audio.searchBlur);
-    addEvent(cur.aSearch, 'focus', Audio.searchFocus);
+    Audio.startEvents();
     cur.destroy.push(function() {
-      removeEvent(Audio.scrollnode, 'scroll', Audio.scrollCheck);
-      removeEvent(window, 'resize', Audio.scrollCheck);
-      removeEvent(cur.aSearch, 'blur', Audio.searchBlur);
-      removeEvent(cur.aSearch, 'focus', Audio.searchFocus);
-      if (Audio.fixedScroll) {
-        var els = geByClass('top_info_wrap', ge('page_wrap'));
-        each(els, function() { show(this); });
-        setStyle(cur.audioEl.head, {width: '', top: ''});
-        setStyle('side_bar', {top: ''});
-
-        removeClass(bodyNode, 'audio_fixed_nav');
-        _fixedNav = false;
-
-        show(_stlSide, 'debuglogwrap');
-      }
-      audioPlayer.deregisterPlayer('ac');
-      setTimeout(function() {
-        toggleGlobalPlayer(true);
-        updGlobalPlayer();
-      }, 100);
+      Audio.stopEvents();
     });
-    cur.gpHidden = true;
-    toggleGlobalPlayer(false);
 
-    if (Audio.fixedScroll) {
-      var els = geByClass('top_info_wrap', ge('page_wrap'));
-      each(els, function() { hide(this); });
-      hide(_stlSide);
-      setTimeout(function() {
-        each(els, function() { hide(this); });
-        hide(_stlSide);
-      }, 110);
-      var headH = cur.audioEl.head.clientHeight,
-          headT = getXY(cur.audioEl.head)[1],
-          audioNavH = cur.audioEl.bar.offsetHeight,
-          headW = cur.audioEl.head.clientWidth,
-          contentY = headH + audioNavH;
-      setStyle(cur.audioEl.head, {width: headW, top: headT});
-      setStyle('side_bar', {top: headH + headT});
-      setStyle(cur.audioEl.bar, {top: headH + headT});
-      setStyle(cur.audioEl.cont, {paddingTop: contentY});
-      setStyle(cur.audioEl.filters, {top: contentY});
+    cur.nav.push(function(changed, old, n) {
+      if (changed.act == 'popular') {
+        Audio.loadPopular(true, intval(n.genre));
+        return false;
+      }
+    });
 
-      addClass(bodyNode, 'audio_fixed_nav');
-      _fixedNav = true;
-
-      // hide('debuglogwrap');
-    }
-    Audio.updateAlbumsTitles();
-    Audio.handleFilterPos();
 
     var _a = window.audioPlayer;
     if (_a && _a.showCurrentTrack) {
@@ -237,6 +194,62 @@ var Audio = {
         }
       });
     }).bind(this)});
+  },
+
+  startEvents: function() {
+    addEvent(Audio.scrollnode, 'scroll', Audio.scrollCheck);
+    addEvent(window, 'resize', Audio.scrollCheck);
+    addEvent(cur.aSearch, 'blur', Audio.searchBlur);
+    addEvent(cur.aSearch, 'focus', Audio.searchFocus);
+    cur.gpHidden = true;
+    toggleGlobalPlayer(false);
+    if (Audio.fixedScroll) {
+      var els = geByClass('top_info_wrap', ge('page_wrap'));
+      each(els, function() { hide(this); });
+      hide(_stlSide);
+      setTimeout(function() {
+        each(els, function() { hide(this); });
+        hide(_stlSide);
+      }, 110);
+      var headH = cur.audioEl.head.clientHeight,
+          headT = getXY(cur.audioEl.head)[1],
+          audioNavH = cur.audioEl.bar.offsetHeight,
+          headW = cur.audioEl.head.clientWidth,
+          contentY = headH + audioNavH;
+      setStyle(cur.audioEl.head, {width: headW, top: headT});
+      setStyle('side_bar', {top: headH + headT});
+      setStyle(cur.audioEl.bar, {top: headH + headT});
+      setStyle(cur.audioEl.cont, {paddingTop: contentY});
+      setStyle(cur.audioEl.filters, {top: contentY});
+
+      addClass(bodyNode, 'audio_fixed_nav');
+      _fixedNav = true;
+    }
+    Audio.updateAlbumsTitles();
+    Audio.handleFilterPos();
+  },
+
+  stopEvents: function() {
+    removeEvent(Audio.scrollnode, 'scroll', Audio.scrollCheck);
+    removeEvent(window, 'resize', Audio.scrollCheck);
+    removeEvent(cur.aSearch, 'blur', Audio.searchBlur);
+    removeEvent(cur.aSearch, 'focus', Audio.searchFocus);
+    if (Audio.fixedScroll) {
+      var els = geByClass('top_info_wrap', ge('page_wrap'));
+      each(els, function() { show(this); });
+      setStyle(cur.audioEl.head, {width: '', top: ''});
+      setStyle('side_bar', {top: ''});
+
+      removeClass(bodyNode, 'audio_fixed_nav');
+      _fixedNav = false;
+
+      show(_stlSide, 'debuglogwrap');
+    }
+    audioPlayer.deregisterPlayer('ac');
+    setTimeout(function() {
+      toggleGlobalPlayer(true);
+      updGlobalPlayer();
+    }, 100);
   },
 
   searchFocus: function() {
@@ -343,6 +356,7 @@ var Audio = {
     }
     var _a = window.audioPlayer;
     if (!list || !list.length) {
+      debugLog('wrong1');
       if (cur.shownAudios == 0 && (cur.album_id || (!Audio.allAudios().length && !cur.searchStr))) {
         var msg;
         if (Audio.allAudios().length) {
@@ -624,7 +638,7 @@ var Audio = {
     }
   },
 
-  updateList: function(e, obj, force, showAlbums) {
+  updateList: function(e, obj, force, showAlbums, fromIndex) {
     if (cur.silent) {
       cur.onSilentLoad = function() {
         Audio.updateList(e, obj, force, showAlbums);
@@ -638,6 +652,7 @@ var Audio = {
       cur.autoComplete = 1;
     }
     clearTimeout(this.filterTimeout);
+    debugLog(new Error().stack);
     this.filterTimeout = setTimeout((function() {
       var str = trim(obj.value), el;
       if (str == cur.searchStr && cur.autoComplete && !cur.ignoreEqual) {
@@ -662,6 +677,7 @@ var Audio = {
         hide(cur.audioFriends, cur.audioAlbums);
         addClass(cur.clearSearch, 'shown');
         show(cur.searchFilters);
+        hide(cur.searchInfoCont);
         if (!c && cur.allAudiosIndex == 'all') removeClass(cur.audioWrap, 'audio_no_recs');
       } else {
         if (showAlbums || cur.oid != vk.id) {
@@ -671,9 +687,16 @@ var Audio = {
           hide(cur.audioFriends);
           show(cur.audioAlbums);
           Audio.updateAlbums();
+        } else if (fromIndex == 2) {
+          hide(cur.audioAlbums);
+          hide(cur.audioFriends);
+          debugLog(cur.performerInfo, cur.allAudiosIndex);
+          cur.searchInfoCont.innerHTML = cur.performerInfo[cur.allAudiosIndex];
+          show(cur.searchInfoCont);
         } else {
           hide(cur.audioAlbums);
           show(cur.audioFriends);
+          hide(cur.searchInfoCont);
           if (cur.allAudiosIndex == 'all') {
             el = ge('album0');
             var curEl = geByClass1('current', ge('audio_friends_list'));
@@ -691,7 +714,7 @@ var Audio = {
       this.searchAudios(str, cur.allAudiosIndex, force);
 
       scrollToTop();
-    }).bind(this), 10);
+    }).bind(this), fromIndex ? 0 :10);
   },
 
   selectPerformer: function(event, name) {
@@ -801,7 +824,7 @@ var Audio = {
     });
   },
 
-  changeAllIndex: function(index, albumSelected, showAlbums) {
+  changeAllIndex: function(index, albumSelected, showAlbums, owner) {
     if (!cur.audiosList[index]) return;
     cur.allAudiosIndex = cur.curList = index;
     this.indexAll(function() {
@@ -821,7 +844,7 @@ var Audio = {
       if (albumSelected) {
         Audio.loadAlbum(albumSelected);
       } else {
-        Audio.updateList(null, cur.aSearch, undefined, showAlbums);
+        Audio.updateList(null, cur.aSearch, undefined, showAlbums, owner ? 2 : 1);
       }
     });
   },
@@ -871,14 +894,20 @@ var Audio = {
     clearTimeout(this.qTimeout);
     this.qTimeout = setTimeout(function() {
       if (cur.allAudiosIndex != 'all') {
-        extend(nav.objLoc, {friend: cur.audioFriend});
+        if (cur.allAudiosIndex && cur.allAudiosIndex.substr(0, 5) == 'owner') {
+          extend(nav.objLoc, {owner: cur.audioFriend});
+        } else {
+          extend(nav.objLoc, {friend: cur.audioFriend});
+        }
       } else {
+        delete nav.objLoc.owner;
         delete nav.objLoc.friend;
       }
       if (cur.curSection && cur.curSection.substr(0, 4) == 'club') {
         extend(nav.objLoc, {club: cur.club});
       } else {
         delete nav.objLoc.club;
+        delete nav.objLoc.genre;
       }
       if (query) {
         extend(nav.objLoc, {q: query});
@@ -1043,9 +1072,9 @@ var Audio = {
       cur.shownFriends = [];
       Audio.showMoreFriends(addClass.pbind(ge('album0'), 'loading'), removeClass.pbind(ge('album0'), 'loading'));
     }
-    if (cur.searchStr && isVisible(cur.searchInfoCont)) {
-      hide(cur.searchInfoCont);
-    }
+    //if (cur.searchStr && isVisible(cur.searchInfoCont)) {
+    hide(cur.searchInfoCont);
+    //}
     if (cur.allAudiosIndex != 'all') {
       Audio.loadFriendsAudios(vk.id, 'all', album_id, showAlbums);
       return;
@@ -1080,11 +1109,14 @@ var Audio = {
       Audio.updateAlbums();
     }
     delete nav.objLoc.q;
+    delete nav.objLoc.owner;
     delete nav.objLoc.friend;
     delete cur.recsOffset;
     delete cur.popularOffset;
     delete nav.objLoc.club;
+    delete nav.objLoc.genre;
     delete nav.objLoc.audio_id;
+    delete cur._back;
     if (nav.objLoc.act == 'recommendations' || nav.objLoc.act == 'popular' || nav.objLoc.act == 'feed' || nav.objLoc.act == 'albums') delete nav.objLoc.act;
     if (album_id) {
       extend(nav.objLoc, {album_id: album_id});
@@ -1206,10 +1238,10 @@ var Audio = {
     var rec_filter = ge('recommendations');
     addClass(rec_filter, 'selected');
     removeClass(cur.albumFiltered, 'selected');
-    hide(cur.searchFilters, cur.popularFilters, cur.popularOwners);
+    hide(cur.searchFilters, cur.popularFilters);
     if (cur.oid == vk.id) {
-      show(cur.audioFriends);
-      hide(cur.audioAlbums);
+      hide(cur.audioFriends, cur.audioAlbums);
+      hide(cur.searchInfoCont);
     }
     removeClass(cur.albumFiltered, 'club_shown');
     Audio.handleFilterPos();
@@ -1269,9 +1301,17 @@ var Audio = {
       query.audio_id = cur.recsAudioId;
     }
     ajax.post(Audio.address, query, {
-      onDone: function(rows, preload, json, preload_json, options) {
+      onDone: function(rows, preload, json, preload_json, options, ownersRows) {
         delete cur.loadingRecs;
         if (cur.lastAct != 'recommendations') return;
+        if (!offset) {
+          if (ownersRows) {
+            val('audio_popular_owners_rows', ownersRows);
+            show(cur.popularOwners);
+          } else {
+            hide(cur.popularOwners);
+          }
+        }
         if (options.recsCount === 0 && offset) {
           cur.noRecommendations = true;
           delete options.recsOffset;
@@ -1332,9 +1372,12 @@ var Audio = {
         hide(cur.sShowMore);
         if (!offset) scrollToTop();
         delete nav.objLoc.q;
+        delete nav.objLoc.owner;
         delete nav.objLoc.friend;
         delete nav.objLoc.album_id;
         delete nav.objLoc.club;
+        delete nav.objLoc.genre;
+        delete cur._back;
         extend(nav.objLoc, {act: 'recommendations'});
         if (query.audio_id) {
           extend(nav.objLoc, {audio_id: query.audio_id});
@@ -1362,13 +1405,22 @@ var Audio = {
     cur.recsOffset += offset ? 50 : 100;
   },
 
-  loadPopular: function(update) {
+  loadPopular: function(update, genre) {
+    if (cur.silent) {
+      cur.onSilentLoad = function() {
+        Audio.loadPopular(update, genre);
+      };
+      return;
+    }
     if (cur.loadingPopular) return;
     if (update) {
       delete cur.popularOffset;
       delete cur.popularIds;
       delete cur.popularAudios;
       delete cur.preloadJSON;
+      if (genre !== undefined) {
+        cur.genre = genre;
+      }
     }
     each(geByClass('audio_filter', cur.albumFilters), function(i, e) {
       removeClass(e, 'selected');
@@ -1376,10 +1428,25 @@ var Audio = {
     if (cur.searchStr && isVisible(cur.searchInfoCont)) {
       hide(cur.searchInfoCont);
     }
+    var genre_filter = false;
+    if (cur.genre) {
+      var prevGenre = geByClass1('selected', ge('audio_genres'));
+      if (prevGenre) {
+        removeClass(prevGenre, 'selected');
+      }
+
+      genre_filter = ge('audio_genre_'+cur.genre);
+      if (genre_filter) {
+        addClass(genre_filter, 'selected');
+      } else {
+        cur.genre = 0;
+      }
+    }
     var pop_filter = ge('top_audios');
     addClass(pop_filter, 'selected');
     removeClass(cur.albumFiltered, 'selected');
     toggle(cur.audioFriends, false);
+    hide(cur.searchInfoCont);
     if (cur.popularFilters) {
       show(cur.popularFilters);
       hide(cur.audioAlbums);
@@ -1388,7 +1455,7 @@ var Audio = {
       Audio.updateAlbums();
     }
     removeClass(cur.albumFiltered, 'club_shown');
-    hide(cur.searchFilters);
+    hide(cur.searchFilters, cur.popularOwners);
     Audio.handleFilterPos();
     cur.curSection = 'popular';
     if (cur.popularOffset === undefined) {
@@ -1442,15 +1509,12 @@ var Audio = {
       query.type = cur.topType;
       delete cur.topType;
     }
+    if (cur.genre) {
+      query.genre = cur.genre;
+    }
     ajax.post(Audio.address, query, {
-      onDone: function(rows, preload, json, preload_json, options, ownersRows) {
+      onDone: function(rows, preload, json, preload_json, options, genres) {
         delete cur.loadingPopular;
-        if (ownersRows) {
-          val('audio_popular_owners_rows', ownersRows);
-          show(cur.popularOwners);
-        } else {
-          hide(cur.popularOwners);
-        }
         if (cur.lastAct != 'popular') return;
         if (options.popularCount === 0 && offset) {
           cur.noPopular = true;
@@ -1500,6 +1564,9 @@ var Audio = {
         if (update == 'remix') {
           cur.justShuffled = true;
         }
+        if (genres) {
+          ge('audio_genres').innerHTML = genres;
+        }
         Audio.changeHTitle();
         val(cur.aSearch, '');
         removeClass(cur.clearSearch, 'shown');
@@ -1509,20 +1576,27 @@ var Audio = {
         hide(cur.sShowMore);
         if (!offset) scrollToTop();
         delete nav.objLoc.q;
+        delete nav.objLoc.owner;
         delete nav.objLoc.friend;
         delete nav.objLoc.album_id;
         delete nav.objLoc.club;
+        delete nav.objLoc.genre;
         delete nav.objLoc.audio_id;
-        extend(nav.objLoc, {act: 'popular'});
+        nav.objLoc.act = 'popular';
+        if (cur.genre) {
+          nav.objLoc.genre = cur.genre;
+        } else {
+          delete nav.objLoc.genre;
+        }
         nav.setLoc(nav.objLoc);
         var _a = window.audioPlayer;
         if (_a && _a.showCurrentTrack) _a.showCurrentTrack();
       },
       showProgress: function () {
-        addClass(pop_filter, 'loading');
+        addClass(genre_filter || pop_filter, 'loading');
       },
       hideProgress: function () {
-        removeClass(pop_filter, 'loading');
+        removeClass(genre_filter || pop_filter, 'loading');
       }
     });
     cur.popularOffset += offset ? 50 : 100;
@@ -1550,9 +1624,10 @@ var Audio = {
     var feed_filter = ge('feed_filter');
     addClass(feed_filter, 'selected');
     removeClass(cur.albumFiltered, 'selected');
-    hide(cur.searchFilters, cur.popularFilters);
+    hide(cur.searchFilters, cur.popularFilters, cur.popularOwners);
     if (cur.oid == vk.id) {
       show(cur.audioFriends);
+      hide(cur.searchInfoCont);
       hide(cur.audioAlbums);
     }
     removeClass(cur.albumFiltered, 'club_shown');
@@ -1603,10 +1678,13 @@ var Audio = {
         hide(cur.sShowMore);
         if (update) scrollToTop();
         delete nav.objLoc.q;
+        delete nav.objLoc.owner;
         delete nav.objLoc.friend;
         delete nav.objLoc.album_id;
         delete nav.objLoc.club;
+        delete nav.objLoc.genre;
         delete nav.objLoc.audio_id;
+        delete cur._back;
         extend(nav.objLoc, {act: 'feed'});
         nav.setLoc(nav.objLoc);
         var _a = window.audioPlayer;
@@ -1706,7 +1784,8 @@ var Audio = {
     removeClass(cur.albumFiltered, 'selected');
     var showFriends = function() {
       show(cur.audioFriends);
-      hide(cur.audioAlbums, cur.searchFilters, cur.popularFilters);
+      hide(cur.searchInfoCont);
+      hide(cur.audioAlbums, cur.searchFilters, cur.popularFilters, cur.popularOwners);
     }
     if (!cur.audioFriendPlaying && cur.shownFriends.length <= 10) {
       Audio.cacheFriendsList();
@@ -1715,8 +1794,8 @@ var Audio = {
     } else {
       addClass(ge('friends_audios'), 'loading');
       var query = {act: 'more_friends'};
-      if (cur.audioFriendPlaying) query.friend = cur.audioFriendPlaying;
-      else if (cur.audioFriend) query.friend = cur.audioFriend;
+      if (cur.audioFriendPlaying) query.owner = cur.audioFriendPlaying;
+      else if (cur.audioFriend) query.owner = cur.audioFriend;
       ajax.post(Audio.address, query, {
         cache: 1,
         onDone: function(cont, friends) {
@@ -1749,7 +1828,7 @@ var Audio = {
     });
     Audio.loadFriendsAudios(id, 'friend'+id);
     if (id && cur.oid == vk.id) {
-      ajax.post(Audio.address, {act: 'list_stats', friend: id});
+      ajax.post(Audio.address, {act: 'list_stats', owner: id});
     }
     return ev ? cancelEvent(ev) : false;
   },
@@ -1835,7 +1914,7 @@ var Audio = {
     });
     return cancelEvent(ev);
   },
-  loadFriendsAudios: function(id, index, album, showAlbums) {
+  loadFriendsAudios: function(id, index, album, showAlbums, owner) {
     if (cur.silent) {
       cur.onSilentLoad = function() {
         Audio.loadFriendsAudios(id, index, album, showAlbums);
@@ -1856,7 +1935,11 @@ var Audio = {
       }
       cur.lastAct = index;
       var query = {act: 'load_audios_silent', id: id};
-      if (index != 'all' && !ge('audio_friend' + id)) {
+      if (owner) {
+        query.is_owner = 1;
+      }
+      if (index != 'all' && !ge('audio_friend' + id) && !owner) {
+        debugLog('not here');
         cur.shownFriends = [];
         var txt = domFC(ge('audio_more_friends')), prg = domLC(ge('audio_more_friends'));
         Audio.showMoreFriends(function() {
@@ -1888,14 +1971,21 @@ var Audio = {
             cur.allAudiosIndex = 'all';
             Audio.generateAlbums();
           }
+          if (!cur.performerInfo) {
+            cur.performerInfo = {};
+          }
+          cur.performerInfo[index] = opts.performerInfo;
+          if (opts.backLink) {
+            showBackLink('/audio?act=popular'+(cur.genre ? '&genre='+cur.genre : ''), opts.backLink);
+          }
           if (index != 'all') cur.audioFriend = id;
-          Audio.changeAllIndex(index, album, showAlbums);
+          Audio.changeAllIndex(index, album, showAlbums, owner);
           Audio.cacheFriendsList();
         }
       });
     } else {
       if (index != 'all') cur.audioFriend = id;
-      Audio.changeAllIndex(index, album, showAlbums);
+      Audio.changeAllIndex(index, album, showAlbums, owner);
     }
   },
   loadCommunityAudios: function(gid, index) {
@@ -1935,7 +2025,7 @@ var Audio = {
     cur.moreFriendsSent = true;
     var query = {act: 'more_friends', ids: cur.shownFriends};
     if (friend) {
-      query.friend = friend;
+      query.owner = friend;
     }
     ajax.post(Audio.address, query, {
       onDone: function(cont, friends, reset) {
@@ -1975,8 +2065,8 @@ var Audio = {
   },
   cacheFriendsList: function() {
     var query = {act: 'more_friends'};
-    if (cur.audioFriendPlaying) query.friend = cur.audioFriendPlaying;
-    else if (cur.audioFriend) query.friend = cur.audioFriend;
+    if (cur.audioFriendPlaying) query.owner = cur.audioFriendPlaying;
+    else if (cur.audioFriend) query.owner = cur.audioFriend;
     ajax.post(Audio.address, query, {cache: 1});
   },
 
@@ -2421,6 +2511,40 @@ var Audio = {
       hiderogress: box.hideProgress
     });
     return false;
+  },
+
+  loadGenre: function(genre_id) {
+    Audio.loadPopular(true, genre_id);
+  },
+
+  loadPerformer: function(oid, ev, obj) {
+    var index = 'owner'+oid;
+    Audio.loadFriendsAudios(oid, index, undefined, undefined, true);
+    return cancelEvent(ev);
+  },
+
+  moreCatalog: function(obj) {
+    if (hasClass(obj, 'audio_performer_shown')) {
+      removeClass(obj, 'audio_performer_shown');
+      hide('audio_more_performers');
+    } else {
+      if (ge('audio_more_performers')) {
+        show('audio_more_performers')
+        addClass(obj, 'audio_performer_shown');
+        return false;
+      }
+      ajax.post('al_audio.php', {act: 'get_more_performers', offset: 4, genre: parseInt(cur.genre)}, {
+        onDone: function(rows) {
+          ge('audio_performers').appendChild(ce('div', {
+            id: 'audio_more_performers',
+            innerHTML: rows
+          }));
+          addClass(obj, 'audio_performer_shown');
+        },
+        showProgress: addClass.pbind(obj, 'audio_performer_loading'),
+        hideProgress: removeClass.pbind(obj, 'audio_performer_loading'),
+      });
+    }
   },
 
   _eof: 1

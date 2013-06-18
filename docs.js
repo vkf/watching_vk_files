@@ -463,7 +463,7 @@ downloadItem: function(oid, did, event) {
   var href = icon.href;
   var ext = trim(icon.getAttribute('ext'));
   if ('jpg|gif|png|pdf|doc|docx|xls|xlsx|rtf'.indexOf(ext) == -1) {
-    location.href = href+(href.match('?') ? '&' : '?')+'wnd=1';
+    location.href = href+(href.match(/\?/) ? '&' : '?')+'wnd=1';
   } else {
     window.open(href);
   }

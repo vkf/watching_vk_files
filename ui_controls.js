@@ -1059,9 +1059,12 @@ createChildClass('Selector', UiControl, {
     }
   },
   showDefaultList: function() {
-    var reversed = hasClass(this.resultList, 'reverse');
-    if (reversed != this.needsReverse() && this.currenDataItems) {
+    var reversed = hasClass(this.resultList, 'reverse'), rev = this.needsReverse();
+    if (reversed != rev && this.currenDataItems) {
       this.setSelectContent(this.currenDataText || '', this.currenDataItems);
+      toggleClass(this.resultList, 'reverse', rev);
+      toggleClass(this.resultListShadow, 'reverse', rev);
+      reversed = rev;
     }
     if (this.defaultList && this.select.hasItems()) {
       if (this.options.multiselect || !this._selectedItems.length)
@@ -1073,10 +1076,9 @@ createChildClass('Selector', UiControl, {
       var text = this.options.autocomplete ? this.options.introText : null;
       this._showSelectList(text, (this.options.defaultItems.length || this.options.zeroDefault) ? this.options.defaultItems : this.dataItems);
     }
-    reversed = hasClass(this.resultList, 'reverse');
     if (reversed) {
       if (!this._selectedItems.length) {
-        this.resultList.scrollTop = getSize(this.resultList.firstChild)[1] - getSize(this.resultList)[1] + 10;
+//        this.resultList.scrollTop = getSize(this.resultList.firstChild)[1] - getSize(this.resultList)[1] + 10;
       }
       setStyle(this.resultList, {bottom: getSize(this.container)[1] - 1});
     } else {
@@ -1143,10 +1145,13 @@ createChildClass('Selector', UiControl, {
         adding.push([it[0], formatted]);
       }
     }
-    var rev = this.needsReverse();
-    if (rev) adding = adding.reverse();
-    toggleClass(this.resultList, 'reverse', rev);
-    toggleClass(this.resultListShadow, 'reverse', rev);
+    if (text && adding.length > 1) {
+      adding = adding.slice(1);
+    }
+//    var rev = this.needsReverse();
+//    if (rev) adding = adding.reverse(); // removed reverse
+//    toggleClass(this.resultList, 'reverse', rev);
+//    toggleClass(this.resultListShadow, 'reverse', rev);
     this.select.content(adding);
   },
   _showSelectList: function(text, items, query) {
@@ -1490,7 +1495,7 @@ createChildClass('Select', UiControl, {
         }
       }
     } else if (this.options.selectFirst) {
-      var reversed = this.container && hasClass(this.container, 'reverse'), ind;
+      var reversed = false;//this.container && hasClass(this.container, 'reverse'), ind;
       for (var i = 0; i < this.list.childNodes.length; i++) {
         ind = reversed ? this.list.childNodes.length - 1 - i : i;
         childNode = this.list.childNodes[ind];
@@ -1622,16 +1627,21 @@ createChildClass('Select', UiControl, {
     this.hide();
   },
   updateContainer: function() {
+    var reversed = this.container && hasClass(this.container, 'reverse');
     if (this.maxHeight < this.list.offsetHeight) {
       this.container.style.height = this.maxHeight + 'px';
-      show(this.shadow);
-      this.shadow.style.marginTop = (this.maxHeight + 1) + 'px'; // +1 - because of border-bottom
+      if (reversed) {
+        hide(this.shadow);
+      } else {
+        show(this.shadow);
+        this.shadow.style.marginTop = (this.maxHeight + 1) + 'px'; // +1 - because of border-bottom
+      }
       addClass(this.container, this.CSS.SCROLLABLE);
     } else {
       removeClass(this.container, this.CSS.SCROLLABLE);
       this.container.style.height = 'auto';
       var shadow_height = intval(this.list.offsetHeight) + intval(this.list.offsetTop);
-      if (shadow_height) {
+      if (shadow_height && !reversed) {
         show(this.shadow);
         this.shadow.style.marginTop = shadow_height + 'px';
       } else {

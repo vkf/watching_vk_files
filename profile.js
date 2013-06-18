@@ -306,21 +306,31 @@ var Profile = {
     var v = trim(val(field)).replace(/\n\n\n+/g, '\n\n');
     if (field.lastLen === v.length) return;
     field.lastLen = v.length;
-    var countRealLen = function(text) {
+    var countRealLen = function(text, max, maxbr) {
       var spec = {'&': 5, '<': 4, '>': 4, '"': 6, "\n": 4, "\r": 0, '!': 5, "'": 5};
-      var res = 0;
+      var res = 0, brs = 0, good = false;
       for (var i = 0, l = text.length; i < l; i++) {
         var k = spec[text.charAt(i)], c = text.charCodeAt(i);
+        if (c == 10) ++brs;
         if (k !== undefined) res += k;
         else if ((c > 0x80 && c < 0xC0) || c > 0x500) res += ('&#' + c + ';').length;
         else res += 1;
+        if (good === false && (max && res > max || maxbr && brs > maxbr)) good = i ? text.substr(0, i) : '';
       }
-      return res;
+      return [res, brs, (good === false) ? text : good];
     }
-    var realLen = countRealLen(v), maxLen = 240;
-    var brCount = (realLen - v.replace(/\n/g, '').length) / 4;
+    var maxLen = 240, maxBrs = 4, r = countRealLen(v, maxLen, maxBrs), realLen = r[0], brCount = r[1];
     var warn = ge('preq_warn');
-    if (realLen > maxLen - 40 || brCount > 4) {
+    if (r[2] !== v) {
+      if (realLen > maxLen) {
+        realLen = maxLen;
+      } else if (brCount > 4) {
+        brCount = 4;
+      }
+      val(field, r[2]);
+      field.lastLen = trim(r[2]).length;
+    }
+    if (realLen > maxLen - 40 || brCount > maxBrs) {
       if (realLen > maxLen) {
         warn.innerHTML = getLang('friends_exceeds_symbol_limit', realLen - maxLen);
       } else if (brCount > 4) {

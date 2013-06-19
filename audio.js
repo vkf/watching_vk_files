@@ -1595,6 +1595,9 @@ var Audio = {
         nav.setLoc(nav.objLoc);
         var _a = window.audioPlayer;
         if (_a && _a.showCurrentTrack) _a.showCurrentTrack();
+        if (window.tooltips) {
+          tooltips.destroyAll();
+        }
       },
       showProgress: function () {
         addClass(genre_filter || pop_filter, 'loading');
@@ -2238,7 +2241,7 @@ var Audio = {
     ajax.post('al_search.php', {act: 'save_top_audio', deleted: 1, audio_hash: audio_hash, hash: hash, id: full_aid}, {
       onDone: function() {
         var audioRow = ge('audio'+full_aid);
-        slideUp(audioRow, 200);
+        slideUp(audioRow, 100);
       }
     })
   },

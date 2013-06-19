@@ -14,7 +14,7 @@
 /*  position: relative;*/
 }
 #audio.new #side_filters {
-  width: 155px;
+  width: 156px;
   top: 87px;
   padding: 13px 0 10px;
 }
@@ -93,7 +93,7 @@
   outline: none;
 }
 #audio.new .audio_search .s_search {
-  width: 263px;
+  width: 262px;
 }
 .audio_search .s_search::-ms-clear {
   display: none;
@@ -168,7 +168,7 @@
 #audio.new .area {
   cursor: pointer;
   position: relative;
-  width: 425px;
+  width: 424px;
   margin: 0px;
 }
 #audio.new .wall_module .area {
@@ -559,19 +559,19 @@
   float: left;
 }
 .audio_table .side_panel {
-  width: 155px;
+  width: 156px;
   vertical-align: top;
   padding: 0 10px;
   background: #F7F7F7;
 }
 .audio_filter {
   color: #2B587A;
-  max-width: 155px;
+  max-width: 156px;
   cursor: pointer;
   position: relative;
 }
 .audio_filter .label {
-  max-width: 120px;
+  max-width: 121px;
   overflow: hidden;
   -o-text-overflow: ellipsis;
   text-overflow: ellipsis;

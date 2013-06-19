@@ -658,7 +658,6 @@ var Audio = {
       cur.autoComplete = 1;
     }
     clearTimeout(this.filterTimeout);
-    debugLog(new Error().stack);
     this.filterTimeout = setTimeout((function() {
       var str = trim(obj.value), el;
       if (str == cur.searchStr && cur.autoComplete && !cur.ignoreEqual) {
@@ -738,7 +737,7 @@ var Audio = {
     cur.shownAudios = 0;
     cur.curSection = type;
     var clubList = (type && type.substr(0, 4) == 'club');
-    if (!clubList) {
+    if (!clubList && cur.searchSortFilter) {
       cur.searchSortFilter.disable(false);
       cur.searchLyricsFilter.disable(false);
       removeClass(cur.albumFiltered, 'club_shown');
@@ -1989,7 +1988,8 @@ var Audio = {
           }
           cur.performerInfo[index] = opts.performerInfo;
           if (opts.backLink) {
-            showBackLink('/audio?act=popular'+(cur.genre ? '&genre='+cur.genre : ''), opts.backLink);
+            cur.backLink = opts.backLink;
+            showBackLink('/audio?act=popular'+(cur.genre ? '&genre='+cur.genre : ''), cur.backLink);
           }
           if (index != 'all') cur.audioFriend = id;
           Audio.changeAllIndex(index, album, showAlbums, owner);
@@ -1998,6 +1998,9 @@ var Audio = {
       });
     } else {
       if (index != 'all') cur.audioFriend = id;
+      if (owner) {
+        showBackLink('/audio?act=popular'+(cur.genre ? '&genre='+cur.genre : ''), cur.backLink);
+      }
       Audio.changeAllIndex(index, album, showAlbums, owner);
     }
   },

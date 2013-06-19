@@ -1139,10 +1139,16 @@ input.apps_edit_input_readonly {
   padding: 5px;
   margin-top: 5px;
 }
+.apps_edit_short {
+  width: 110px;
+}
 .apps_edit_right {
   padding: 5px 5px;
   width: 400px;
   margin-top: 5px;
+}
+.apps_edit_long {
+  width: 584px;
 }
 .apps_edit_func_name_c {
   font-weight: bold;
@@ -1161,12 +1167,13 @@ input.apps_edit_func_name {
   border-radius: 3px;
   padding: 4px;
   margin: -4px 2px;
+  width: 200px;
 }
 .apps_edit_funcs_create {
   margin-top: 16px;
 }
 .apps_edit_func_row {
-  padding: 10px 0px 5px 0px;
+  padding: 0px 0px 10px 0px;
 }
 .apps_edit_func_acts {
   position: absolute;

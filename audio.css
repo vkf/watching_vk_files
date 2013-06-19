@@ -565,10 +565,14 @@
   background: #F7F7F7;
 }
 .audio_filter {
+  display: block;
   color: #2B587A;
   max-width: 156px;
   cursor: pointer;
   position: relative;
+}
+.audio_filter:hover {
+  text-decoration: none;
 }
 .audio_filter .label {
   max-width: 121px;

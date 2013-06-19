@@ -877,6 +877,8 @@ var Audio = {
       htitle = cur.recommendTitle ? cur.recommendTitle : getLang('audio_recommended_audios');
     } else if (cur.curSection && cur.curSection == 'popular') {
       htitle = cur.popularTitle ? cur.popularTitle : getLang('audio_popular_audios');
+    } else if (cur.curSection && cur.curSection.indexOf('owner') === 0) {
+      htitle = cur.allFriendsHTitles[cur.audioFriend];
     } else if (from_search) {
       htitle = getLang('audio_title_search').replace('{q}', val('s_search'));
     } else if (cur.curSection && !cur.curSection.indexOf('club')) {
@@ -1602,6 +1604,9 @@ var Audio = {
         if (_a && _a.showCurrentTrack) _a.showCurrentTrack();
         if (window.tooltips) {
           tooltips.destroyAll();
+        }
+        if (options.infoJS) {
+          eval('(function(){' + options.infoJS + ';})()');
         }
       },
       showProgress: function () {
@@ -2546,11 +2551,18 @@ var Audio = {
     return false;
   },
 
-  loadGenre: function(genre_id) {
+  loadGenre: function(genre_id, ev) {
+    if (checkEvent(ev)) {
+      return true;
+    }
     Audio.loadPopular(true, genre_id);
+    return cancelEvent(ev);
   },
 
-  loadPerformer: function(oid, ev, obj) {
+  loadPerformer: function(oid, ev) {
+    if (checkEvent(ev)) {
+      return true;
+    }
     var index = 'owner'+oid;
     Audio.loadFriendsAudios(oid, index, undefined, undefined, true);
     return cancelEvent(ev);

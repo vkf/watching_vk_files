@@ -910,9 +910,11 @@ commentTo: function(comm, toId, event) {
     mvcur.mvReplyTo = false;
     hide(tl, 'mv_del_reply_to');
   }
+  cur.mvReplyIn = mvcur.videoRaw;
+  cur.mvReplyTo = mvcur.mvReplyTo;
 
   var v = trim(val(rf)), cEl = comm && geByClass1('mv_reply_to', ge('mv_comment' + comm));
-  if (!v || replyNameOld && !winToUtf(replyNameOld[1]).indexOf(v)) {
+  if (!v || replyNameOld && !winToUtf(replyNameOld[1]).indexOf(v) || comm === false) {
     val(rf, (comm && !checkEvent(event)) ? replaceEntities(replyName[1]) : '');
   }
   toggleClass(asGroup, 'on', !!(cEl && cEl.getAttribute('rid') === cmnt[0]));
@@ -1595,12 +1597,12 @@ showVideo: function(title, html, js, desc, info, controlsLine, opt) {
 
   opt = opt || {};
   window.lang = extend(window.lang || {}, opt.lang);
-  mvcur.mvReplyNames = opt.names || {};
   mvcur.mvCommLimit = opt.commlimit;
   mvcur.mvData = opt.mvData;
   mvcur.videoRaw = opt.mvData.videoRaw;
   mvcur.mvMediaTypes = opt.media;
   mvcur.mvMediaShare = opt.share;
+  mvcur.mvReplyNames = opt.names || {};
 
   if (!mvcur.mvContent) {
     mvcur.mvContent = ge('mv_content');
@@ -1612,12 +1614,19 @@ showVideo: function(title, html, js, desc, info, controlsLine, opt) {
   if (mvcur.mvWide) {
     mvcur.mvWide.innerHTML = desc;
   }
-  mvcur.mvReplyTo = false;
   if (mvcur.mvNarrow) {
     mvcur.mvNarrow.innerHTML = info;
   }
 
   Videoview.updateComposer();
+  if (mvcur.mvData.videoRaw == cur.mvReplyIn) {
+    mvcur.mvReplyTo = cur.mvReplyTo;
+    cur.mvReplyIn = mvcur.videoRaw;
+    cur.mvReplyTo = mvcur.mvReplyTo;
+  } else {
+    Videoview.commentTo(false);
+  }
+
   if (!cur.mvComments) cur.mvComments = {};
   var cms = ge('mv_comments_wrap');
   if (cur.mvComments[mvcur.videoRaw]) {
@@ -2105,6 +2114,8 @@ unminimize: function(noLoc, beforeHide, noQueue) {
       layers.wrapshow(mvLayerWrap, 0.7);
       layers.fullhide = Videoview.hide;
       Videoview.updateComposer();
+      cur.mvReplyIn = mvcur.videoRaw;
+      cur.mvReplyTo = mvcur.mvReplyTo;
     }, 0);
   }
   Videoview.hidePlayer(true);

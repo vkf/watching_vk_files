@@ -187,9 +187,15 @@ var Audio = {
           var audio = cur.audios[cur.audio_id];
           if (audio) {
             var audio_id = audio[0] + '_' + audio[1];
-            try{
-              playAudioNew(audio_id);
-            }catch(e){};
+            if (audio[11] && parseInt(audio[11])) {
+              var claim = parseInt(audio[11]) || 0;
+              if (claim == -2) claim = 0;
+              Audio.showAudioClaimWarning(audio_id, claim, audio[5] + ' &ndash; ' + audio[6]);
+            } else {
+              try{
+                playAudioNew(audio_id);
+              }catch(e){};
+            }
           }
         }
       });

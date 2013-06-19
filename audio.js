@@ -2226,6 +2226,22 @@ var Audio = {
     return false;
   },
 
+  editTopAudio: function(full_aid, event) {
+    showBox('al_search.php', {act: 'audio_top_edit_box', id: full_aid, full_id: full_aid}, {
+      params: {width: '430px', bodyStyle: 'padding: 15px;'}
+    });
+    if (event) cancelEvent(event);
+    return false;
+  },
+  removeFromTop: function(audio_hash, hash, event) {
+    ajax.post('al_search.php', {act: 'save_top_audio', deleted: 1, audio_hash: audio_hash, hash: hash}, {
+      onDone: function() {
+
+      }
+    })
+
+  },
+
   updateAlbums: function() {
     if (!cur.canEdit || browser.mobile) return;
     each (cur.audioAlbumsWrap.sorter.elems, function() {

@@ -2233,13 +2233,14 @@ var Audio = {
     if (event) cancelEvent(event);
     return false;
   },
-  removeFromTop: function(audio_hash, hash, event) {
-    ajax.post('al_search.php', {act: 'save_top_audio', deleted: 1, audio_hash: audio_hash, hash: hash}, {
-      onDone: function() {
 
+  removeFromTop: function(audio_hash, hash, full_aid, event) {
+    ajax.post('al_search.php', {act: 'save_top_audio', deleted: 1, audio_hash: audio_hash, hash: hash, id: full_aid}, {
+      onDone: function() {
+        var audioRow = ge('audio'+full_aid);
+        slideUp(audioRow, 200);
       }
     })
-
   },
 
   updateAlbums: function() {

@@ -1865,7 +1865,7 @@
   border-radius: 3px;
 }
 .audio_owner_info_name {
-  margin-top: 4px;
+  margin-top: 6px;
   text-align: center;
   font-weight: bold;
 }
@@ -1884,4 +1884,8 @@
 }
 .audio_performer_loading .audio_catalog_more {
   display: none;
+}
+.audio_owner_info_desc {
+  color: #777777;
+  padding-top: 6px;
 }

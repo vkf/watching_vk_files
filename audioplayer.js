@@ -638,6 +638,8 @@ var audioPlayer = {
     if ((cur.module == 'groups' || cur.module == 'public' || cur.module == 'audio') && cur.oid == ids[0] && cur.oid < 0) params.group = 1;
     if ((cur.module == 'audio' || cur.module == 'feed') && nav.objLoc['q'] || cur.module == 'search' && nav.objLoc['c[q]']) params.search = 1;
     if (cur.module == 'audio' && nav.objLoc['album_id'] && cur.album_id) params.album = 1;
+    if (cur.module == 'audio' && nav.objLoc['owner']) params.top_bands = 1;
+    if (cur.module == 'audio' && nav.objLoc['genre']) params.popular_genre = 1;
     if (cur.module == 'audio' && cur.club) params.club = cur.club;
     if (!params.search && cur.module == 'feed') params.feed = 1;
     _a.playbackParams = params;

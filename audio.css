@@ -33,7 +33,7 @@
   line-height: 0.5em;
 }
 .font_medium .audio_search div.abutton_wrap button {
-  width: 135px;
+  width: 134px;
   line-height: 0.4em;
 }
 .audio_search div.abutton_wrap img {
@@ -1868,6 +1868,7 @@
   margin-top: 6px;
   text-align: center;
   font-weight: bold;
+  overflow:hidden;
 }
 .audio_catalog_more_loading,
 .audio_catalog_hide_more {

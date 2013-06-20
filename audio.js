@@ -2570,8 +2570,12 @@ var Audio = {
 
   moreCatalog: function(obj) {
     if (hasClass(obj, 'audio_performer_shown')) {
+      var height = getSize(ge('audio_more_performers'))[1];
       removeClass(obj, 'audio_performer_shown');
       hide('audio_more_performers');
+      if (height > 300) {
+        scrollToTop(0);
+      }
     } else {
       if (ge('audio_more_performers')) {
         show('audio_more_performers')

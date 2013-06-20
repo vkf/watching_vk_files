@@ -1308,7 +1308,7 @@ var audioPlayer = {
       }
       re(el);
     } else {
-      ajax.post('/audio', {act: 'load_audios_silent', id: vk.id}, {
+      ajax.post('/audio', {act: 'load_audios_silent', id: vk.id, please_dont_ddos: 4}, {
         cache: 1,
         showProgress: function() {
           ge('pad_footer_text').innerHTML = '<div class="progress" style="display: block;"></div>';
@@ -1812,6 +1812,9 @@ var audioPlayer = {
   },
   deregisterPlayer: function(name) {
     var _a = audioPlayer, obj = audioPlayer.controls[name];
+    if (!obj) {
+      return;
+    }
     if (obj.duration) {
       removeEvent(obj.duration, 'mousedown', function(){
         _a.switchTimeFormat();

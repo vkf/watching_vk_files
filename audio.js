@@ -104,7 +104,7 @@ var Audio = {
     hide(cur.sContent);
 
     cur.silent = true;
-    var query = {act: 'load_audios_silent', id: (cur.allAudiosIndex == 'all' ? cur.id : cur.audioFriend), gid: cur.gid};
+    var query = {act: 'load_audios_silent', id: (cur.allAudiosIndex == 'all' ? cur.id : cur.audioFriend), gid: cur.gid, please_dont_ddos: 2};
     if (cur.allAudiosIndex != 'all') {
       Audio.cacheFriendsList();
     }
@@ -1951,7 +1951,7 @@ var Audio = {
         removeClass(cur.albumFiltered, 'selected');
       }
       cur.lastAct = index;
-      var query = {act: 'load_audios_silent', id: id};
+      var query = {act: 'load_audios_silent', id: id, please_dont_ddos: 3};
       if (owner) {
         query.is_owner = 1;
       }
@@ -2018,7 +2018,7 @@ var Audio = {
     }
     if (!cur.audiosList[index]) {
       cur.lastAct = index;
-      ajax.post(Audio.address, {act: 'load_audios_silent', gid: gid}, {
+      ajax.post(Audio.address, {act: 'load_audios_silent', gid: gid, please_dont_ddos: 1}, {
         cache: 1,
         showProgress: addClass.pbind(ge('album0'), 'loading'),
         hideProgress: removeClass.pbind(ge('album0'), 'loading'),
@@ -2587,7 +2587,7 @@ var Audio = {
           addClass(obj, 'audio_performer_shown');
         },
         showProgress: addClass.pbind(obj, 'audio_performer_loading'),
-        hideProgress: removeClass.pbind(obj, 'audio_performer_loading'),
+        hideProgress: removeClass.pbind(obj, 'audio_performer_loading')
       });
     }
   },

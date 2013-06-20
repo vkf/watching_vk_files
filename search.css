@@ -998,8 +998,9 @@ div.target .sponsored_header {
   visibility: hidden;
 }
 #search_content .area .actions a {
-  display: block;
+  display: inline-block;
   padding: 6px;
+  background: #EDF1F5;
 }
 #search_content .audio.claimed .actions,
 #search_content .audio.over .actions {

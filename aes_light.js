@@ -1145,6 +1145,16 @@ AdsLight.handleAllAds = function(box, adsIdsMore, adsIdsApply, adsHeightMore) {
     ajax.post('/ads_light.php?act=all_ads_apply', ajaxParams, {onDone: onCompleteApplyAds, onFail: onCompleteApplyAds})
   }
   function onCompleteApplyAds(response) {
+    for (var blockIdSuffix in response) {
+      var elem = ge('ads_ad_box2_' + blockIdSuffix);
+      if (!elem) {
+        continue;
+      }
+      for (var key in response[blockIdSuffix]) {
+        elem.setAttribute(key, response[blockIdSuffix][key]);
+      }
+    }
+
     applyLocked = false;
     applyAds();
   }

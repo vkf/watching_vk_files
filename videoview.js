@@ -918,7 +918,9 @@ commentTo: function(comm, toId, event) {
     val(rf, (comm && !checkEvent(event)) ? replaceEntities(replyName[1]) : '');
   }
   toggleClass(asGroup, 'on', !!(cEl && cEl.getAttribute('rid') === cmnt[0]));
-  elfocus(rf);
+  if (comm) {
+    elfocus(rf);
+  }
 },
 receiveComms: function(text, names, noOld, toUp) {
   var n = ce('div', {innerHTML: text}), comms = ge('mv_comments'), last = current = domLC(comms), frm = getXY(current, true)[1], mv = mvcur.mvData, commField = ge('mv_comment');

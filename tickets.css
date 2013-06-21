@@ -196,10 +196,12 @@ h4.tickets_template.my {
   color: #555;
 }
 #tickets_reply_warn,
+#tickets_links_warn,
 #tickets_text_warn {
   display: none;
   color: #777;
 }
+#tickets_links_warn,
 #tickets_text_warn {
   margin-top: 3px;
 }

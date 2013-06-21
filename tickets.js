@@ -578,20 +578,21 @@ addPayData: function(hash) {
   });
 },
 
-checkTextLength: function(el, maxLen, warn) {
+checkTextLength: function(el, maxLen, warn, maxLines) {
   var v = trim(el.value).replace(/\n\n\n+/g, '\n\n');
   if (el.lastLen === v.length) return;
 
   var realLen = el.lastLen = v.length;
   var brCount = realLen - v.replace(/\n/g, '').length;
+  maxLines = maxLines || 10;
 
   warn = ge(warn);
-  if (realLen > maxLen - 100 || brCount > 10) {
+  if (realLen > maxLen - 100 || brCount > maxLines) {
     show(warn);
     if (realLen > maxLen) {
       warn.innerHTML = getLang('global_recommended_exceeded', realLen - maxLen);
-    } else if (brCount > 10) {
-      warn.innerHTML = getLang('global_recommended_lines', brCount - 10);
+    } else if (brCount > maxLines) {
+      warn.innerHTML = getLang('global_recommended_lines', brCount - maxLines);
     } else {
       warn.innerHTML = getLang('text_N_symbols_remain', maxLen - realLen);
     }

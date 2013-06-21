@@ -1708,6 +1708,14 @@ a.tickets_question_row_tt:hover {
   height: 13px;
   padding: 5px !important;
 }
+.tickets_dmca_log_in_msg {
+  line-height: 160%;
+  padding: 20px;
+}
+.tickets_dmca_log_in_btn {
+  text-align: center;
+  margin-bottom: 30px;
+}
 .tickets_late_info {
   width: 500px;
 }

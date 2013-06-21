@@ -207,6 +207,138 @@ savePayTicket: function(hash) {
   });
 },
 
+saveDMCATicket: function(hash) {
+  if (!Tickets.checkDMCAForm()) {
+    return;
+  }
+  var attachs = [], chosen = cur.ticketsNewMedia.chosenMedias;
+  if (chosen) {
+    for (var i in chosen) {
+      var att = chosen[i], type = att[0], value = att[1];
+      if (type == 'photo' || type == 'doc') {
+        attachs.push(type+','+value);
+      }
+    }
+  }
+  var _uafull = Tickets.getBrowser();
+  var query = extend({act: 'save', hash: hash, section: 21, attachs: attachs, browser: _uafull}, Tickets.getDMCAFields());
+  if (cur.samples && cur.samples.audio || ge('audio_checking')) {
+    query.audio_html = ge('audio_checking').innerHTML;
+    var orig = (cur.samples || {}).audio || '';
+    if (window.ag && window.sh) {query.audio_html = query.audio_html.replace(/_info/g, 'vkontakte_info')};
+    if (window.dwnl_video || window.add_js) {query.audio_html = query.audio_html.replace(/_info/g, 'dwnl_info')};
+    query.audio_orig = ce('div', {innerHTML: orig.replace(/z9q2m/g, 'audio')}).innerHTML;
+  }
+  ajax.post('/support', query, {
+    showProgress: lockButton.pbind(ge('tickets_send')),
+    hideProgress: unlockButton.pbind(ge('tickets_send'))
+  });
+},
+
+checkDMCAForm: function() {
+  var params = Tickets.getDMCAFields();
+  var legal = params.type == 1,
+      suffix = legal ? '_legal' : '';
+  if (!params.text) {
+    notaBene('tickets_text');
+    return;
+  }
+  if (params.links.length < 9) {
+    notaBene('tickets_links');
+    return;
+  }
+  if (legal) {
+    if (!params.title) {
+      notaBene('tickets_dmca_corp');
+      return false;
+    }
+    if (params.repr.length < 5) {
+      notaBene('tickets_dmca_repr');
+      return false;
+    }
+    if (params.post.length < 3) {
+      notaBene('tickets_dmca_post');
+      return false;
+    }
+  } else {
+    if (!params.title) {
+      notaBene('tickets_dmca_name');
+      return false;
+    }
+  }
+  if (!(/^\s*[a-zA-Z0-9_\.\-]+@[a-zA-Z0-9_\.\-]+\s*$/.test(params.email))) {
+    notaBene('tickets_dmca_email');
+    return false;
+  }
+  if (params.country < 1) {
+    cur.uiCountry.focus();
+    return false;
+  }
+  if (params.city < 1) {
+    cur.uiCity.focus();
+    return false;
+  }
+  if (params.address < 9) {
+    notaBene('tickets_dmca_address');
+    return false;
+  }
+  if (!isChecked('support_dmca_agree_owner' + suffix)) {
+    return Tickets.showMsgBox(getLang(legal ? 'help_ccform_legal_need_is_owner' : 'help_ccform_natural_need_owner'), getLang('global_error'));
+  }
+  if (!isChecked('support_dmca_agree_unauthorized' + suffix)) {
+    return Tickets.showMsgBox(getLang(legal ? 'help_ccform_legal_need_unauthorized' : 'help_ccform_natural_need_unauthorized'), getLang('global_error'));
+  }
+  if (!isChecked('support_dmca_agree_perjury' + suffix)) {
+    return Tickets.showMsgBox(getLang(legal ? 'help_ccform_legal_need_perjury' : 'help_ccform_natural_need_perjury'), getLang('global_error'));
+  }
+  if (!isChecked('support_dmca_agree_email' + suffix)) {
+    return Tickets.showMsgBox(getLang(legal ? 'help_ccform_legal_need_email' : 'help_ccform_natural_need_email'), getLang('global_error'));
+  }
+  if (!isChecked('support_dmca_agree_inform' + suffix)) {
+    return Tickets.showMsgBox(getLang(legal ? 'help_ccform_legal_need_inform' : 'help_ccform_natural_need_inform'), getLang('global_error'));
+  }
+  if (!isChecked('support_dmca_agree_rules')) {
+    return Tickets.showMsgBox(getLang('help_ccform_need_rules'), getLang('global_error'));
+  }
+
+  return true;
+},
+
+getDMCAFields: function() {
+  var text = trim(val('tickets_text')),
+      links = trim(val('tickets_links'));
+  var res = {
+    text: trim(val('tickets_text')),
+    links: trim(val('tickets_links')),
+    type: cur.dmcaType,
+    email: trim(val('tickets_dmca_email')),
+    country: cur.uiCountry.val(),
+    city: cur.uiCity.val(),
+    region: trim(val('tickets_dmca_region')),
+    address: trim(val('tickets_dmca_address'))
+  };
+  if (cur.dmcaType == 1) {
+    res.title = trim(val('tickets_dmca_corp'));
+    res.repr = trim(val('tickets_dmca_repr'));
+    res.post = trim(val('tickets_dmca_post'));
+  } else {
+    res.title = trim(val('tickets_dmca_name'));
+  }
+  for (var i in res) {
+    if (res[i] === '') {
+      delete res[i];
+    }
+  }
+
+  return res;
+
+},
+
+showMsgBox: function(text, title, input) {
+  setTimeout(showFastBox({title: title, dark: true, bodyStyle: 'line-height: 160%;', onHide: function() {if (input) ge(input).focus();}}, text).hide, 4000);
+  return false;
+},
+
 checkPhone: function(phone) {
   ajax.post(nav.objLoc[0], {act: 'check_phone', phone: phone}, {
     cache: 1,

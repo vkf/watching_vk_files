@@ -17,6 +17,10 @@
 .firefox #tickets_detailed_form.pay {
   margin-bottom: 40px;
 }
+#tickets_detailed_form.dmca {
+  display: block;
+  padding-top: 0px;
+}
 .tickets_new_title .input_back_content {
   padding: 4px 2px;
   padding: 4px 1px\9;
@@ -49,7 +53,8 @@ h4.tickets_template.favs {
 h4.tickets_template.my {
   margin-top: 5px;
 }
-#tickets_text {
+#tickets_text,
+#tickets_links {
   width: 436px;
   height: 94px;
   margin: 0 0 10px;
@@ -1555,6 +1560,7 @@ a.tickets_question_row_tt:hover {
 }
 
 /* Payments support */
+.tickets_dmca_head,
 .tickets_pay_head {
   margin: 0px 0 4px;
   padding: 10px 0px 4px;
@@ -1566,6 +1572,7 @@ a.tickets_question_row_tt:hover {
 #tickets_payment_data {
   padding: 0px 0px 15px;
 }
+#tickets_dmca_holder .radiobtn,
 #tickets_payment_type .radiobtn {
   padding: 5px 0px;
 }
@@ -1598,18 +1605,55 @@ a.tickets_question_row_tt:hover {
 #tickets_post_form #tickets_payment_data {
   padding-bottom: 10px;
 }
+.tickets_dmca_data,
 .tickets_pay_data {
   padding-top: 10px;
 }
+.tickets_dmca_data_row,
 .tickets_pay_data_row {
   padding-top: 5px;
 }
+.tickets_dmca_data_row.links {
+  padding-top: 10px;
+  padding-bottom: 20px;
+}
+.tickets_dmca_data_row.blocked {
+  padding-top: 0px;
+  padding-bottom: 15px;
+}
+.tickets_dmca_data_row .label,
 .tickets_pay_data .label {
   min-width: 150px;
   color: #777;
 }
+.tickets_dmca_data_row .value,
 .tickets_pay_data .value {
   max-width: 380px;
+}
+.tickets_dmca_data_row.blocked .label,
+.tickets_dmca_data_row.name .label,
+.tickets_dmca_data_row.links .label {
+  padding-bottom: 5px;
+}
+.tickets_dmca_data_row.links .value {
+  max-width: 530px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.tickets_dmca_buttons {
+  padding-top: 10px;
+}
+.tickets_dmca_buttons .button_gray {
+  margin-left: 10px;
+}
+#tickets_decline_dmca_comment {
+  width: 393px;
+  height: 70px;
+}
+.is_rtl1 .tickets_dmca_buttons .button_gray {
+  margin-left: 0px;
+  margin-right: 10px;
 }
 .tickets_payments_header {
   display: inline-block;
@@ -1631,6 +1675,36 @@ a.tickets_question_row_tt:hover {
 #tickets_payment_data .cal_table .day.past_day,
 #tickets_payment_data .cal_table .day.today {
   color: #000;
+}
+
+#tickets_dmca_data {
+  padding: 0px 0px 15px;
+}
+.tickets_dmca_row {
+  padding-top: 10px;
+}
+.tickets_dmca_row.padd {
+  padding-top: 20px;
+}
+.tickets_dmca_row .checkbox {
+  line-height: 170%;
+  padding-left: 20px;
+  position: relative;
+}
+.tickets_dmca_row .checkbox div {
+  margin-top: 2px;
+  left: 0px !important;
+  left: -20px;
+  position: absolute;
+}
+.tickets_dmca_row .selector input {
+  height: 17px;
+  margin-bottom: 2px;
+}
+.tickets_dmca_input {
+  width: 300px;
+  height: 13px;
+  padding: 5px !important;
 }
 .tickets_late_info {
   width: 500px;

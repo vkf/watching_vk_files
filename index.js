@@ -152,7 +152,12 @@ var Index = {
     }, showProgress: lockButton.pbind('ij_submit'), hideProgress: unlockButton.pbind('ij_submit')});
   },
   fbCheck: function(appId, context) {
-    window.fbAsyncInit = function() {
+
+    stManager.add(['fbsign.js'], function() {Fbsign.init();});
+    var indexDiv = ge('index_fbsign' + (context || ''));
+    setStyle(indexDiv, {opacity:1, height:54});
+    show(indexDiv);
+    /*window.fbAsyncInit = function() {
       FB.init({
         appId      : appId,
         channelUrl : '//vk.com//api/fb_channel.html',
@@ -181,7 +186,7 @@ var Index = {
          js = ce('script', {id: id, async: true, src: '//connect.facebook.net/en_US/all.js'})
          ref.parentNode.insertBefore(js, ref);
       }(document));
-    }
+    }*/
   },
   fbJoin: function(context) {
     cur.fbContext = context;

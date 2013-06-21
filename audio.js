@@ -1420,10 +1420,13 @@ var Audio = {
       return;
     }
     if (cur.loadingPopular) return;
+    if (cur.popularAudios === undefined) {
+      cur.popularAudios = [];
+    }
     if (update) {
       delete cur.popularOffset;
       delete cur.popularIds;
-      delete cur.popularAudios;
+      delete cur.popularAudios[genre];
       delete cur.preloadJSON;
       if (genre !== undefined) {
         cur.genre = genre;
@@ -1471,7 +1474,7 @@ var Audio = {
       addClass(cur.showMore, 'loading');
     }
     if (cur.popularIds === undefined) cur.popularIds = [];
-    if (cur.popularAudios === undefined) cur.popularAudios = [];
+    if (cur.popularAudios[genre] === undefined) cur.popularAudios[genre] = [];
     if (cur.popularCount === undefined) cur.popularCount = 0;
     if (cur.sPreload.innerHTML) {
       while (cur.sPreload.firstChild) {
@@ -1488,11 +1491,11 @@ var Audio = {
         audio._order = cur_order++;
         if (indexOf(cur.popularIds, audio[0]+"_"+audio[1]) == -1) {
           cur.popularIds.push(audio[0]+"_"+audio[1]);
-          cur.popularAudios.push(audio);
+          cur.popularAudios[genre].push(audio);
         }
       }
       var aid = currentAudioId(), needs_update = (aid && cur.popularIds && indexOf(cur.popularIds, aid) != -1);
-      audioPlayer.genPlaylist(cur.popularAudios, needs_update);
+      audioPlayer.genPlaylist(cur.popularAudios[genre], needs_update);
     }
     if (cur.noPopular) {
       hide(cur.showMore);
@@ -1536,11 +1539,11 @@ var Audio = {
             audio._order = cur_order++;
             if (indexOf(cur.popularIds, audio[0]+"_"+audio[1]) == -1) {
               cur.popularIds.push(audio[0]+"_"+audio[1]);
-              cur.popularAudios.push(audio);
+              cur.popularAudios[genre].push(audio);
             }
           }
           var aid = currentAudioId(), needs_update = (aid && cur.popularIds && indexOf(cur.popularIds, aid) != -1);
-          audioPlayer.genPlaylist(cur.popularAudios, needs_update);
+          audioPlayer.genPlaylist(cur.popularAudios[genre], needs_update);
         }
         removeClass(cur.showMore, 'loading');
         if (offset) {

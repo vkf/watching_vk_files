@@ -2585,7 +2585,14 @@ var Audio = {
         addClass(obj, 'audio_performer_shown');
         return false;
       }
-      ajax.post('al_audio.php', {act: 'get_more_performers', offset: 4, genre: parseInt(cur.genre)}, {
+      var exclude = [];
+      var nodes = ge('audio_performers').childNodes;
+      for (var i in nodes) {
+        if (hasClass(nodes[i], 'audio_owner')) {
+          exclude.push(intval(nodes[i].getAttribute('ref')));
+        }
+      }
+      ajax.post('al_audio.php', {act: 'get_more_performers', offset: 4, exclude: exclude.join(','), genre: parseInt(cur.genre)}, {
         onDone: function(rows) {
           ge('audio_performers').appendChild(ce('div', {
             id: 'audio_more_performers',

@@ -4636,10 +4636,10 @@ var IM = {
     });
   },
 
-  showChatMembers: function () {
+  showChatMembers: function(ev) {
     var peer = cur.peer;
     if (peer <= 2e9) return;
-    showBox('al_im.php', {act: 'a_show_members_box', chat: peer - 2e9}, {stat: ['boxes.css']});
+    return !showBox('al_im.php', {act: 'a_show_members_box', chat: peer - 2e9}, {stat: ['boxes.css']}, ev);
   },
 
   searchPeer: function() {

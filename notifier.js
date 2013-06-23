@@ -3182,7 +3182,7 @@ FastChat = {
     return false;
   },
   addPeer: function (peer, events, force, opts) {
-    var mem = curFastChat.friends[peer+'_'], need = 0;
+    var mem = curFastChat.friends && curFastChat.friends[peer+'_'], need = 0;
     if (force) {
       FastChat.stateChange({op: 'added', peer: peer});
     } else if (curNotifier.idle_manager && !curNotifier.idle_manager.is_idle && events) {
@@ -3978,7 +3978,7 @@ FastChat = {
     if (last && last.className == 'fc_msgs_error') {
       last = last.previousSibling;
     }
-    if (!last || !hasClass(last, 'fc_msgs_wrap') || last.getAttribute('from_id') != data.from_id || data.date - intval(last.getAttribute('date')) >= 300) {
+    if (!last || !hasClass(last, 'fc_msgs_wrap') || last.getAttribute('data-from') != data.from_id || data.date - intval(last.getAttribute('data-date')) >= 300) {
       re('fc_log_empty' + peer);
       log.appendChild(last = se(rs(curFastChat.tpl.msgs, {
         from_id: data.from_id,

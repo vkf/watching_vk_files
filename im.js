@@ -1,6 +1,31 @@
 var IM = {
-  updateUnread: function (newmsg) {
-    // handlePageCount('msg', newmsg);
+  updateCounts: function (cnts) {
+    if (!cnts || !cnts.length) {
+      return;
+    }
+
+    handlePageCount('msg', cnts[0]);
+
+    val('im_important_count', cnts[1] ? /*' +' + */cnts[1] : '');
+    toggle('im_important_link', cnts[1]);
+
+    val('im_spam_cnt', cnts[2] ? ' +' + cnts[2] : '');
+    toggle('im_spam_link', cnts[3]);
+  },
+  updateUnreadMsgs: function () {
+    cur.unreadMsgs = 0;
+    var peer, unread;
+    for (peer in cur.tabs) {
+      unread = intval(cur.tabs[peer].unread);
+      if (unread > 0 && cur.peer != peer) {
+        val('im_unread' + peer, '&nbsp;<span class="im_unread">+' + unread + '</span>');
+      } else {
+        val('im_unread' + peer, '');
+      }
+      cur.unreadMsgs += unread;
+    }
+    val('im_unread_count', cur.unreadMsgs ? '+' + cur.unreadMsgs : '');
+    toggleClass(ge('tab_conversation'), 'count', IM.r() && cur.unreadMsgs);
   },
   peerToId: function(peer) {
     if (peer > 2e9) {
@@ -305,21 +330,24 @@ var IM = {
       }
     }
 
-    var img_class = 'img';
-    var classNames = [out ? 'im_out' : 'im_in', 'im_msg_from' + (actual_peer || (out ? cur.id : peer_id))];
+    var img_class = 'img',
+        fromId = actual_peer || (out ? cur.id : cur.peer);
+    var classNames = [out ? 'im_out' : 'im_in'];
     if (status > 1) classNames.push('im_new_msg');
 
     var msgInfo = IM.getMsgInfo(msg_id, kludges);
-    if (index && hasClass(hist.rows[index - 1], classNames[1]) && (date - intval(ge('im_date' + hist.rows[index - 1].id.substr(4)).value) < 300) && !msgInfo) {
+    if (index && hist.rows[index - 1].getAttribute('data-from') == fromId && (date - intval(hist.rows[index - 1].getAttribute('data-date')) < 300) && !msgInfo) {
       classNames.push('im_add_row');
     }
-    if (index < hist.rows.length && hasClass(hist.rows[index], classNames[0]) && (intval(ge('im_date' + hist.rows[index].id.substr(4)).value) - date < 300)) {
+    if (index < hist.rows.length && hist.rows[index].getAttribute('data-from') == fromId && (intval(hist.rows[index].getAttribute('data-date')) - date < 300)) {
       removeClass(hist.rows[index], 'im_add_row');
     }
 
     var row = hist.insertRow(index), user, author_html;
-    row.id = 'mess' + msg_id;
 
+    row.setAttribute('data-date', date);
+    row.setAttribute('data-from', fromId);
+    row.id = 'mess' + msg_id;
     row.className = classNames.join(' ');
 
     if (peer_data && actual_peer && (user = peer_data.members[actual_peer])) {
@@ -358,8 +386,8 @@ var IM = {
     row.insertCell(1).innerHTML = author_html;
     row.insertCell(2).innerHTML = '<div class="wrapped">' + message + '</div>';
 
-    var dateLink = msg_id > 0 ? '<a class="im_date_link" href="/mail?act=show&id=' + msg_id + '">' + full_date + '</a>' : '<span>' + full_date + '</span>';
-    row.insertCell(3).innerHTML = dateLink + '<input type="hidden" id="im_date' + msg_id + '" value="' + date + '" />';
+    var dateLink = msg_id > 0 ? '<a class="im_important_toggler" onclick="return IM.toggleImportant(' + msg_id + ');" onmouseover="IM.showImportantTT(this);"></a><a class="im_date_link" href="/mail?act=show&id=' + msg_id + '">' + full_date + '</a>' : '<span>' + full_date + '</span>';
+    row.insertCell(3).innerHTML = dateLink;
 
     row.insertCell(4).className = 'im_log_rspacer';
 
@@ -399,9 +427,9 @@ var IM = {
       onDone: function (content, msgInfo, opts) {
         var cont = ge('im_msg_media' + msg_id), el;
         if (!cont) return;
-        cont.innerHTML = content;
+        val(cont, content);
         if (msgInfo) {
-          ge('im_msg_info' + msg_id).innerHTML = msgInfo;
+          val('im_msg_info' + msg_id, msgInfo);
         }
         if (opts) {
           if (opts.gift) {
@@ -417,7 +445,9 @@ var IM = {
           IM.scrollAppended(0);
         }
       },
-      onFail: function () {
+      onFail: function (a) {
+        debugLog('load media fail', msg_id, peer_id);
+        topError('IM media fail: ' + a + '; ' + peer_id + '_' + msg_id, {dt: -1});
         var cont = ge('im_msg_media' + msg_id);
         hide(cont);
       }
@@ -480,7 +510,7 @@ var IM = {
     }, {
       showProgress: addClass.pbind(moreEl, 'im_more_loading'),
       hideProgress: removeClass.pbind(moreEl, 'im_more_loading'),
-      onDone: function (html, msgs, all_shown, newmsg, data) {
+      onDone: function (html, msgs, all_shown, cnts, data) {
         if (!cur.tabs[peer_id]) {
           return;
         }
@@ -545,7 +575,7 @@ var IM = {
           if (!more) IM.scrollOn(false, msgId);
           if (!cur.fixedScroll && !more) IM.scrollOn();
         }, 0);
-        IM.updateUnread(newmsg);
+        IM.updateCounts(cnts);
         if (!cur.fixedScroll && !more) IM.scrollOn();
       },
       onFail: function () {
@@ -797,6 +827,8 @@ var IM = {
         media.push(v[0] + ':' + v[1]);
         if (v[0] == 'mail') {
           kludges.fwd = v[1];
+        } else if (v[0] == 'map') {
+          kludges['geo'] = 'GEO';
         } else {
           kludges['attach' + i + '_type'] = v[0];
           kludges['attach' + i] = v[1];
@@ -856,25 +888,21 @@ var IM = {
           }
         }
 
-        msg_row.cells[3].innerHTML = '<a class="im_date_link" href="/mail?act=show&id=' + new_msg_id + '">' + IM.mkdate(response.date + cur.tsDiff) + '</a><input type="hidden" id="im_date' + new_msg_id + '" value="' + response.date + '" />';
+        msg_row.cells[3].innerHTML = '<a class="im_important_toggler" onclick="return IM.toggleImportant(' + new_msg_id + ');" onmouseover="IM.showImportantTT(this);"></a><a class="im_date_link" href="/mail?act=show&id=' + new_msg_id + '">' + IM.mkdate(response.date + cur.tsDiff) + '</a><input type="hidden" id="im_date' + new_msg_id + '" value="' + response.date + '" />';
         msg_row.id = 'mess' + new_msg_id;
         msg_row.cells[0].innerHTML = '<div id="ma'+new_msg_id+'" class="im_log_check_wrap"><div class="im_log_check" id="mess_check'+new_msg_id+'"></div></div>';
         addEvent(msg_row, 'mouseover', IM.logMessState.pbind(1, new_msg_id));
         addEvent(msg_row, 'mouseout', IM.logMessState.pbind(0, new_msg_id));
         msg_row.onclick = function (e) {if (!IM.checkLogClick(this, e || window.event)) IM.checkLogMsg(new_msg_id)};
 
-        if (peerMedia) {
-          var cont = ge('im_msg_media' + msg_id);
-          if (cont) {
-            cont.innerHTML = response.media || '';
-          }
-          IM.scroll();
+        if (ge('im_msg_media' + msg_id)) {
+          val('im_msg_media' + msg_id, response.media || '');
+          IM.scrollOn();
         }
 
-        peerTab.msgs[new_msg_id] = [1, 1];
+        peerTab.msgs[new_msg_id] = [1, 1, 0];
         if (cur.peer == peer) IM.updateOnline(response.online, response.sex);
-        IM.updateUnread(response.newmsg);
-
+        IM.updateCounts(response.cnts);
       },
       onFail: function(error) {
         peerTab.sending = false;
@@ -1038,7 +1066,7 @@ var IM = {
               IM.notify(peer, msg);
             }
           }
-          cur.tabs[peer].msgs[i] = [msg[1], (msg[0] > 1) ? 1 : 0];
+          cur.tabs[peer].msgs[i] = [msg[1], (msg[0] > 1) ? 1 : 0, 0];
           if (peer == cur.peer) {
             delete cur.typingEvents[peer];
             IM.updateTyping(false);
@@ -1046,6 +1074,7 @@ var IM = {
         } else if (cur_msg) { // Existing message changed read status
           var out = cur_msg[0],
               unread = cur_msg[1],
+              imporant = cur_msg[2],
               dialogs_row = geByClass1('dialogs_msg' + i, ge('im_dialogs'), 'div');
 
           if (out && dialogs_row) {
@@ -1079,6 +1108,12 @@ var IM = {
               }
               IM.updateMoreNew(peer);
             }
+          }
+
+          // debugLog('imp check', row, msg, cur_msg);
+          if (row && msg[6] != imporant) {
+            cur_msg[2] = msg[6];
+            toggleClass(row, 'im_important_msg', msg[6]);
           }
         }
       }
@@ -1212,7 +1247,7 @@ var IM = {
           insBefore = cont && cont.firstChild;
       while (insBefore) {
         if (hasClass(insBefore, 'dialogs_row') &&
-            repls.timestamp > intval(insBefore.getAttribute('timestamp'))) {
+            repls.timestamp > intval(insBefore.getAttribute('data-date'))) {
           break;
         }
         insBefore = insBefore.nextSibling;
@@ -1226,24 +1261,6 @@ var IM = {
       show('im_dialogs_summary');
     }
   },
-  updateUnreadMsgs: function () {
-    cur.unreadMsgs = 0;
-    var peer, unread;
-    for (peer in cur.tabs) {
-      unread = intval(cur.tabs[peer].unread);
-      if (unread > 0 && cur.peer != peer) {
-        val('im_unread' + peer, '&nbsp;<span class="im_unread">+' + unread + '</span>');
-      } else {
-        val('im_unread' + peer, '');
-      }
-      cur.unreadMsgs += unread;
-    }
-    val('im_unread_count', cur.unreadMsgs ? '+'+cur.unreadMsgs : '');
-    toggleClass(ge('tab_conversation'), 'count', !!cur.unreadMsgs);
-  },
-  updateUnreadSpam: function () {
-    val('im_spam_cnt', cur.spam.unread ? ' (<b>' + cur.spam.unread + '</b>)' : '');
-  },
 
   getKey: function() {
     cur.lastOperation = vkNow();
@@ -1256,7 +1273,7 @@ var IM = {
     }
 
     cur.keyReq = ajax.post('al_im.php', {act: 'a_get_key', uid: cur.id}, {
-      onDone: function (key, frame, url, newmsg) {
+      onDone: function (key, frame, url, cnts) {
         key = trim(key);
         if (/[0-9a-f]{40}/i.test(key)) {
           cur.key = key;
@@ -1270,7 +1287,7 @@ var IM = {
         } else {
           IM.error(getLang('mail_im_auth_failed'));
         }
-        IM.updateUnread(newmsg);
+        IM.updateCounts(cnts);
       },
       onFail: function (msg) {
         setTimeout(IM.getKey, cur.errorTimeout * 1000);
@@ -1362,7 +1379,18 @@ var IM = {
         }
         if (!peer) continue;
 
-        if (code == 0 || code == 2 || code == 3) {
+        if (code == 0 || code == 1 || code == 2 || code == 3) {
+          if (result[peer] !== undefined && result[peer][msg_id] !== undefined) {
+            if (result[peer][msg_id][0] == 2 && (code == 3 && (flags & 1) || code == 1 && !(flags & 1))) {
+              result[peer][msg_id][0] = 1;
+            }
+            if (code == 0 || (code == 1 || code == 2) && (flags & 192)) {
+              result[peer][msg_id][0] = 0;
+            }
+            if (code == 3 && (flags & 128)) {
+              result[peer][msg_id][0] = 0;
+            }
+          }
           if (!cur.tabs[peer] || !cur.tabs[peer].msgs) continue;
           var prev_msg = cur.tabs[peer].msgs[msg_id];
           if (!prev_msg) {
@@ -1380,6 +1408,8 @@ var IM = {
             flags = prev_flags | flags;
           } else if (code == 3) {
             flags = prev_flags & (~flags);
+          } else {
+
           }
           modified_flags[peer + '_' + msg_id] = flags;
         }
@@ -1402,8 +1432,9 @@ var IM = {
           var title = update[5];
           var date = intval(update[4]);
           var out = (flags & 2) ? 1 : 0;
+          var imp = (flags & 8) ? 1 : 0;
           if (ge('mess' + msg_id) || (msg !== undefined) || cur.tabs[peer].q_new[msg_id]) {
-            result[peer][msg_id] = [status, out, title, msg, date, update[7] || {}];
+            result[peer][msg_id] = [status, out, title, msg, date, update[7] || {}, imp];
           }
         } else {
           result[peer][msg_id] = [0];
@@ -1412,6 +1443,11 @@ var IM = {
     } else {
       result = response.result;
     }
+
+    if (response.updates.length) {
+      debugLog('checked', response.updates, result);
+    }
+
     if (result) {
       for (var peer in result) {
         if (!intval(peer) || cur.flushing_peer == peer) continue;
@@ -1534,19 +1570,16 @@ var IM = {
     // debugLog('reading', unread, peer, IM.r(peer));
     // console.trace();
     ajax.post('al_im.php', {act: 'a_mark_read', peer: peer, ids: unread, hash: curTab.hash}, {
-      onDone: function (res, newmsg) {
+      onDone: function (res, cnts) {
         curTab.markingRead = false;
 
         each (unread, function (k, msg_id) {
           if (peer == -4) msg_id = 's' + msg_id; // spam
-          // debugLog(msg_id, clone(curTab.msgs[msg_id]));
           if (IM.r(peer) || curTab.msgs[msg_id] && !curTab.msgs[msg_id][0] && curTab.msgs[msg_id][1]) {
             if (!IM.r(peer)) {
               curTab.msgs[msg_id][1] = 0;
+              --curTab.unread;
             }
-            // debugLog(curTab.unread);
-            --curTab.unread;
-            // debugLog(curTab.unread, msg_id, clone(curTab));
             var row = ge('mess' + msg_id),
                 dialogs_row = geByClass1('dialogs_msg' + msg_id, ge('im_dialogs'), 'div');
             removeClass(row, 'im_new_msg');
@@ -1559,12 +1592,10 @@ var IM = {
         if (!IM.r(peer) && cur.peer == peer) {
           IM.updateScroll();
         }
-        // debugLog(111, peer, IM.r(peer));
+
+        IM.updateCounts(cnts);
         if (!IM.r(peer)) {
-          IM.updateUnread(newmsg);
           IM.updateUnreadMsgs();
-        } else {
-          IM.updateUnreadSpam();
         }
       },
       onFail: function () {
@@ -2129,6 +2160,7 @@ var IM = {
     var count = 0,
         unread = 0,
         newmsgs = 0,
+        row,
         prev;
     for (var i in msgs) {
       ++count;
@@ -2137,9 +2169,15 @@ var IM = {
       }
       prev = cur.tabs[peer].msgs[i];
       cur.tabs[peer].msgs[i] = msgs[i];
+
+      row = ge('mess' + i);
+
+      addEvent(row, 'mouseover', IM.logMessState.pbind(1, i));
+      addEvent(row, 'mouseout', IM.logMessState.pbind(0, i));
+
       if (!msgs[i][0] && msgs[i][1] && (!prev || !prev[1] || from > 0)) {
         ++unread;
-        addEvent(ge('mess' + i), 'mouseover', IM.onNewMsgOver.pbind(peer, i));
+        addEvent(row, 'mouseover', IM.onNewMsgOver.pbind(peer, i));
       }
     }
     cur.tabs[peer].msg_count += count;
@@ -2283,7 +2321,7 @@ var IM = {
     toggle('im_sound_controls', r);
     toggle('im_more-2', cur.peer == -2 && cur.searchOffset);
     toggle('im_none-2', cur.peer == -2 && !geByTag1('tr', ge('im_log_search')));
-    toggle('im_more-4', cur.peer == -4 && cur.spam.offset);
+    toggle('im_more-4', cur.peer == -4 && cur.spamOffset);
     toggle('im_none-4', cur.peer == -4 && !geByTag1('tr', ge('im_log_spam')));
     toggle(cur.imEl.bar, cur.peer != -3);
     toggle(cur.imEl.controls, cur.peer != -3);
@@ -2412,7 +2450,7 @@ var IM = {
     IM.updateTopNav();
 
     if (window.devicePixelRatio >= 2) {
-      var customMenuOpts = {bgsprite: '/images/icons/im_actions_iconset2_2x.png?6', bgSize: '20px 236px'};
+      var customMenuOpts = {bgsprite: '/images/icons/im_actions_iconset2_2x.png?7', bgSize: '20px 300px'};
     } else {
       var customMenuOpts = {bgsprite: '/images/icons/im_actions_iconset2.png?6'};
     }
@@ -2488,6 +2526,8 @@ var IM = {
         IM.searchMessages();
       } else if (n.sel == -4) {
         IM.spamMessages();
+      } else if (n.sel == -5) {
+        IM.importantMessages();
       } else if (changed.sel !== undefined) {
         var n = changed.sel;
         IM.activateTab((n === '0' || n === '-3') ? intval(n) : -1, opts.back ? 3 : 0);
@@ -2655,6 +2695,7 @@ var IM = {
   },
 
   onWindowFocus: function () {
+    // debugLog('focus', __afterFocus);
     if (!__afterFocus) return; // opera fix
     if (cur.id != vk.id) {
       nav.reload({force: true});
@@ -2668,6 +2709,7 @@ var IM = {
     } else {
       cur.focused = -1;
     }
+    // debugLog(peer, scrollGetY(true), cur.deletedDialogs);
     if (peer == -1 && scrollGetY(true) < 100) {
       var hasDel = false;
       each (cur.deletedDialogs, function (k, v) {
@@ -2675,7 +2717,8 @@ var IM = {
           hasDel = true;
           return false;
         }
-      })
+      });
+      // debugLog(hasDel);
       if (!hasDel) IM.updateDialogs();
     } else if (!IM.r() && IM.restoreDraft(peer)) {
       IM.restorePeerMedia(peer);
@@ -2686,7 +2729,8 @@ var IM = {
     IM.updateScroll();
     IM.readLastMsgs();
   },
-  onWindowBlur: function () {
+  onWindowBlur: function (e) {
+    debugLog('blur');
     cur.wasFocused = cur.focused;
     cur.focused = 0;
   },
@@ -2940,14 +2984,20 @@ var IM = {
   updateTopNav: function () {
     var cl = 'active_link', p = cur.peer;
 
-    ge('tab_dialogs').className = (p == -1) ? cl : '';
-    ge('tab_search').className = (p == -2) ? cl : '';
+    toggleClass('tab_friends', cl, (p == 0));
+
+    toggleClass('tab_dialogs', cl, (p == -1));
+
+    toggleClass('tab_search', cl, (p == -2));
     setStyle('tab_search', {display: cur.lastSearchQ ? 'block' : ''});
-    ge('tab_friends').className = !p ? cl : '';
-    ge('tab_write').className = (p == -3) ? cl : '';
+
+    toggleClass('tab_write', cl, (p == -3));
     setStyle('tab_write', {display: cur.lastWasIMW ? 'block' : ''});
-    ge('tab_conversation').className = !IM.r(p) ? cl : '';
-    ge('tab_spam').className = (p == -4) ? cl : '';
+
+    toggleClass('tab_spam', cl, (p == -4));
+    toggleClass('tab_important', cl, (p == -5));
+
+    toggleClass('tab_conversation', cl, !IM.r(p));
 
     var top_peer = !IM.r() ? p : cur.prev_peer || 0;
     if (IM.r(top_peer)) {
@@ -2987,10 +3037,8 @@ var IM = {
     toggle('im_spam_flush', p == -4 && !cur.selSpam.length);
     toggle('im_write', p != 0 || !cur.multi && !cur.multi_appoint);
     toggle('im_top_multi', p > 2e9 && cur.tabs[p].data.top_controls);
-    toggle('im_spam_cnt_wrap', p != -4 && cur.spam.msg_count);
     showBackLink(p != -1 ? 'im?sel=-1' : false, getLang('mail_im_back_to_dialogs'), 1);
     cur._noUpLink = (p > 0 || p < -2e9);
-    // toggle(cur.imEl.controls, p != -2);
   },
   resetStyles: function() {
     cur.imEl.head.style.left = ge('side_bar').style.left =
@@ -3016,7 +3064,27 @@ var IM = {
       }
     } else {
       var imControlsH = cur.imEl.controls.offsetHeight,
-          paddingBottom = Math.max(imControlsH, winH - contentY - cur.imEl.rowsWrap.offsetHeight - 1);
+          paddingBottom = imControlsH; //Math.max(imControlsH, winH - contentY - cur.imEl.rowsWrap.offsetHeight - 1);
+
+      if (paddingBottom > 700/* && paddingBottom > imControlsH*/) {
+        window.console && console.trace && console.trace();
+        debugLog('padding problem', cur.imEl.rowsWrap.offsetHeight, cur.imEl.rowsWrap, paddingBottom, imControlsH, cur.imEl.controls);
+      }
+
+      var prevPaddTop = getStyle(cur.imEl.cont, 'paddingTop'),
+          prevPaddBottom = getStyle(cur.imEl.cont, 'paddingBottom'),
+          prevPadd = (getStyle(cur.imEl.cont, 'padding') || '').split(' ');
+
+      if (prevPadd.length == 3) {
+        if (!prevPaddTop) {
+          prevPaddTop = prevPadd[0];
+        }
+        if (!prevPaddBottom) {
+          prevPaddBottom = prevPadd[2];
+        }
+      }
+      prevPaddTop = intval(prevPaddTop);
+      prevPaddBottom = intval(prevPaddBottom);
 
       cur.lastContentH = contentY + imControlsH + 20;
       if (cur.peer != -3) {
@@ -3025,16 +3093,43 @@ var IM = {
         setStyle(cur.imEl.cont, {padding: ''});
       }
 
-      if (!IM.r(cur.peer) || cur.peer == -2 || cur.peer == -4) { // spam and search
+      if (!IM.r(cur.peer) || cur.peer == -2 || cur.peer == -4 || cur.peer == -5) { // spam and search
         var curHeight = cur.imEl.rows.clientHeight,
-            newHeight = ge('im_rows' + cur.peer).clientHeight,
-            st = scrollGetY(true);
+            rowsEl = ge('im_rows' + (cur.peer == -5 ? -2 : cur.peer)),
+            newHeight = rowsEl.clientHeight,
+            st = scrollGetY(true),
+            stUpd = false;
 
         newHeight = Math.max(newHeight, winH - imControlsH - contentY - 1);
 
         setStyle(cur.imEl.rows, {height: newHeight});
-        if (e !== true && st != st + newHeight - curHeight) {
-          scrollToY(st + newHeight - curHeight, 0);
+        if (e !== true && newHeight != curHeight) {
+          st += newHeight - curHeight;
+          stUpd = true;
+        }
+        if (prevPaddTop != contentY && (!cur.bottom || contentY > prevPaddTop)) { // Chrome workaround
+          st += contentY - prevPaddTop;
+          stUpd = true;
+        }
+        if (stUpd) {
+          debugLog('st upd', st, scrollGetY(true), contentY, (getStyle(cur.imEl.cont, 'padding') || '').split(' '), prevPadd, prevPaddTop, prevPaddBottom, newHeight - curHeight);
+          scrollToY(st, 0);
+        }
+        // debugLog();
+        // if (prevPaddTop != contentY) {
+        //   st += contentY - prevPaddTop;
+        // }
+
+        // if (cur.lastNavHeight) {
+        //   if (cur.lastNavHeight != imNavH) {
+        //     st += imNavH - cur.lastNavHeight;
+        //     scrollToY(st, 0);
+        //   }
+        //   delete cur.lastNavHeight;
+        // }
+
+        if (IM.r(cur.peer)) {
+          setStyle(rowsEl, {minHeight: winH - imControlsH - contentY - 21});
         }
       } else {
         setStyle(cur.imEl.rows, {height: 'auto'});
@@ -3133,7 +3228,7 @@ var IM = {
         contOH = cont.offsetHeight,
         controlsH = cur.imEl.controls.offsetHeight;
 
-    if (IM.r() && cur.peer != -2 && cur.peer != -3 && cur.peer != -4) { // Show more in case of friends or dialogs
+    if (IM.r() && cur.peer != -2 && cur.peer != -3 && cur.peer != -4 && cur.peer != -5) { // Show more in case of friends or dialogs
       var moreEl = cur.peer ? ge('im_more_dialogs') : ge('im_more_friends');
       if (moreEl && isVisible(moreEl) && moreEl.offsetTop < contentST + winH + 200) {
         moreEl.onclick();
@@ -3143,8 +3238,8 @@ var IM = {
       hide('im_top_sh', 'im_bottom_sh');
       return;
     }
-    if ((!IM.r() || cur.peer == -2 || cur.peer == -4) && !curBox() && !isVisible(layerBG)) {
-      var moreEl = ge('im_more' + cur.peer), moreNewEl = (cur.tabs[cur.peer] || {}).q_offset ? ge('im_morenew' + cur.peer) : false;
+    if ((!IM.r() || cur.peer == -2 || cur.peer == -4 || cur.peer == -5) && !curBox() && !isVisible(layerBG)) {
+      var moreEl = ge('im_more' + (cur.peer == -5 ? -2 : cur.peer)), moreNewEl = (cur.tabs[cur.peer] || {}).q_offset ? ge('im_morenew' + cur.peer) : false;
       if (moreEl && isVisible(moreEl) && contentST < 300) {
         moreEl.onclick();
       } else if (moreNewEl && isVisible(moreNewEl) && moreNewEl.offsetTop < contentST + winH + 200) {
@@ -3454,6 +3549,8 @@ var IM = {
       IM.uncheckSpamMsgs();
     } else if (old_peer == -2) {
       cur.lastSearchScroll = scrollGetY(true);
+    } else if (old_peer == -5) {
+      cur.lastImportantScroll = scrollGetY(true);
     }
 
     if (!IM.r(old_peer)) {
@@ -3478,7 +3575,6 @@ var IM = {
       }
     }
 
-
     if (!IM.r(old_peer)) {
       hide('im_txt_wrap' + old_peer);
     } else if (old_peer == -3) {
@@ -3496,8 +3592,6 @@ var IM = {
         cur.hiddenChats[peer] = 1;
       }
       !browser.mobile && setTimeout('if (!IM.r()) ' + txtFocus, browser.msie ? 100 : 0);
-
-      IM.updateUnreadMsgs();
     } else if (!peer) {
       cur.lastSearchQ = cur.searchQ = '';
       cur.qDay = false;
@@ -3515,14 +3609,19 @@ var IM = {
     } else if (peer == -3) {
       IM.initWrite();
     }
+
     IM.updateMoreNew(peer);
 
-    revertLastInlineVideo(ge('im_rows' + old_peer))
-    hide('im_rows' + old_peer);
-    show(cur.imEl.rows.appendChild(ge('im_rows' + peer))); // chrome performance bug workaround
+    var oldRowsEl = ge('im_rows' + (old_peer == -5 ? -2 : old_peer));
+    var newRowsEl = ge('im_rows' + (peer == -5 ? -2 : peer));
+
+    revertLastInlineVideo(oldRowsEl)
+    hide(oldRowsEl);
+    show(cur.imEl.rows.appendChild(newRowsEl)); // chrome performance bug workaround
 
     IM.applyPeer();
     IM.updateTopNav();
+    IM.updateUnreadMsgs();
     IM.updateLoc();
 
     if (!IM.r(peer)) {
@@ -3533,7 +3632,7 @@ var IM = {
       }
       IM.readLastMsgs();
     } else {
-      IM.updateScroll(true, (peer == -2));
+      IM.updateScroll(true, (peer == -2 || peer == -5));
       if (peer == -1) {
         var st = cur.lastDialogsY, mid = cur.lastDialogsPeer;
         cur.lastDialogsY = 0;
@@ -3550,14 +3649,19 @@ var IM = {
       scrollToY(cur.tabs[peer].lastScrollTop, 0);
       delete cur.tabs[peer].lastScrollTop;
       IM.onScroll();
-    } else if (peer == -2 && cur.lastSearchScroll !== undefined) {
+    } else if (peer == -2 && cur.lastSearchScroll !== undefined && from == 3) {
       scrollToY(cur.lastSearchScroll, 0);
       delete cur.lastSearchScroll;
       IM.onScroll();
+    } else if (peer == -5 && cur.lastImportantScroll !== undefined && from == 3) {
+      scrollToY(cur.lastImportantScroll, 0);
+      delete cur.lastImportantScroll;
+      IM.onScroll();
     } else {
-      IM.scrollOn(IM.r(peer) && peer != -2 && peer != -4);
+      IM.scrollOn(IM.r(peer) && peer != -2 && peer != -4 && peer != -5);
     }
-    IM.checkEditable(ge('im_editable'+peer));
+
+    IM.checkEditable(ge('im_editable' + peer));
   },
   restorePeerMedia: function (peer) {
     var conts = [
@@ -3755,7 +3859,7 @@ var IM = {
     if (!cur.peer) IM.filterFriends();
     if (cur.friendsLoaded) {
       ajax.post('al_im.php', {act: 'a_onlines', peer: cur.peer}, {
-        onDone: function (friendsOnline, newmsg) {
+        onDone: function (friendsOnline, cnts) {
           for (var i in cur.friends) {
             cur.friends[i][0] = intval(friendsOnline[intval(i)]);
           }
@@ -3764,7 +3868,7 @@ var IM = {
           } else {
             IM.updateOnline(intval(friendsOnline[cur.peer]), (cur.tabs[cur.peer] || {}).sex || (cur.friends[cur.peer + '_'] || {})[5]);
           }
-          IM.updateUnread(newmsg);
+          IM.updateCounts(cnts);
         }
       });
     } else {
@@ -3813,11 +3917,12 @@ var IM = {
           show('im_dialogs_summary');
           IM.onScroll();
         }
-        IM.updateUnread(options.newmsg);
+        IM.updateCounts(options.cnts);
         cur.deletedDialogs = {};
       }
     });
     if (force) {
+      hide('im_important_link');
       show('im_progress');
     }
   },
@@ -4199,7 +4304,7 @@ var IM = {
           text += IM.wrapEmail(cur.addEmailPeer, to_match);
         }
       }
-      if (to_match && !text && cur.limitedUser) {
+      if (to_match && !text) {
         text += '<div class="im_friend_not_found">' + getLang('mail_im_empty_search') + '</div>';
       }
     }
@@ -4230,10 +4335,7 @@ var IM = {
     if (q.length > 1 && !IM.cacheFriends[q] || q.length == 1 && parseLatin(q)) IM.cacheFriends(q);
     var friends = q ? cur.friends_cache[q] : cur.friends;
 
-
-    if (cur.limitedUser) {
-      cur.addEmailPeer = (q.split('@').length == 2) ? q : false;
-    }
+    cur.addEmailPeer = (q.split('@').length == 2) ? q : false;
 
     // selUser
     for (var f in friends) break;
@@ -4428,10 +4530,13 @@ var IM = {
               row = extend(hist.insertRow(len++), {className: 'im_in im_chat_event', id: 'mess' + msg_id}),
               date = Math.floor(vkNow() / 1000);
 
+          row.setAttribute('data-date', date);
+          row.setAttribute('data-from', 0);
+
           extend(row.insertCell(0), {className: 'im_log_act'});
           extend(row.insertCell(1), {innerHTML: this.user || '', className: 'im_log_author'});
           extend(row.insertCell(2), {innerHTML: this.message, className: 'im_log_body'});
-          extend(row.insertCell(3), {innerHTML: '<span>' + IM.mkdate(date + cur.tsDiff) + '</span><input type="hidden" id="im_date' + msg_id + '" value="' + date + '" />', className: 'im_log_date'});
+          extend(row.insertCell(3), {innerHTML: '<span>' + IM.mkdate(date + cur.tsDiff) + '</span>', className: 'im_log_date'});
           extend(row.insertCell(4), {className: 'im_log_rspacer'});
 
           hide('im_none' + peer);
@@ -4563,10 +4668,12 @@ var IM = {
       delete(cur.qPeerShown);
       val(bck, getLang('mail_im_filter_friend_intro'));
       if (!IM.r(cur.peer)) {
-        delete(cur.qPeer);
         toggle('im_tabs', !cur.selMsgs.length);
         toggle('im_log_controls', cur.selMsgs.length);
         hide('im_filter_out');
+
+        delete cur.qPeer;
+
         IM.updateScroll(true);
       } else if (cur.qPeer) {
         setTimeout(IM.selectPeer.pbind(cur.qPeer, 0), 50);
@@ -4582,6 +4689,7 @@ var IM = {
     IM.activateTab(-2);
     cur.searchOffset = false;
     cur.searchLoading = true;
+    delete cur.lastSearchScroll;
     ajax.post('al_im.php', {act: 'a_search', q: IM.fullQ()}, {
       onDone: function (rows, nextOffset, ttip) {
         IM.calendarUpdTip(ttip);
@@ -4605,6 +4713,9 @@ var IM = {
   },
 
   showMoreSearch: function() {
+    if (cur.peer == -5) {
+      return IM.showMoreImportant();
+    }
     var q = cur.searchQ, p = cur.qPeer, d = cur.qDay;
     if (cur.searchLoading || cur.searchOffset === false || !q && !d) return false;
     cur.searchLoading = true;
@@ -4662,16 +4773,90 @@ var IM = {
     return false;
   },
 
+  importantMessages: function () {
+    IM.activateTab(-5);
+    cur.importantOffset = false;
+    cur.importantLoading = true;
+    delete cur.lastImportantScroll;
+
+    ajax.post('al_im.php', {act: 'a_important'}, {
+      onDone: function (rows, nextOffset) {
+        cur.importantLoading = false;
+        cur.importantOffset = nextOffset;
+        var none = !rows;
+        if (!none) {
+          var t = ge('im_log_search');
+          t.parentNode.replaceChild(se(rows), t);
+          toggle('im_more-2', nextOffset);
+        } else {
+          show('im_none-2');
+          hide('im_log_search');
+        }
+        IM.scrollOn();
+        IM.updateLoc();
+      }
+    });
+  },
+
+  showMoreImportant: function() {
+    if (cur.importantLoading) return false;
+    cur.importantLoading = true;
+    ajax.post('al_im.php', {act: 'a_important', offset: cur.importantOffset}, {
+      showProgress: addClass.pbind('im_more-2', 'im_more_loading'),
+      hideProgress: removeClass.pbind('im_more-2', 'im_more_loading'),
+      onDone: function (html, nextOffset) {
+        cur.importantLoading = false;
+        var table = ge('im_log_search');
+        if (!table) {
+          debugLog('table#im_log_search not found');
+          return;
+        }
+        cur.importantOffset = nextOffset;
+        var cur_rows = geByTag1('tbody', table),
+            new_t = se(html),
+            new_rows = geByTag1('tbody', new_t),
+            before_row = cur_rows.firstChild, add_row, row_id;
+
+        table.parentNode.insertBefore(new_t, table);
+        toggle('im_more-2', nextOffset);
+        IM.updateScroll();
+
+        setTimeout(function () {
+          while (add_row = new_rows.firstChild) {
+            if (!add_row.id.match(/messq\d+/)) {
+              new_rows.removeChild(add_row);
+              continue;
+            }
+            row_id = add_row.id;
+            add_row.id = '';
+            if (ge(row_id)) {
+              new_rows.removeChild(add_row);
+              continue;
+            }
+            add_row.id = row_id;
+            cur_rows.insertBefore(add_row, before_row);
+          }
+          re(new_t);
+          IM.updateScroll();
+        }, 0);
+      },
+      onFail: function () {
+        cur.importantLoading = false;
+      }
+    });
+    return false;
+  },
+
   spamMessages: function () {
     IM.activateTab(-4);
     cur.selSpam = [];
-    cur.spam.offset = false;
+    cur.spamOffset = false;
     cur.spamLoading = true;
 
     ajax.post('al_im.php', {act: 'a_spam'}, {
       onDone: function (rows, nextOffset) {
         cur.spamLoading = false;
-        cur.spam.offset = nextOffset;
+        cur.spamOffset = nextOffset;
         var none = !rows;
         toggle('im_more-4', rows && nextOffset);
         toggle('im_log_spam', !none);
@@ -4689,7 +4874,7 @@ var IM = {
   showMoreSpam: function() {
     if (cur.spamLoading) return false;
     cur.spamLoading = true;
-    ajax.post('al_im.php', {act: 'a_spam', offset: cur.spam.offset}, {
+    ajax.post('al_im.php', {act: 'a_spam', offset: cur.spamOffset}, {
       showProgress: addClass.pbind('im_more-4', 'im_more_loading'),
       hideProgress: removeClass.pbind('im_more-4', 'im_more_loading'),
       onDone: function (html, nextOffset) {
@@ -4699,7 +4884,7 @@ var IM = {
           debugLog('table#im_log_spam not found');
           return;
         }
-        cur.spam.offset = nextOffset;
+        cur.spamOffset = nextOffset;
         var cur_rows = geByTag1('tbody', table),
             new_t = se(html),
             new_rows = geByTag1('tbody', new_t),
@@ -4753,7 +4938,7 @@ var IM = {
             ge('im_dialogs').appendChild(ge('im_more_dialogs'));
             IM.onScroll();
           }
-          IM.updateUnread(options.newmsg);
+          IM.updateCounts(options.cnts);
         }
       });
     } else {
@@ -4764,7 +4949,8 @@ var IM = {
     if (cur.selSpamSingle) {return true;}
     var pos = indexOf(cur.selMsgs, msg_id), posSp = indexOf(cur.selSpam, msg_id), row = ge('mess' + msg_id);
     if (pos != -1 || posSp != -1 || !row || cur.deletedRows[msg_id]) return;
-    setStyle('ma' + msg_id, 'visibility', state ? 'visible' : 'hidden');
+    toggleClass(row, 'im_msg_over', state);
+    // setStyle('ma' + msg_id, 'visibility', state ? 'visible' : 'hidden');
 
     if (cur.peer == -4 && !cur.spam.markingRead && hasClass('mess' + msg_id, 'im_new_msg')) {
       IM.markRead(-4, [msg_id.substr(1)]);
@@ -4778,6 +4964,7 @@ var IM = {
         foundGood = false,
         checkeRE = /wrapped|im_log_act|im_log_ract|im_log_author|im_log_body|im_log_date|im_log_rspacer/;
     do {
+      // debugLog(target, debugEl(target));
       if (!target ||
           target == el ||
           target.onclick ||
@@ -4791,6 +4978,7 @@ var IM = {
         break;
       }
     } while (i-- && (target = target.parentNode));
+    // debugLog(foundGood);
     if (!foundGood) {
       cur.updateScrollTO = setTimeout(IM.updateScroll.pbind(false), 100);
       return true;
@@ -4812,14 +5000,14 @@ var IM = {
       }
       return false;
     }
-    if (cur.selSpamSingle) {
-      return false;
-    }
     var pos = indexOf(cur.selMsgs, msg_id), row = ge('mess' + msg_id);
     if (!row || cur.deletedRows[msg_id]) return;
     if (pos == -1) {
       if (cur.selMsgs.length >= 100) {
         return false;
+      }
+      if (!cur.selMsgs.length) {
+        cur.lastNavHeight = cur.imEl.nav.offsetHeight;
       }
       cur.selMsgs.push(msg_id);
       if (data(row, 'tween')) {
@@ -4836,10 +5024,94 @@ var IM = {
     } else {
       cur.selMsgs.splice(pos, 1);
       removeClass(row, 'im_sel_row');
+      if (!cur.selMsgs.length) {
+        cur.lastNavHeight = cur.imEl.nav.offsetHeight;
+      }
     }
+    toggleClass('im_log_fav_btn', 'im_log_fav_btn__active', IM.checkLogIsImportant());
+
     val('im_n_marked', getLang('mail_im_X_sel_msgs', cur.selMsgs.length));
     toggle('im_tabs', !cur.selMsgs.length && !cur.qPeerShown);
     toggle('im_log_controls', cur.selMsgs.length && !cur.qPeerShown);
+
+    IM.updateScroll();
+  },
+  checkLogIsImportant: function () {
+    if (!cur.selMsgs.length || IM.r()) return false;
+
+    var isImportant = true,
+        msgs = cur.tabs[cur.peer].msgs;
+
+    each (cur.selMsgs, function (k, msg_id) {
+      if (msgs[msg_id] && !msgs[msg_id][2]) {
+        isImportant = false;
+        return false;
+      }
+    });
+
+    return isImportant;
+  },
+  markLogMsgsImportant: function (btn) {
+    var isImportant = IM.checkLogIsImportant(),
+        selMsgs = cur.selMsgs;
+    ajax.post('al_im.php', {act: 'a_mark_important', ids: selMsgs, val: isImportant ? 0 : 1, from: 'im', hash: cur.mark_hash}, {
+      onDone: function (selMsgs, cnts) {
+        var msgs = cur.tabs[cur.peer].msgs;
+
+        each (selMsgs, function (k, msg_id) {
+          if (msgs[msg_id] !== undefined) {
+            msgs[msg_id][2] = isImportant ? 0 : 1;
+          }
+          toggleClass('mess' + msg_id, 'im_important_msg', !isImportant);
+        });
+        IM.uncheckLogMsgs();
+        IM.updateCounts(cnts);
+      },
+      showProgress: function () {
+        lockButton(btn);
+        addClass('im_log_fav_btn', 'im_log_fav_btn__loading');
+      },
+      hideProgress: function () {
+        unlockButton(btn);
+        removeClass('im_log_fav_btn', 'im_log_fav_btn__loading');
+      }
+    });
+  },
+  showImportantTT: function (btn) {
+    showTooltip(btn, {text: getLang('mail_im_toggle_important'), showdt: 0, black: 1, shift: [10, -2, 0], className: 'im_important_tt'});
+  },
+  toggleImportant: function (msg_id) {
+    var isImportant = cur.tabs[cur.peer].msgs[msg_id][2];
+    ajax.post('al_im.php', {act: 'a_mark_important', ids: [msg_id], val: isImportant ? 0 : 1, from: 'im', hash: cur.mark_hash}, {
+      onDone: function (selMsgs, cnts) {
+        var msgs = cur.tabs[cur.peer].msgs;
+
+        each (selMsgs, function (k, msg_id) {
+          if (msgs[msg_id] !== undefined) {
+            msgs[msg_id][2] = isImportant ? 0 : 1;
+          }
+          toggleClass('mess' + msg_id, 'im_important_msg', !isImportant);
+        });
+        IM.updateCounts(cnts);
+        toggleClass('im_log_fav_btn', 'im_log_fav_btn__active', IM.checkLogIsImportant());
+      }
+    });
+    return false;
+  },
+  toggleListImportant: function (msg_id) {
+    var msgEl = ge('messq' + msg_id),
+        notImportant = intval(msgEl.getAttribute('data-notimportant'));
+    ajax.post('al_im.php', {act: 'a_mark_important', ids: [msg_id], val: notImportant ? 1 : 0, from: 'im', hash: cur.mark_hash}, {
+      onDone: function (selMsgs, cnts) {
+        each (selMsgs, function (k, msg_id) {
+          msgEl = ge('messq' + msg_id);
+          msgEl.setAttribute('data-notimportant', notImportant ? 0 : 1);
+          toggleClass(msgEl, 'im_important_msg', notImportant);
+        });
+        IM.updateCounts(cnts);
+      }
+    });
+    return false;
   },
   markLogMsgs: function (act, btn) {
     if (!cur.selMsgs.length || IM.r()) return;
@@ -4886,11 +5158,17 @@ var IM = {
   },
   uncheckLogMsgs: function () {
     each (cur.selMsgs, function (k, msg_id) {
-      removeClass(ge('mess' + msg_id), 'im_sel_row');
+      var msgEl = ge('mess' + msg_id);
+      removeClass(msgEl, 'im_sel_row');
+      removeClass(msgEl, 'im_msg_over');
     });
     cur.selMsgs = [];
+
+    cur.lastNavHeight = cur.imEl.nav.offsetHeight;
     show('im_tabs');
     hide('im_log_controls');
+
+    IM.updateScroll();
   },
   attachMsgs: function () {
     if (!cur.fwdFromPeer || !cur.selMsgs.length) return;
@@ -4954,9 +5232,7 @@ var IM = {
           mBody.parentNode.insertBefore(mRes, mBody);
           addClass(tr, act == 'delspam' ? 'im_del_row' : 'im_spam_row');
         });
-        cur.spam.msg_count = cnt;
-        cur.spam.unread = unread;
-        IM.updateUnreadSpam();
+        IM.updateCounts(cnts);
         IM.uncheckSpamMsgs();
       },
       showProgress: lockButton.pbind(btn),
@@ -4988,6 +5264,7 @@ var IM = {
     cur.selSpamSingle = msgId;
     hide('im_tabs', 'im_log_controls');
     show('im_spam_controls');
+
     return false;
   },
   uncheckSpamSingle: function () {
@@ -5002,12 +5279,12 @@ var IM = {
   },
   flushSpam: function () {
     var onYes = function () {
-        ajax.post('/al_mail.php', {act: 'a_flush_spam', hash: cur.spam.flushhash, from: 'im'}, {
-          onDone: function (res, text) {
+        ajax.post('/al_mail.php', {act: 'a_flush_spam', hash: cur.spamFlushhash, from: 'im'}, {
+          onDone: function (res, text, cnts) {
             box.hide();
-            cur.spam.unread = cur.spam.msg_count = 0;
             IM.activateTab(-1);
             showDoneBox(text);
+            IM.updateCounts(cnts);
           },
           showProgress: box.showProgress,
           hideProgress: box.hideProgress
@@ -5056,8 +5333,8 @@ var IM = {
     if  (!mBody || !mres) return false;
     mres.innerHTML = '<img src="/images/upload.gif" />';
     cur.deletedRows[msg_id] = 0;
-    ajax.post('al_mail.php', {act: 'a_restore_spam', id: msg_id, from: 'imspam', hash: cur.mark_hash}, {onDone: function (res, cnt) {
-      cur.spam.msg_count = cnt;
+    ajax.post('al_mail.php', {act: 'a_restore_spam', id: msg_id, from: 'imspam', hash: cur.mark_hash}, {onDone: function (res, cnts) {
+      IM.updateCounts(cnts);
       show(mBody);
       re(mres);
       removeClass(tr, 'im_del_row');
@@ -5210,7 +5487,7 @@ var IM = {
     if (peer === undefined) {
       peer = cur.peer;
     }
-    return (peer == 0 || peer == -1 || peer == -2 || peer == -3 || peer == -4);
+    return (peer == 0 || peer == -1 || peer == -2 || peer == -3 || peer == -4 || peer == -5);
   },
 
   deinitWrite: function() {
@@ -5953,13 +6230,6 @@ var IM = {
     var pos = getXY(obj)
     var bpos = getXY(block);
     setStyle(tt, {marginLeft: pos[0] - bpos[0] - 105, marginTop: pos[1] - bpos[1] - 40});
-    /*if (cur.ttScrollTime) {
-      clearTimeout(cur.ttShowTimeout);
-      if (new Date().getTime() - cur.ttScrollTime < 200) {
-        cur.ttShowTimeout = setTimeout(IM.ttUnlockEmoji.pbind(obj), 200);
-      }
-    }
-    showTooltip(obj, {black: 1, center: 1, text: getLang('mail_im_enable_emoji'), shift: [1, 3, 0], showsp: 0, className: 'im_emoji_unlock_tt'});*/
   },
   emojiOver: function(obj) {
     addClass(obj, 'im_emoji_over');

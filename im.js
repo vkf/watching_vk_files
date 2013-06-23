@@ -2412,9 +2412,9 @@ var IM = {
     IM.updateTopNav();
 
     if (window.devicePixelRatio >= 2) {
-      var customMenuOpts = {bgsprite: '/images/icons/im_actions_iconset2_2x.png?5', bgSize: '20px 216px'};
+      var customMenuOpts = {bgsprite: '/images/icons/im_actions_iconset2_2x.png?6', bgSize: '20px 236px'};
     } else {
-      var customMenuOpts = {bgsprite: '/images/icons/im_actions_iconset2.png?5'};
+      var customMenuOpts = {bgsprite: '/images/icons/im_actions_iconset2.png?6'};
     }
     cur.actionsMenu = initCustomMedia('chat_actions', [], customMenuOpts);
     if (!IM.r()) {
@@ -3694,31 +3694,12 @@ var IM = {
       }
     }
 
-    var types = [], bgpos = {'invite': 3, 'topic': -19, 'return': -107, 'leave': -84, 'history': -41, 'search': -171, 'clear': -63, 'chat': 3, 'photos': -193, 'avatar': -193}, cstyles = {};
+    var types = [], bgpos = {'invite': 3, 'topic': -19, 'return': -107, 'leave': -84, 'history': -41, 'search': -171, 'clear': -63, 'chat': 3, 'photos': -213, 'avatar': -192}, cstyles = {};
+    opts.hideItem = -1;
+    opts.hideLabel = '';
     if (user.msg_count) {
-      opts.hideItem = 'photos';
-      opts.hideLabel = getLang('mail_im_show_media_history');
-
-      acts['photos'] = getLang('mail_im_show_photo_history');
-      acts['videos'] = getLang('mail_im_show_video_history');
-      acts['audios'] = getLang('mail_im_show_audio_history');
-      acts['docs'] = getLang('mail_im_show_docs_history');
-
-      var bgsprite = window.devicePixelRatio >= 2 ? {
-        backgroundImage: 'url(/images/icons/attach_icons_2x.png?6)',
-        backgroundSize: '20px 220px'
-      } : {backgroundImage: 'url(/images/icons/attach_icons.png?6)'};
-      cstyles = {
-        'photos': extend({backgroundPosition: '3px 3px'}, bgsprite),
-        'videos': extend({backgroundPosition: '3px -20px'}, bgsprite),
-        'audios': extend({backgroundPosition: '3px -42px'}, bgsprite),
-        'docs': extend({backgroundPosition: '3px -64px'}, bgsprite)
-      };
-    } else {
-      opts.hideItem = 0;
-      opts.hideLabel = '';
+      acts['photos'] = getLang('mail_im_show_media_history');
     }
-
 
     each (acts, function (k, v) {
       types.push([k, v, '3px ' + bgpos[k] + 'px', IM.onActionMenu.pbind(k), false, false, cstyles[k]]);

@@ -958,7 +958,8 @@ div#wl_reply_form .submit_reply {
 
 
 /* Wk likers */
-.wk_likes_content .wk_wiki_content {
+.wk_likes_content .wk_wiki_content,
+.wk_history_content .wk_wiki_content {
   font-size: 1em;
   padding: 0;
   line-height: normal;
@@ -966,7 +967,8 @@ div#wl_reply_form .submit_reply {
 .wk_likes_content #wk_content {
   width: 620px;
 }
-.wk_likes_content #wk_close_link {
+.wk_likes_content #wk_close_link,
+.wk_history_content #wk_close_link {
   padding: 17px 20px 18px;
   color: #C7D7E9;
   -webkit-transition: color 100ms linear;
@@ -974,7 +976,8 @@ div#wl_reply_form .submit_reply {
   -o-transition: color 100ms linear;
   transition: color 100ms linear;
 }
-.wk_likes_content #wk_close_link:hover {
+.wk_likes_content #wk_close_link:hover,
+.wk_history_content #wk_close_link:hover {
   color: white;
   text-decoration: none;
 }
@@ -1133,7 +1136,7 @@ a:hover .wk_likes_bl_wrap {
   width: 598px;
 }
 #wk_history_wall {
-  padding: 0;
+  padding: 0px 23px 22px;
 }
 #wk_history_rows {
   width: auto;

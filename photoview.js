@@ -932,6 +932,7 @@ if (ph.actions.edit/* & 2*/) {
 ' + (fs ? '<a onclick="Photoview.fullscreen()">' + getLang('photos_fullscreen') + '</a>' : '') + '\
   <a id="pv_tag_link" onclick="stManager.add([\'phototag.js\', \'phototag.css\', \'tagger.css\', \'tagger.js\'], function() { Phototag.startTag(); })"' + taglnkst + '>' + getLang('photos_tagperson') + '</a>\
 ' + (ph.actions.prof ? ('<a id="pv_to_profile" onmouseover="Photoview.toProfileTag()" onmouseout="Photoview.hideTag()" onclick="showBox(\'al_page.php\', {act: \'owner_photo_edit\', photo: \'' + ph.id + '\'}, {stat: [\'owner_photo.css\', \'owner_photo.js\', \'tagger.css\', \'tagger.js\']});">' + getLang('photos_load_to_profile') + '</a>') : '') + '\
+' + (ph.actions.dialog ? ('<a id="pv_to_dialog" onclick="showBox(\'al_page.php\', {act: \'owner_photo_edit\', photo: \'' + ph.id + '\', oid: ' + ph.actions.dialog + ', list: \'' + cur.pvListId + '\'}, {stat: [\'owner_photo.css\', \'owner_photo.js\', \'tagger.css\', \'tagger.js\']});">' + getLang('photos_load_to_dialog') + '</a>') : '') + '\
 ' + photoEditAct + '\
 ' + ((ph.y_src || ph.y_) ? ('<a id="pv_large_link" onclick="Photoview.switchSize()">' + getLang(vk.pvbig ? 'photos_smaller' : 'photos_larger') + '</a>') : '') + '\
 ' + share + '\

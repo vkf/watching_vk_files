@@ -219,6 +219,7 @@ var IM = {
     }
     if (kludges.emoji) {
       message = IM.emojiToHTML(message, kludges.emoji);
+      //message = message.replace()
     }
     message = '<div class="im_msg_text">'+message+'</div>';
     if (kludges.geo) {
@@ -229,7 +230,9 @@ var IM = {
     }
     if (media_html) {
       message += '<div id="im_msg_media' + msg_id + '" class="wall_module">' + media_html + '</div>';
-      if (msg_id > 0) IM.loadMedia(msg_id, peer_id);
+      if (msg_id > 0 && !kludges._no_media_load) {
+        IM.loadMedia(msg_id, peer_id);
+      }
     }
 
     if (IM.goodTitle(title, peer_id)) {
@@ -379,20 +382,36 @@ var IM = {
     }
   },
 
+  receivePeerData: function(peer_id, data) {
+    if (data.hash) {
+      data.hash = IM.decodehash(data.hash);
+    }
+    extend(cur.tabs[peer_id], data);
+    if (cur.peer == peer_id) {
+      IM.applyPeer();
+    }
+    el = ge('im_dialog' + peer_id);
+    if (el) el = geByClass1('dialogs_photo', el);
+    if (el) val(el, cur.tabs[peer_id].data.members_grid_small);
+  },
   loadMedia: function (msg_id, peer_id) {
     ajax.post('al_im.php', {act: 'a_get_media', id: msg_id}, {
       onDone: function (content, msgInfo, opts) {
-        var cont = ge('im_msg_media' + msg_id);
+        var cont = ge('im_msg_media' + msg_id), el;
         if (!cont) return;
         cont.innerHTML = content;
         if (msgInfo) {
           ge('im_msg_info' + msg_id).innerHTML = msgInfo;
         }
-        if (opts && opts.gift) {
-          var msgObj = ge('mess' + msg_id);
-          addClass(msgObj, 'im_gift_msg');
-          var textObj = geByClass1('im_msg_text', msgObj);
-          textObj.parentNode.appendChild(textObj);
+        if (opts) {
+          if (opts.gift) {
+            var msgObj = ge('mess' + msg_id);
+            addClass(msgObj, 'im_gift_msg');
+            var textObj = geByClass1('im_msg_text', msgObj);
+            textObj.parentNode.appendChild(textObj);
+          } else if (opts.peer) {
+            IM.receivePeerData(peer_id, opts.peer);
+          }
         }
         if (cur.peer == peer_id) {
           IM.scrollAppended(0);
@@ -403,6 +422,26 @@ var IM = {
         hide(cont);
       }
     });
+  },
+  chatPhotoSaved: function(res) {
+    if (curBox()) curBox().hide();
+
+    var peer = (res || {})[1];
+    if (!peer) return nav.reload();
+    if (cur.pvShown) layers.fullhide(true, true);
+    if (cur.module != 'im' || cur.peer != peer) {
+      return nav.go('/im?sel=c' + (peer - 2e9));
+    }
+
+    IM.updateUnread(res[3]);
+    IM.receivePeerData(peer, res[4]);
+
+    var msg_id = res[0];
+    if (!msg_id) return;
+    if (!ge('mess' + msg_id)) return IM.addMsg(peer, -1, msg_id, 2, 1, '', '', res[2], {source_act: 'chat_photo_update', from: cur.id, attach1_type: 'photo', _no_media_load: 1});
+
+    val('im_msg_media' + msg_id, res[5]);
+    IM.scroll();
   },
 
   setLastAct: function(peerId, str) {
@@ -3606,22 +3645,18 @@ var IM = {
     }
     var user = cur.tabs[peer], user_data = user.data, acts = {}, opts = {};
     if (user.msg_count) {
-      acts['0'] = getLang('mail_im_peer_search')
+      acts['search'] = getLang('mail_im_peer_search');
     }
     if (user.msg_count && !user.all_shown) {
-      acts['8'] = getLang('mail_im_load_all_history');
-    } else {
-      delete acts['8'];
+      acts['history'] = getLang('mail_im_load_all_history');
     }
     if (peer < -2e9) {
-      acts['9'] = getLang('mail_im_delete_email_contact');
+      acts['clear'] = getLang('mail_im_delete_email_contact');
     } else if (user.msg_count) {
-      acts['9'] = getLang('mail_im_delete_all_history');
-    } else {
-      delete acts['9'];
+      acts['clear'] = getLang('mail_im_delete_all_history');
     }
     if (peer > 0 && peer < 2e9 && cur.friends[peer + '_']) {
-      acts['10'] = getLang('mail_im_create_chat_with');
+      acts['chat'] = getLang('mail_im_create_chat_with');
     }
 
     if (peer > 2e9) {
@@ -3659,25 +3694,25 @@ var IM = {
       }
     }
 
-    var types = [], bgpos = {'1': 3, '2': -19, '3': -107, '4': -84, '8': -41, '0': -171, '9': -63, '10': 3, '11': -193}, cstyles = {};
+    var types = [], bgpos = {'invite': 3, 'topic': -19, 'return': -107, 'leave': -84, 'history': -41, 'search': -171, 'clear': -63, 'chat': 3, 'photos': -193, 'avatar': -193}, cstyles = {};
     if (user.msg_count) {
-      opts.hideItem = '11';
+      opts.hideItem = 'photos';
       opts.hideLabel = getLang('mail_im_show_media_history');
 
-      acts['11'] = getLang('mail_im_show_photo_history');
-      acts['12'] = getLang('mail_im_show_video_history');
-      acts['13'] = getLang('mail_im_show_audio_history');
-      acts['14'] = getLang('mail_im_show_docs_history');
+      acts['photos'] = getLang('mail_im_show_photo_history');
+      acts['videos'] = getLang('mail_im_show_video_history');
+      acts['audios'] = getLang('mail_im_show_audio_history');
+      acts['docs'] = getLang('mail_im_show_docs_history');
 
       var bgsprite = window.devicePixelRatio >= 2 ? {
         backgroundImage: 'url(/images/icons/attach_icons_2x.png?6)',
         backgroundSize: '20px 220px'
       } : {backgroundImage: 'url(/images/icons/attach_icons.png?6)'};
       cstyles = {
-        '11': extend({backgroundPosition: '3px 3px'}, bgsprite),
-        '12': extend({backgroundPosition: '3px -20px'}, bgsprite),
-        '13': extend({backgroundPosition: '3px -42px'}, bgsprite),
-        '14': extend({backgroundPosition: '3px -64px'}, bgsprite)
+        'photos': extend({backgroundPosition: '3px 3px'}, bgsprite),
+        'videos': extend({backgroundPosition: '3px -20px'}, bgsprite),
+        'audios': extend({backgroundPosition: '3px -42px'}, bgsprite),
+        'docs': extend({backgroundPosition: '3px -64px'}, bgsprite)
       };
     } else {
       opts.hideItem = 0;
@@ -4401,11 +4436,7 @@ var IM = {
     });
     ajax.post('al_im.php', extend({act: 'a_get_chat', chat: peer - 2e9, cur_peers: curMems.join(','), cur_title: replaceEntities(curData.title), hash: curTab.hash}, options || {}), {
       onDone: function (evs, newTab) {
-        if (newTab.hash) {
-          newTab.hash = IM.decodehash(newTab.hash);
-        }
-        extend(cur.tabs[peer], newTab);
-        IM.applyPeer();
+        IM.receivePeerData(peer, newTab);
         var hist = ge('im_log' + peer), len = hist && hist.rows.length, ev;
         if (!hist) {
           debugLog('no chat log found', peer, evs);
@@ -4452,6 +4483,14 @@ var IM = {
       return;
     }
     IM.activateTab(0, 2);
+  },
+  chatAva: function() {
+    if (cur.peer <= 2e9) return;
+    if (cur.tabs[cur.peer].data.closed) {
+      setTimeout(showFastBox(getLang('global_error'), getLang('mail_im_invite_closed')).hide, 5000);
+      return;
+    }
+    Page.ownerPhoto(cur.peer);
   },
   leaveChat: function (force) {
     var peer = cur.peer;
@@ -5081,19 +5120,32 @@ var IM = {
     cur.ctrl_submit = !!val;
   },
   onActionMenu: function (val) {
-    switch (intval(val)) {
+    switch (val) {
+      case 'search':
       case 0: IM.searchPeer(); break;
+      case 'invite':
       case 1: IM.inviteToChat(); break;
+      case 'topic':
       case 2: IM.changeChatTopic(); break;
+      case 'return':
       case 3: IM.returnToChat(); break;
+      case 'leave':
       case 4: IM.leaveChat(); break;
+      case 'history':
       case 8: IM.loadHistory(cur.peer, 2); break;
+      case 'clear':
       case 9: IM.deleteHistory(cur.peer); break;
+      case 'chat':
       case 10: IM.startChatWith(cur.peer); break;
+      case 'photos':
       case 11: IM.showMediaHistory(cur.peer, 'photo'); break;
+      case 'videos':
       case 12: IM.showMediaHistory(cur.peer, 'video'); break;
+      case 'audios':
       case 13: IM.showMediaHistory(cur.peer, 'audio'); break;
+      case 'docs':
       case 14: IM.showMediaHistory(cur.peer, 'doc'); break;
+      case 'avatar': IM.chatAva(); break;
     }
   },
   notify: function (peer_id, msg) {
@@ -6090,10 +6142,12 @@ var IM = {
     }
     return false;
   },
-  getMsgInfo: function(msgId, kludges) {
+  getMsgInfo: function(msgId, kludges, user) {
     var info = '';
     if (kludges['attach1_type'] == 'gift') {
-      var info = '<span id="im_msg_info'+msgId+'"></span>';
+      info = '<span id="im_msg_info'+msgId+'"></span>';
+    } else if (kludges['source_act'] == 'chat_photo_update') {
+      info = '<span id="im_msg_info'+msgId+'"></span>';
     }
     return info;
   },

@@ -579,7 +579,8 @@ var mail = {
           if (cur.thread.id != itemValue) {
             img.style.display = '';
             img.src = itemData[3];
-            img.parentNode.href = itemData[0] > 0 ? '/id' + itemData[0] : 'javascript: void(0);';
+
+            img.parentNode.href = (itemData[0] > 2e9) ? '/im?sel=c' + (itemData[0] - 2e9) : (itemData[0] > 0 ? '/id' + itemData[0] : '/write?email=' + itemData[0]);
             img.parentNode.setAttribute('target', '_blank');
             img.parentNode.target = '_blank';
             var onl = '';

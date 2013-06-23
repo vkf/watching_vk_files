@@ -229,7 +229,8 @@ var OwnerPhoto = {
             thumb: Upload.options[cur.ownerPhotoUploadId].static_url + obj.x_src,
             thumbSize: obj.x_size,
             size: obj.size,
-            uploadUrl: url
+            uploadUrl: url,
+            square: opts.square
           });
         }
       },
@@ -343,7 +344,7 @@ var OwnerPhoto = {
     var opts = cur.ownerPhotoEditOpts, size = opts.size, tsize = opts.thumbSize, minSize = [
       Math.max(100, Math.ceil(200 * tsize[0] / size[0])),
       Math.max(100, Math.ceil(200 * tsize[1] / size[1]))
-    ], rect;
+    ], rect, mul1 = opts.square ? 1 : 1.5, mul2 = opts.square ? 1 : 2.5, div1 = opts.square ? 1 : 0.4;
     if (tsize[0] < minSize[0] || tsize[1] < minSize[1]) nav.reload();
     if (opts.rect) {
       if (opts.strict) {
@@ -364,27 +365,27 @@ var OwnerPhoto = {
           rect.left = Math.max(0, rect.left - Math.floor((minSize[0] - rect.width) / 2));
           rect.width = minSize[0];
         }
-        if (rect.width * 1.5 > rect.height) {
-          if (rect.width * 1.5 > tsize[1]) {
-            if (tsize[1] / 1.5 < minSize[0]) {
+        if (rect.width * mul1 > rect.height) {
+          if (rect.width * mul1 > tsize[1]) {
+            if (tsize[1] / mul1 < minSize[0]) {
               rect = {left: rect.left + Math.floor((rect.width - minSize[0]) / 2), top: 0, width: minSize[0], height: tsize[1]};
             } else {
-              rect = {left: rect.left + Math.floor((rect.width - tsize[1] / 1.5) / 2), top: 0, width: Math.floor(tsize[1] / 1.5), height: tsize[1]};
+              rect = {left: rect.left + Math.floor((rect.width - tsize[1] / mul1) / 2), top: 0, width: Math.floor(tsize[1] / mul1), height: tsize[1]};
             }
           } else {
-            rect.top = Math.max(0, rect.top - Math.floor((rect.width * 1.5 - rect.height) / 4));
-            rect.height = Math.ceil(rect.width * 1.5);
+            rect.top = Math.max(0, rect.top - Math.floor((rect.width * mul1 - rect.height) / 4));
+            rect.height = Math.ceil(rect.width * mul1);
             if (rect.top + rect.height > tsize[1]) {
               rect.top = tsize[1] - rect.height;
             }
           }
         }
-        if (rect.height > rect.width * 2.5) {
-          if (rect.height > tsize[0] * 2.5) {
-            rect = {left: 0, top: rect.top + Math.floor((rect.height - tsize[0] * 2.5) / 2), width: tsize[0], height: Math.floor(tsize[0] * 2.5)};
+        if (rect.height > rect.width * mul2) {
+          if (rect.height > tsize[0] * mul2) {
+            rect = {left: 0, top: rect.top + Math.floor((rect.height - tsize[0] * mul2) / 2), width: tsize[0], height: Math.floor(tsize[0] * mul2)};
           } else {
-            rect.left = Math.max(0, rect.left - Math.floor((rect.height / 2.5 - rect.width) / 2));
-            rect.width = Math.ceil(rect.height / 2.5);
+            rect.left = Math.max(0, rect.left - Math.floor((rect.height / mul2 - rect.width) / 2));
+            rect.width = Math.ceil(rect.height / mul2);
             if (rect.left + rect.width > tsize[0]) {
               rect.left = tsize[0] - rect.width;
             }
@@ -396,8 +397,8 @@ var OwnerPhoto = {
       if (rect.width > rect.height) {
         rect.width = rect.height;
       }
-      if (rect.height > rect.width * 2.5) {
-        rect.height = Math.floor(rect.width * 2.5);
+      if (rect.height > rect.width * mul2) {
+        rect.height = Math.floor(rect.width * mul2);
       }
       rect.left = Math.floor((tsize[0] - rect.width) / 2);
       rect.top = Math.floor((tsize[1] - rect.height) / 2);
@@ -408,7 +409,7 @@ var OwnerPhoto = {
     cur.ownerPhotoEditTagger = photoTagger('owner_photo_img', {
       minw: minSize[0],
       minh: minSize[1],
-      mina: 0.4,
+      mina: div1,
       maxa: 1,
       rect: rect,
       zstart: 1000
@@ -430,15 +431,33 @@ var OwnerPhoto = {
       Math.ceil(rect[2] * cx),
       Math.ceil(rect[3] * cy)
     ], url = cur.ownerPhotoEditOpts.uploadUrl + '&_full=' + encodeURIComponent(crop.join(',')) + '&_rot=' + intval(cur.ownerPhotoRotation);
-    hide('owner_photo_edit');
-    re('owner_photo_error');
-    ge('owner_photo_edit_return').className = 'button_cancel inl_bl';
-    OwnerPhoto.crop({
-      uploadUrl: url,
-      thumb: url + '&_proxy=1',
-      thumbSize: [200, intval(200 * crop[3] / crop[2])],
-      size: [crop[2], crop[3]]
-    });
+
+    if (opts.square) {
+      lockButton('owner_photo_done_edit');
+      clearTimeout(cur.ownerPhotoCropTimer);
+      cur.ownerPhotoCropTimer = setTimeout(OwnerPhoto.cropSuccess.pbind(true, '{"error":"ERR_CLIENT_UPLOAD_TIMEOUT: no response on owner_photo_crop iframe request"}'), 10000);
+      stManager.add(['upload.js'], function() {
+        var lastcrop = [
+          0,
+          0,
+          crop[2] // or crop[3], must be almost equal
+        ], jsonp = jsonpManager.reg(OwnerPhoto.cropSuccess.pbind(true));
+        utilsNode.appendChild(ce('iframe', {
+          src: url + '&_crop=' + lastcrop.join(',') + '&_jsonp=' + jsonp + '&_origin=' + encodeURIComponent(locProtocol + '//' + locHost)
+        }));
+      });
+
+    } else {
+      hide('owner_photo_edit');
+      re('owner_photo_error');
+      ge('owner_photo_edit_return').className = 'button_cancel inl_bl';
+      OwnerPhoto.crop({
+        uploadUrl: url,
+        thumb: url + '&_proxy=1',
+        thumbSize: [200, intval(200 * crop[3] / crop[2])],
+        size: [crop[2], crop[3]]
+      });
+    }
   },
   editReturn: function() {
     if (cur.ownerPhotoCropTagger) {
@@ -540,24 +559,28 @@ var OwnerPhoto = {
       }));
     });
   },
-  cropSuccess: function(res) {
+  cropSuccess: function(squareEdit, res) {
+    if (squareEdit !== true) {
+      res = squareEdit;
+      squareEdit = false;
+    }
     clearTimeout(cur.ownerPhotoCropTimer);
-    var obj = parseJSON(res) || {};
+    var obj = parseJSON(res) || {}, btn = squareEdit ? 'owner_photo_done_edit' : 'owner_photo_done';
     if (obj.error) {
-      unlockButton('owner_photo_done');
-      OwnerPhoto.showError(3, obj.error + Upload.getErrorAdditional(obj));
+      unlockButton(btn);
+      OwnerPhoto.showError(squareEdit ? 2 : 3, obj.error + Upload.getErrorAdditional(obj));
     } else {
       if (cur.photoTooltipHide) {
         cur.photoTooltipHide(true);
       }
       ajax.post('al_page.php', {act: 'owner_photo_save', _query: res}, {
-        onDone: nav.reload,
+        onDone: squareEdit && window.IM ? IM.chatPhotoSaved : nav.reload,
         onFail: function(text) {
-          OwnerPhoto.showError(3, text);
+          OwnerPhoto.showError(squareEdit ? 2 : 3, text);
           return true;
         },
-        showProgress: lockButton.pbind('owner_photo_done'),
-        hideProgress: unlockButton.pbind('owner_photo_done')
+        showProgress: lockButton.pbind(btn),
+        hideProgress: unlockButton.pbind(btn)
       });
     }
   }

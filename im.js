@@ -2450,9 +2450,9 @@ var IM = {
     IM.updateTopNav();
 
     if (window.devicePixelRatio >= 2) {
-      var customMenuOpts = {bgsprite: '/images/icons/im_actions_iconset2_2x.png?7', bgSize: '20px 300px'};
+      var customMenuOpts = {bgsprite: '/images/icons/im_actions_iconset2_2x.png?8', bgSize: '20px 300px'};
     } else {
-      var customMenuOpts = {bgsprite: '/images/icons/im_actions_iconset2.png?6'};
+      var customMenuOpts = {bgsprite: '/images/icons/im_actions_iconset2.png?8'};
     }
     cur.actionsMenu = initCustomMedia('chat_actions', [], customMenuOpts);
     if (!IM.r()) {

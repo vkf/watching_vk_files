@@ -438,7 +438,7 @@ var IM = {
 
     var msg_id = res[0];
     if (!msg_id) return;
-    if (!ge('mess' + msg_id)) return IM.addMsg(peer, -1, msg_id, 2, 1, '', '', res[2], {source_act: 'chat_photo_update', from: cur.id, attach1_type: 'photo', _no_media_load: 1});
+    if (!ge('mess' + msg_id)) IM.addMsg(peer, -1, msg_id, 2, 1, '', '', res[2], {source_act: 'chat_photo_update', from: cur.id, attach1_type: 'photo', _no_media_load: 1});
 
     val('im_msg_media' + msg_id, res[5]);
     IM.scroll();

@@ -650,7 +650,7 @@ var Friends = {
         str += ' '+(parseLatin(str) || '');
         str = trim(escapeRE(str.replace(/[,]/g, '')));
         cur.selection = {
-          re: new RegExp('('+str.replace(index.delimiter, '|')+')', 'gi'),
+          re: new RegExp('('+str.replace(index.delimiter, '|').replace(/(^\||\|$|\?)/g, '')+')', 'gi'),
           val: '<em>$1</em>'
         };
       }

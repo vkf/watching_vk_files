@@ -936,7 +936,7 @@ var Audio = {
     var res = [];
     for (var i = 0; i < len; i++) {
       var t = arr[i];
-      if (cur.audios && cur.audios[t[1]] && (!(cur.audios[t[1]][11] && parseInt(cur.audios[t[1]][11])) || cur.audios[t[1]][12] && parseInt(cur.audios[t[1]][12]))) {
+      if (cur.audios && cur.audios[t[1]] && (!(cur.audios[t[1]][11] && parseInt(cur.audios[t[1]][11])) || cur.audios[t[1]][12] && parseInt(cur.audios[t[1]][12]) || nav.objLoc.claim)) {
         res.push(t);
       }
     }
@@ -1518,6 +1518,9 @@ var Audio = {
     cur.lastAct = 'popular';
     var offset = cur.popularOffset, query = {act: 'get_popular', offset: offset},
         needsUpdate = window.audioPlayer && audioPlayer.shuffle;
+    if (nav.objLoc.update)  {
+      query.update = 1;
+    }
     if (needsUpdate && !offset) query.offset = -1;
     if (update == 'remix' || needsUpdate != cur.popRemix) {
       cur.popRemix = needsUpdate;

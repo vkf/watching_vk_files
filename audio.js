@@ -336,8 +336,10 @@ var Audio = {
     if (list[0] && list[0]._order !== undefined) {
       list = list.sort(function(a,b) {return a._order - b._order});
     }
+    list = Audio.filterClaimed(list);
+    cur.sectionCount = list.length;
     if (!cur.searchStr) {
-      list = Audio.filter(list);
+      list = Audio.filterDeleted(list);
       if (cur.filterUnsorted) {
         list = Audio.filterByAlbum(list, 0);
       }
@@ -362,7 +364,6 @@ var Audio = {
     }
     var _a = window.audioPlayer;
     if (!list || !list.length) {
-      debugLog('wrong1');
       if (cur.shownAudios == 0 && (cur.album_id || (!Audio.allAudios().length && !cur.searchStr))) {
         var msg;
         if (Audio.allAudios().length) {
@@ -695,7 +696,6 @@ var Audio = {
         } else if (fromIndex == 2) {
           hide(cur.audioAlbums);
           hide(cur.audioFriends);
-          debugLog(cur.performerInfo, cur.allAudiosIndex);
           cur.searchInfoCont.innerHTML = cur.performerInfo[cur.allAudiosIndex];
           show(cur.searchInfoCont);
         } else {
@@ -931,7 +931,19 @@ var Audio = {
     }, 500);
   },
 
-  filter: function(arr) {
+  filterClaimed: function(arr) {
+    var len = arr.length;
+    var res = [];
+    for (var i = 0; i < len; i++) {
+      var t = arr[i];
+      if (cur.audios && cur.audios[t[1]] && (!(cur.audios[t[1]][11] && parseInt(cur.audios[t[1]][11])) || cur.audios[t[1]][12] && parseInt(cur.audios[t[1]][12]))) {
+        res.push(t);
+      }
+    }
+    return res;
+  },
+
+  filterDeleted: function(arr) {
     var len = arr.length;
     var res = [];
     for (var i = 0; i < len; i++) {
@@ -1959,7 +1971,6 @@ var Audio = {
         query.is_owner = 1;
       }
       if (index != 'all' && !ge('audio_friend' + id) && !owner) {
-        debugLog('not here');
         cur.shownFriends = [];
         var txt = domFC(ge('audio_more_friends')), prg = domLC(ge('audio_more_friends'));
         Audio.showMoreFriends(function() {

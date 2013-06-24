@@ -1783,7 +1783,7 @@
 #audio.new .wall_module .post {
   border-top: 0;
   border-bottom: 1px solid #F1F1F1;
-  margin-right: 13px;
+  margin-right: 12px;
 }
 #audio.new .wall_module .post:first-child {
   margin-top: -10px;

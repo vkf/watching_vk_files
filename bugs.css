@@ -477,7 +477,7 @@
 .bugs_new_cont.status .bugs_new_text_toggle {
   display: none;
 }
-.bugs_new_cont.status .selector input {
+.bugs_new_cont.status .selector_container td.selector input {
   padding: 3px 3px 5px 6px!important;
   padding: 4px 3px 4px 7px;
 }
@@ -487,27 +487,27 @@
   cursor: pointer;
   background: #FFF url(/images/wide_dd.gif) no-repeat -2px 1px;
 }
-.bugs_new_cont.status .selector_focused td.selector_dropdown {
+.bugs_new_cont.status .selector_focused.selector_container td.selector_dropdown {
   border-left: none;
 }
 .bugs_new_cont.status .result_list {
   border: 1px solid #96AABE;
   border-top: 1px solid #C0CAD5;
 }
-.bugs_new_cont.status .result_list ul li {
+.bugs_new_cont.status .selector_container .result_list ul li {
   border-width: 1px 0px;
   border-color: #EDEDED;
   padding: 8px 1px;
   margin: -1px 5px 0px;
 }
-.bugs_new_cont.status .result_list ul li.active {
+.bugs_new_cont.status .selector_container .result_list ul li.active {
   background: #F1F5F9;
   border-color: #E1E7ED;
   color: #000;
   padding: 8px 6px;
   margin: -1px 0px 0px;
 }
-.bugs_new_cont.status .result_list ul li.last {
+.bugs_new_cont.status .selector_container .result_list ul li.last {
   border-bottom: none;
 }
 .bugs_new_cont.status .bugs_new_input {

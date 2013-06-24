@@ -5,14 +5,11 @@
 /* -------------- */
 
 .ads_edit_page_wrap1 {
-  border: 2px solid #EDEFF1
 }
 .ads_edit_page_wrap2 {
-  border: 1px solid #ADBBCA;
 }
 .ads_edit_page_wrap3 {
-  border: 10px solid #DAE2E8;
-  background-color: #F5F7FA;
+  background-color: #F9F9F9;
   padding: 20px;
 }
 
@@ -20,11 +17,11 @@
   margin-bottom: 20px;
 }
 
-.ads_edit_panels_top {
+.ads_edit_panels_view {
   padding-top: 20px;
 }
 .ads_edit_panel_edit {
-  width: 500px;
+  width: 540px;
 }
 .ads_edit_panel_preview {
   padding-right: 60px;
@@ -41,22 +38,37 @@
 }
 
 .ads_edit_label {
-  width: 170px;
+  width: 190px;
   text-align: right;
   padding-right: 10px;
-  color: #777777;
+  color: #666666;
 }
 
 .ads_edit_label_input_ui {
-  padding-top: 5px;
+  padding-top: 8px;
+}
+@-moz-document url-prefix() {
+.ads_edit_label_input_ui {
+  padding-top: 7px;
+}
 }
 
 .ads_edit_label_input {
-  padding-top: 4px;
+  padding-top: 8px;
+}
+@-moz-document url-prefix() {
+.ads_edit_label_input {
+  padding-top: 7px;
+}
 }
 
 .ads_edit_label_checkbox {
   padding-top: 3px;
+}
+@-moz-document url-prefix() {
+.ads_edit_label_checkbox {
+  padding-top: 2px;
+}
 }
 
 .ads_edit_label_radiobutton {
@@ -64,25 +76,28 @@
 }
 
 .ads_edit_label_textarea {
-  padding-top: 4px;
+  padding-top: 8px;
+}
+@-moz-document url-prefix() {
+.ads_edit_label_textarea {
+}
+  padding-top: 7px;
 }
 
 .ads_edit_value .text {
-  width: 250px;
+  width: 310px;
+  height: 17px;
+  line-height: 17px;
+  padding: 5px 6px 6px 10px;
+}
+@-moz-document url-prefix() {
+.ads_edit_value .text {
+  padding-left: 9px;
+  width: 311px;
+}
 }
 .ads_edit_value .ads_edit_value_range .text {
-  width: 116px;
-}
-.ads_edit_value .text.ads_edit_value_ui {
-  height: 14px;
-}
-
-.ads_edit_value_help {
-  display: none;
-}
-
-.ads_edit_value_help_wrap {
-  padding: 4px 0 0 7px;
+  width: 142px;
 }
 
 .listing.ads_edit_help_listing {
@@ -95,7 +110,7 @@
 }
 
 .ads_edit_value_range_sep {
-  padding: 4px 3px 0 3px;
+  width: 10px;
 }
 
 .ads_edit_value_cost_type_wrap {
@@ -122,34 +137,41 @@
 .ads_edit_separator_big {
   border-bottom: 1px solid #DAE2E8;
   height: 1px;
-  width: 475px;
   margin: 10px 0 20px 0;
 }
 
-.ads_edit_hider_on,
-.ads_edit_hider_off {
-  color: #666666;
+.ads_edit_targeting_group_hider_title {
+  color: #555555;
+  font-size: 1.09em;
   cursor: pointer;
   font-weight: bold;
-  padding: 5px 0 5px 14px;
+  padding: 5px 0 5px 20px;
+  margin-left: -21px;
 }
-.ads_edit_hider_on {
-  background: url("/images/filterset_on.gif") no-repeat scroll 1px 9px transparent;
+.ads_edit_targeting_group_hider_title.on {
+  background: url(/images/filterset_on.gif) no-repeat scroll 1px 9px transparent;
 }
-.ads_edit_hider_off {
-  background: url("/images/filterset_off.gif") no-repeat scroll 2px 8px transparent;
+.ads_edit_targeting_group_hider_title.off {
+  background: url(/images/filterset_off.gif) no-repeat scroll 2px 8px transparent;
 }
-.ads_edit_hider_separator {
-  width: 258px;
-  height: 1px;
-  background-color: #DDDDDD;
-  border-bottom: 1px solid white;
+.ads_edit_targeting_group_hider_info {
+  color: #909090;
+  cursor: pointer;
 }
-.ads_edit_value.ads_edit_hider_row {
-  padding-bottom: 4px;
+.ads_edit_value.ads_edit_targeting_group_hider {
+  padding-top: 8px;
+  padding-bottom: 12px;
 }
-.ads_targeting_group {
-  padding-top: 3px;
+#ads_edit_targeting_group_demography_hider.ads_edit_value.ads_edit_targeting_group_hider,
+#ads_edit_targeting_group_graduation_hider.ads_edit_value.ads_edit_targeting_group_hider {
+  padding-bottom: 6px;
+}
+#ads_edit_targeting_group_interests_hider.ads_edit_value.ads_edit_targeting_group_hider,
+#ads_edit_targeting_group_additional_hider.ads_edit_value.ads_edit_targeting_group_hider {
+  padding-top: 14px;
+}
+.ads_edit_targeting_group {
+  padding-bottom: 5px;
 }
 
 /* ---------------- */
@@ -160,7 +182,7 @@
 .ads_param_description_remain_wrap,
 #ads_targeting_criterion_tags_remain {
   font-size: 0.9em;
-  color: #999999;
+  color: #777777;
   padding-top: 6px;
 }
 
@@ -183,13 +205,32 @@
 }
 
 .ads_ad_play.empty {
-  background-image: url("/images/ad_video_empty.png");
+  background-image: url(/images/ad_video_empty.png);
 }
 
 .ads_edit_ad_view_controls {
   padding-top: 5px;
 }
 
+/* ------------------ */
+/* Edit ad - audience */
+/* ------------------ */
+
+#ads_edit_audience {
+  padding: 20px;
+  background-color: #EDF0F2;
+  width: 160px;
+}
+#ads_edit_audience_title,
+#ads_edit_recommended_cost_title {
+  color: #36638E;
+  font-size: 1.09em;
+  font-weight: bold;
+  padding-bottom: 5px;
+}
+#ads_edit_recommended_cost_title {
+  padding-top: 15px;
+}
 
 /* -------------- */
 /* Edit ad - view */
@@ -201,10 +242,10 @@
 }
 
 #ads_param_title {
-  height: 26px;
+  height: 34px;
 }
 #ads_param_description {
-  height: 52px;
+  height: 68px;
 }
 #ads_param_title,
 #ads_param_description {
@@ -218,9 +259,9 @@
 
 .ads_edit_value_header {
   color: #36638E;
-  font-size: 1.09em;
+  font-size: 1.18em;
   font-weight: bold;
-  padding-top: 10px;
+  padding-bottom: 5px;
 }
 
 #ads_edit_ad_row_additional .ads_edit_value_checkbox_wrap {
@@ -236,7 +277,12 @@
 /* ------------------ */
 
 .ads_param_cost_per_click_currency_wrap {
-  padding: 4px 0 0 6px;
+  padding: 8px 0 0 10px;
+}
+@-moz-document url-prefix() {
+.ads_param_cost_per_click_currency_wrap {
+  padding-top: 7px;
+}
 }
 
 .text#ads_param_cost_per_click {
@@ -261,6 +307,10 @@
   min-height: 22px;
 }
 
+/* ------------------ */
+/* Edit ad - controls */
+/* ------------------ */
+
 .ads_edit_value_terms {
   line-height: 160%;
 }
@@ -269,15 +319,13 @@
   margin-right: 10px;
 }
 
+.ads_edit_cancel_link {
+  padding: 5px 10px;
+}
+
 /* ------------------- */
 /* Edit ad - targeting */
 /* ------------------- */
-
-#ads_edit_audience_count {
-  color: #36638E;
-  font-size: 1.09em;
-  font-weight: bold;
-}
 
 .ads_edit_value_birthday_today {
   padding-right: 5px;

@@ -27,6 +27,8 @@ AdsEdit.init = function() {
     var tagsElem = ge('ads_targeting_criterion_tags');
     tagsElem.value = AdsEdit.unescapeValueInit(tagsElem.innerHTML);
   }
+
+  Ads.initFixed('ads_edit_audience_wrap');
 }
 
 AdsEdit.destroy = function() {
@@ -47,6 +49,13 @@ AdsEdit.unescapeValue = function(value) {
   return replaceEntities(value.replace(/&/g, '&amp;'));
 }
 
+AdsEdit.getTextWidth = function(text) {
+  var elem = ce('span', {innerHTML: text});
+  document.body.appendChild(elem);
+  var size = getSize(elem);
+  re(elem)
+  return size[0];
+}
 
 AdsEdit.showError = function(message, section) {
   if (section !== 'targeting' && section !== 'behavior') {
@@ -132,18 +141,18 @@ AdsEdit.showHelpCriterionTooltip = function(helpTooltipName, targetElem, ttHandl
   if (cur.lastHelpTooltipName && cur.lastHelpTooltipName != helpTooltipName) {
     cur.getLastTooltip().hide();
   }
-  cur.lastHelpTooltipName = helpTooltipName;
   cur.getLastTooltip = function(){ return targetElem.tt; };
+  cur.lastHelpTooltipName = helpTooltipName;
 
   if (shiftTop === undefined || shiftTop === false || shiftTop === null) {
-    shiftTop = -54;
+    shiftTop = -58;
   }
 
   showTooltip(targetElem, {
     text: '<div class="ads_edit_tt_pointer ads_edit_tt_pointer_' + helpTooltipName + '"></div><div class="ads_edit_tt_text">' + helpText + '</div>',
     className: 'ads_edit_tt',
     slideX: 15,
-    shift: [-270, 0, shiftTop],
+    shift: [-350, 0, shiftTop],
     nohide: true,
     forcetodown: true,
     onCreate: function() { AdsEdit.initHelpTooltip(targetElem, ttHandler, ttContainer, curLocal); }
@@ -165,7 +174,7 @@ AdsEdit.onHelpTooltipEvent = function(event, helpTooltipName, context, showToolt
         clearTimeout(context.overTimeout)
         delete context.overTimeout;
       }
-      showHelp();
+      //showHelp(); // Do not show tooltip on focus
       break;
     case 'blur':
       if (cur.focusedHelpTooltipName == helpTooltipName) {
@@ -230,12 +239,13 @@ AdsEdit.onHelpTooltipEvent = function(event, helpTooltipName, context, showToolt
   }
 }
 
-AdsEdit.toggleTargetingGroup = function(hiderElem, groupId, groupElemId) {
+AdsEdit.toggleTargetingGroup = function(groupId, groupElemId) {
   var prefValue;
+  var hiderTitleElem = ge(groupElemId + '_hider_title');
 
   cur.toClean[groupElemId] = true;
 
-  if (hasClass(hiderElem, 'ads_edit_hider_on')) {
+  if (hasClass(hiderTitleElem, 'on')) {
     prefValue = 0;
   } else {
     prefValue = 1;
@@ -246,12 +256,12 @@ AdsEdit.toggleTargetingGroup = function(hiderElem, groupId, groupElemId) {
   }
 
   if (prefValue == 0) {
-    removeClass(hiderElem, 'ads_edit_hider_on');
-    addClass(hiderElem, 'ads_edit_hider_off');
+    removeClass(hiderTitleElem, 'on');
+    addClass(hiderTitleElem, 'off');
     slideUp(groupElemId, 200);
   } else {
-    removeClass(hiderElem, 'ads_edit_hider_off');
-    addClass(hiderElem, 'ads_edit_hider_on');
+    removeClass(hiderTitleElem, 'off');
+    addClass(hiderTitleElem, 'on');
     slideDown(groupElemId, 200, function(){ cur.targetingEditor.showGroupEnd(groupId); });
   }
 
@@ -1086,7 +1096,7 @@ AdsViewEditor.prototype.init = function(options, targetingEditor, params, params
 
   this.options = {
     targetIdPrefix: 'ads_param_',
-    uiWidth: 250 + 8
+    uiWidth: 320 + 8
   };
 
   this.options = extend({}, this.options, options);
@@ -1113,7 +1123,7 @@ AdsViewEditor.prototype.init = function(options, targetingEditor, params, params
     photo:                 {value: '', value_s: '', value_m: '', value_b: '', value_p: ''},
     photo_link:            {value: '', value_s: '', value_m: '', value_b: '', value_p: '', value_default_s: '', value_default_m: '', value_empty_m: '', value_default_b: '', value_empty_b: ''},
     video_hash:            {value: ''},
-    cost_per_click:        {value: '', value_cpc: '', value_cpm: '', value_cpm_exclusive: '', value_cpc_app: '', value_cpm_app: '', value_cpm_exclusive_app: '', recommended_cpc: '', recommended_cpm: '', recommended_cpm_exclusive: '', recommended_cpc_app: '', recommended_cpm_app: '', recommended_cpm_exclusive_app: '', edited: false, last_value: ''},
+    cost_per_click:        {value: '', value_cpc: '', value_cpm: '', value_cpm_exclusive: '', value_cpc_app: '', value_cpm_app: '', value_cpm_exclusive_app: '', recommended_cpc_short: '', recommended_cpm_short: '', recommended_cpm_exclusive_short: '', recommended_cpc_app_short: '', recommended_cpm_app_short: '', recommended_cpm_exclusive_app_short: '', recommended_cpc_long: '', recommended_cpm_long: '', recommended_cpm_exclusive_long: '', recommended_cpc_app_long: '', recommended_cpm_app_long: '', recommended_cpm_exclusive_app_long: '', edited: false, last_value: ''},
     views_places:          {value: 0, data: [], value_normal: 0, value_disabled: 0},
     views_limit_flag:      {value: 0},
     views_limit_exact:     {value: 0, data: []},
@@ -1210,7 +1220,7 @@ AdsViewEditor.prototype.initHelpParam = function(paramName) {
 
   switch (paramName) {
     case 'cost_type':        shiftTop = -55; break;
-    case 'category1_id':     shiftTop = -40; break;
+    case 'category1_id':     shiftTop = -44; break;
     case 'views_limit_flag': shiftTop = -32; break;
   }
 
@@ -1307,6 +1317,7 @@ AdsViewEditor.prototype.initUiParam = function(paramName) {
       targetElem.removeAttribute('autocomplete');
       this.params[paramName].ui = new Dropdown(targetElem, this.getUiParamData(paramName), {
         selectedItem: this.params[paramName].value,
+        big:          true,
         width:        this.options.uiWidth,
         onChange:     function(value) { this.onUiChange(paramName, value); }.bind(this)
       });
@@ -1325,8 +1336,9 @@ AdsViewEditor.prototype.initUiParam = function(paramName) {
         placeholder:  this.getUiParamPlaceholderText(paramName),
         noResult:     this.getUiParamNoResultText(paramName),
 
-        width:        this.options.uiWidth,
         autocomplete: true,
+        big:          true,
+        width:        this.options.uiWidth,
 
         onChange:     function(value) { this.onUiChange(paramName, value); }.bind(this)
       });
@@ -1334,13 +1346,13 @@ AdsViewEditor.prototype.initUiParam = function(paramName) {
       break;
     case 'link_url':
       targetElem = ge(this.options.targetIdPrefix + paramName);
-      placeholderSetup(targetElem, {back: true});
+      placeholderSetup(targetElem, {back: true, big: true});
       addEvent(targetElem, this.interestingEvents, function(event) { return this.onUiEvent(paramName, event); }.bind(this));
       this.cur.destroy.push(function(targetElem){ cleanElems(targetElem); }.pbind(targetElem));
       break;
     case 'link_domain':
       targetElem = ge(this.options.targetIdPrefix + paramName);
-      placeholderSetup(targetElem, {back: true});
+      placeholderSetup(targetElem, {back: true, big: true});
       addEvent(targetElem, this.interestingEvents, function(event) { return this.onUiEvent(paramName, event); }.bind(this));
       this.cur.destroy.push(function(targetElem){ cleanElems(targetElem); }.pbind(targetElem));
       break;
@@ -1367,6 +1379,7 @@ AdsViewEditor.prototype.initUiParam = function(paramName) {
       this.params[paramName].ui = new Dropdown(targetElem, this.getUiParamData(paramName), {
         selectedItem: this.params[paramName].value,
         disabledText: this.getUiParamDisabledText(paramName),
+        big:          true,
         width:        this.options.uiWidth,
         onChange:     function(value) { this.onUiChange(paramName, value); }.bind(this)
       });
@@ -1377,7 +1390,7 @@ AdsViewEditor.prototype.initUiParam = function(paramName) {
       break;
     case 'stats_url':
       targetElem = ge(this.options.targetIdPrefix + paramName);
-      placeholderSetup(targetElem, {back: true});
+      placeholderSetup(targetElem, {back: true, big: true});
       addEvent(targetElem, this.interestingEvents, function(event) { return this.onUiEvent(paramName, event); }.bind(this));
       this.cur.destroy.push(function(targetElem){ cleanElems(targetElem); }.pbind(targetElem));
       break;
@@ -1411,6 +1424,7 @@ AdsViewEditor.prototype.initUiParam = function(paramName) {
       targetElem.removeAttribute('autocomplete');
       this.params[paramName].ui = new Dropdown(targetElem, this.getUiParamData(paramName), {
         selectedItem: this.params[paramName].value,
+        big:          true,
         width:        this.options.uiWidth,
         onChange:     function(value) { this.onUiChange(paramName, value); }.bind(this)
       });
@@ -1471,6 +1485,7 @@ AdsViewEditor.prototype.initUiParam = function(paramName) {
       targetElem.removeAttribute('autocomplete');
       this.params[paramName].ui = new Dropdown(targetElem, this.getUiParamData(paramName), {
         selectedItem: this.params[paramName].value,
+        big:          true,
         width:        this.options.uiWidth,
         onChange:     function(value) { this.onUiChange(paramName, value); }.bind(this)
       });
@@ -1478,7 +1493,7 @@ AdsViewEditor.prototype.initUiParam = function(paramName) {
       break;
     case 'campaign_name':
       targetElem = ge(this.options.targetIdPrefix + paramName);
-      placeholderSetup(targetElem, {back: true});
+      placeholderSetup(targetElem, {back: true, big: true});
       addEvent(targetElem, this.interestingEvents, function(event) { return this.onUiEvent(paramName, event); }.bind(this));
       this.cur.destroy.push(function(targetElem){ cleanElems(targetElem); }.pbind(targetElem));
       break;
@@ -1558,11 +1573,12 @@ AdsViewEditor.prototype.updateUiParam = function(paramName) {
       var isAppAdminLink = (this.params.link_type.value == 4 && this.params.link_id.app_admin_links_ids[this.params.link_id.value]);
       var isApp = (isAppCampaign && isAppAdminLink);
 
-      var suffix1                 = ((this.params.cost_type.value == 2) ? '_cpm_exclusive' : ((this.params.cost_type.value == 1) ? '_cpm' : '_cpc'));
-      var suffix2                 = (isApp ? '_app' : '');
-      var suffixesAll             = suffix1 + suffix2;
-      var costPerClickValue       = 'value' + suffixesAll;
-      var costPerClickRecommended = 'recommended' + suffixesAll;
+      var suffix1                      = ((this.params.cost_type.value == 2) ? '_cpm_exclusive' : ((this.params.cost_type.value == 1) ? '_cpm' : '_cpc'));
+      var suffix2                      = (isApp ? '_app' : '');
+      var suffixesAll                  = suffix1 + suffix2;
+      var costPerClickValue            = 'value' + suffixesAll;
+      var costPerClickRecommendedShort = 'recommended' + suffixesAll + '_short';
+      var costPerClickRecommendedLong  = 'recommended' + suffixesAll + '_long';
 
       if (!this.params[paramName].edited || costPerClickValue !== this.params[paramName].last_value) {
         this.params[paramName].last_value = costPerClickValue;
@@ -1574,8 +1590,10 @@ AdsViewEditor.prototype.updateUiParam = function(paramName) {
       var currencyElem = ge(this.options.targetIdPrefix + paramName + '_currency');
       currencyElem.innerHTML = getLang('global_money_amount_rub_text', this.params[paramName].value);
 
-      var recommendedElem = ge(this.options.targetIdPrefix + paramName + '_recommended');
-      recommendedElem.innerHTML = this.params[paramName][costPerClickRecommended];
+      var recommendedShortElem = ge('ads_edit_recommended_cost_text');
+      var recommendedLongElem  = ge('ads_param_cost_per_click_recommended');
+      recommendedShortElem.innerHTML = this.params[paramName][costPerClickRecommendedShort];
+      recommendedLongElem.innerHTML  = this.params[paramName][costPerClickRecommendedLong];
       break;
     case 'views_places':
       this.params[paramName].disabled = (this.params.campaign_type.value == 2 || this.params.campaign_type.value == 0 && this.params.campaign_id.value_app && this.params.campaign_id.value == this.params.campaign_id.value_app || this.params.cost_type.value != 0 || this.params.link_type.value == 7 || this.params.disclaimer_medical.value || this.params.disclaimer_specialist.value);
@@ -2892,25 +2910,23 @@ AdsViewEditor.prototype.setUpdateData = function(data, result) {
 
   if (isObject(result) && 'cost_per_click' in result) {
     if (!this.params.cost_per_click.edited) {
-      this.params.cost_per_click.value_cpc               = result.cost_per_click.value_cpc;
-      this.params.cost_per_click.value_cpm               = result.cost_per_click.value_cpm;
-      this.params.cost_per_click.value_cpm_exclusive     = result.cost_per_click.value_cpm_exclusive;
-      this.params.cost_per_click.value_cpc_app           = result.cost_per_click.value_cpc_app;
-      this.params.cost_per_click.value_cpm_app           = result.cost_per_click.value_cpm_app;
-      this.params.cost_per_click.value_cpm_exclusive_app = result.cost_per_click.value_cpm_exclusive_app;
+      for (var key in result.cost_per_click) {
+        if (key.indexOf('value_') === 0 && key in this.params.cost_per_click) {
+          this.params.cost_per_click[key] = result.cost_per_click[key];
+        }
+      }
     }
-    this.params.cost_per_click.recommended_cpc               = result.cost_per_click.recommended_cpc;
-    this.params.cost_per_click.recommended_cpm               = result.cost_per_click.recommended_cpm;
-    this.params.cost_per_click.recommended_cpm_exclusive     = result.cost_per_click.recommended_cpm_exclusive;
-    this.params.cost_per_click.recommended_cpc_app           = result.cost_per_click.recommended_cpc_app;
-    this.params.cost_per_click.recommended_cpm_app           = result.cost_per_click.recommended_cpm_app;
-    this.params.cost_per_click.recommended_cpm_exclusive_app = result.cost_per_click.recommended_cpm_exclusive_app;
+    for (var key in result.cost_per_click) {
+      if (key.indexOf('recommended_') === 0 && key in this.params.cost_per_click) {
+        this.params.cost_per_click[key] = result.cost_per_click[key];
+      }
+    }
 
     this.updateUiParam('cost_per_click');
   }
 
   if (isObject(result) && 'audience_count_text' in result) {
-    var targetElem = ge('ads_edit_audience_count');
+    var targetElem = ge('ads_edit_audience_text');
     targetElem.innerHTML = result.audience_count_text;
   }
 
@@ -2947,9 +2963,9 @@ AdsTargetingEditor.prototype.init = function(options, viewEditor, criteria, crit
 
   this.options = {
     targetIdPrefix: 'ads_targeting_criterion_',
-    uiWidth: 250 + 8,
+    uiWidth: 320 + 8,
     uiHeight: 250,
-    uiWidthRange: 116 + 8,
+    uiWidthRange: 151 + 8,
     uiHeightRange: 190,
     uiMaxSelected: 25
   };
@@ -2981,6 +2997,7 @@ AdsTargetingEditor.prototype.init = function(options, viewEditor, criteria, crit
     stations:               {value: '', data: [],                  selectedData: [], dataInited: true}, // No default data to allow autocomplete by data
     streets:                {value: '', data: [],                  selectedData: []}, // No default data at all
 
+    schools_type:           {value: 0},
     schools:                {value: '', data: [],                  selectedData: []}, // No default data at all
     school_from:            {value: 0,  data: []},
     school_to:              {value: 0,  data: []},
@@ -3080,9 +3097,9 @@ AdsTargetingEditor.prototype.initHelpCriterion = function(criterionName) {
 
   switch (criterionName) {
     case 'travellers': shiftTop = -52; break;
-    case 'positions':  shiftTop = -40; break;
-    case 'pays_money': shiftTop = -40; break;
-    case 'tags':       shiftTop = -92; break;
+    case 'positions':  shiftTop = -44; break;
+    case 'pays_money': shiftTop = -44; break;
+    case 'tags':       shiftTop = -96; break;
   }
 
   switch (criterionName) {
@@ -3114,6 +3131,33 @@ AdsTargetingEditor.prototype.initUi = function() {
   }
 }
 
+AdsTargetingEditor.prototype.initUiGroup = function(groupName) {
+
+  if (!this.targetingGroups[groupName] || this.targetingGroups[groupName].uiInited) {
+    return;
+  }
+
+  var targetElem;
+
+  switch (groupName) {
+    case 'geography':
+    case 'interests':
+      if (this.targetingGroups[groupName].criteria_more) {
+        targetElem = ge('ads_edit_targeting_group_' + groupName + '_more_link');
+        addEvent(targetElem, 'click keypress', function(event) { return this.onUiEvent('group_' + groupName + '_more', event); }.bind(this));
+        this.cur.destroy.push(function(targetElem){ cleanElems(targetElem); }.pbind(targetElem));
+      }
+      if (this.targetingGroups[groupName].criteria_less) {
+        targetElem = ge('ads_edit_targeting_group_' + groupName + '_less_link');
+        addEvent(targetElem, 'click keypress', function(event) { return this.onUiEvent('group_' + groupName + '_less', event); }.bind(this));
+        this.cur.destroy.push(function(targetElem){ cleanElems(targetElem); }.pbind(targetElem));
+      }
+      break;
+  }
+
+  this.targetingGroups[groupName].uiInited = true;
+}
+
 AdsTargetingEditor.prototype.initUiCriterion = function(criterionName) {
 
   //debugLog('Targeting: Try init UI ' + criterionName);
@@ -3136,27 +3180,33 @@ AdsTargetingEditor.prototype.initUiCriterion = function(criterionName) {
 
   this.criteria[criterionName].uiInited = false;
 
+  // Init UI controls which do not change criteria
+  switch (criterionName) {
+  }
+
   // Init UI control
   switch (criterionName) {
+    // Dropdowns
     case 'country':
       targetElem = ge(this.options.targetIdPrefix + criterionName);
       targetElem.removeAttribute('autocomplete');
       this.criteria[criterionName].ui = new Dropdown(targetElem, this.getUiCriterionData(criterionName), {
         selectedItem: this.getUiCriterionSelectedData(criterionName),
         defaultItems: this.getUiCriterionDefaultData(criterionName),
-        width:        this.options.uiWidth,
+        big:          true,
         autocomplete: true,
+        width:        this.options.uiWidth,
         onChange:     function(value) { this.onUiChange(criterionName, value); }.bind(this)
       });
       this.updateUiCriterionEnabled(criterionName);
       this.cur.destroy.push(function(){ this.criteria[criterionName].ui.destroy(); }.bind(this));
       break;
-    case 'sex':
     case 'pays_money':
       targetElem = ge(this.options.targetIdPrefix + criterionName);
       targetElem.removeAttribute('autocomplete');
       this.criteria[criterionName].ui = new Dropdown(targetElem, this.getUiCriterionData(criterionName), {
         selectedItem: this.getUiCriterionSelectedData(criterionName),
+        big:          true,
         width:        this.options.uiWidth,
         onChange:     function(value) { this.onUiChange(criterionName, value); }.bind(this)
       });
@@ -3173,9 +3223,11 @@ AdsTargetingEditor.prototype.initUiCriterion = function(criterionName) {
       targetElem.removeAttribute('autocomplete');
       this.criteria[criterionName].ui = new Dropdown(targetElem, this.getUiCriterionData(criterionName), {
         selectedItem: this.getUiCriterionSelectedData(criterionName),
-        width:        this.options.uiWidthRange,
-        height:       this.options.uiHeightRange,
-        onChange:     function(value) { this.onUiChange(criterionName, value); }.bind(this)
+        big:             true,
+        zeroPlaceholder: true,
+        width:           this.options.uiWidthRange,
+        height:          this.options.uiHeightRange,
+        onChange:        function(value) { this.onUiChange(criterionName, value); }.bind(this)
       });
       this.updateUiCriterionEnabled(criterionName);
       this.cur.destroy.push(function(){ this.criteria[criterionName].ui.destroy(); }.bind(this));
@@ -3205,6 +3257,7 @@ AdsTargetingEditor.prototype.initUiCriterion = function(criterionName) {
       targetElem = ge(this.options.targetIdPrefix + criterionName);
       targetElem.removeAttribute('autocomplete');
       this.criteria[criterionName].ui = new Autocomplete(targetElem, this.getUiCriterionData(criterionName), {
+        name1: criterionName,
         defaultItems:  this.getUiCriterionDefaultData(criterionName),
         selectedItems: this.getUiCriterionSelectedData(criterionName),
 
@@ -3214,6 +3267,7 @@ AdsTargetingEditor.prototype.initUiCriterion = function(criterionName) {
         disabledText:  this.getUiCriterionDisabledText(criterionName),
 
         dropdown:      true,
+        big:           true,
         maxItems:      this.options.uiMaxSelected,
         width:         this.options.uiWidth,
         height:        this.options.uiHeight,
@@ -3224,24 +3278,109 @@ AdsTargetingEditor.prototype.initUiCriterion = function(criterionName) {
       this.updateUiCriterionEnabled(criterionName);
       this.cur.destroy.push(function(){ this.criteria[criterionName].ui.destroy(); }.bind(this));
       break;
+    // Radiobuttons
+    case 'sex':
+      targetElem = ge(this.options.targetIdPrefix + criterionName + '_any');
+      this.criteria[criterionName].ui_any = new Radiobutton(targetElem, {
+        width:    this.options.uiWidth,
+        label:    getLang('search_adv_any_sex'),
+        onSelect: function(value) { this.onUiSelect(criterionName, value) }.bind(this)
+      });
+      this.cur.destroy.push(function(){ this.criteria[criterionName].ui_any.destroy(); }.bind(this));
+
+      targetElem = ge(this.options.targetIdPrefix + criterionName + '_male');
+      this.criteria[criterionName].ui_male = new Radiobutton(targetElem, {
+        width:    this.options.uiWidth,
+        label:    getLang('Sex_m'),
+        onSelect: function(value) { this.onUiSelect(criterionName, value) }.bind(this)
+      });
+      this.cur.destroy.push(function(){ this.criteria[criterionName].ui_male.destroy(); }.bind(this));
+
+      targetElem = ge(this.options.targetIdPrefix + criterionName + '_female');
+      this.criteria[criterionName].ui_female = new Radiobutton(targetElem, {
+        width:    this.options.uiWidth,
+        label:    getLang('Sex_fm'),
+        onSelect: function(value) { this.onUiSelect(criterionName, value) }.bind(this)
+      });
+      this.cur.destroy.push(function(){ this.criteria[criterionName].ui_female.destroy(); }.bind(this));
+
+      Radiobutton.select(this.options.targetIdPrefix + criterionName, this.criteria[criterionName].value);
+      break;
+    case 'schools_type':
+      targetElem = ge(this.options.targetIdPrefix + criterionName + '_any');
+      this.criteria[criterionName].ui_any = new Radiobutton(targetElem, {
+        width:    this.options.uiWidth,
+        label:    getLang('ads_schools_type_any'),
+        onSelect: function(value) { this.onUiSelect(criterionName, value) }.bind(this)
+      });
+      this.cur.destroy.push(function(){ this.criteria[criterionName].ui_any.destroy(); }.bind(this));
+
+      targetElem = ge(this.options.targetIdPrefix + criterionName + '_school');
+      this.criteria[criterionName].ui_school = new Radiobutton(targetElem, {
+        width:    this.options.uiWidth,
+        label:    getLang('ads_schools_type_school'),
+        onSelect: function(value) { this.onUiSelect(criterionName, value) }.bind(this)
+      });
+      this.cur.destroy.push(function(){ this.criteria[criterionName].ui_school.destroy(); }.bind(this));
+
+      targetElem = ge(this.options.targetIdPrefix + criterionName + '_uni');
+      this.criteria[criterionName].ui_uni = new Radiobutton(targetElem, {
+        width:    this.options.uiWidth,
+        label:    getLang('ads_schools_type_university'),
+        onSelect: function(value) { this.onUiSelect(criterionName, value) }.bind(this)
+      });
+      this.cur.destroy.push(function(){ this.criteria[criterionName].ui_uni.destroy(); }.bind(this));
+
+      Radiobutton.select(this.options.targetIdPrefix + criterionName, this.criteria[criterionName].value);
+      break;
+    // Checkboxes
     case 'birthday':
+      var labelToday    = this.criteria.birthday.label_checkbox_today;
+      var labelTomorrow = this.criteria.birthday.label_checkbox_tomorrow;
+      var labelWeek     = this.criteria.birthday.label_checkbox_week;
+      var widthToday    = AdsEdit.getTextWidth(labelToday);
+      var widthTomorrow = AdsEdit.getTextWidth(labelTomorrow);
+      var widthWeek     = AdsEdit.getTextWidth(labelWeek);
+      var widthMore     = Math.floor((this.options.uiWidth - (widthToday + widthTomorrow + widthWeek)) / 3);
+      widthToday       += widthMore;
+      widthTomorrow    += widthMore;
+      widthWeek        += widthMore;
+
+      var isCheckedToday   = !!(this.criteria.birthday.value & (1 << 0));
+      var isCheckedTmorrow = !!(this.criteria.birthday.value & (1 << 1));
+      var isCheckedWeek    = !!(this.criteria.birthday.value & (1 << 2));
+
       targetElem = ge(this.options.targetIdPrefix + 'birthday_today');
       this.criteria.birthday.ui_today = new Checkbox(targetElem, {
-        label:    this.criteria.birthday.label_checkbox_today,
-        checked:  this.criteria.birthday.value & (1 << 0),
-        width:    80,
+        label:    labelToday,
+        checked:  isCheckedToday,
+        width:    widthToday,
         onChange: function(state) { this.onUiChange('birthday_today', state); }.bind(this)
       });
       this.cur.destroy.push(function(){ this.criteria[criterionName].ui_today.destroy(); }.bind(this));
 
       targetElem = ge(this.options.targetIdPrefix + 'birthday_tomorrow');
       this.criteria.birthday.ui_tomorrow = new Checkbox(targetElem, {
-        label:    this.criteria.birthday.label_checkbox_tomorrow,
-        checked:  this.criteria.birthday.value & (1 << 1),
-        width:    120,
+        label:    labelTomorrow,
+        checked:  isCheckedTmorrow,
+        width:    widthTomorrow,
         onChange: function(state) { this.onUiChange('birthday_tomorrow', state); }.bind(this)
       });
       this.cur.destroy.push(function(){ this.criteria[criterionName].ui_tomorrow.destroy(); }.bind(this));
+
+      targetElem = ge(this.options.targetIdPrefix + 'birthday_week');
+      this.criteria.birthday.ui_week = new Checkbox(targetElem, {
+        label:    labelWeek,
+        checked:  isCheckedWeek,
+        width:    widthWeek,
+        onChange: function(state) { this.onUiChange('birthday_week', state); }.bind(this)
+      });
+      this.cur.destroy.push(function(){ this.criteria[criterionName].ui_week.destroy(); }.bind(this));
+
+      if (isCheckedWeek) {
+        this.criteria[criterionName].ui_today.disable(true);
+        this.criteria[criterionName].ui_tomorrow.disable(true);
+      }
       break;
     case 'travellers':
       targetElem = ge(this.options.targetIdPrefix + criterionName);
@@ -3253,6 +3392,7 @@ AdsTargetingEditor.prototype.initUiCriterion = function(criterionName) {
       });
       this.cur.destroy.push(function(){ this.criteria[criterionName].ui.destroy(); }.bind(this));
       break;
+    // Inputs
     case 'tags':
       targetElem = ge(this.options.targetIdPrefix + criterionName);
       addEvent(targetElem, this.interestingEvents, function(event) { return this.onUiEvent(criterionName, event); }.bind(this));
@@ -3290,7 +3430,7 @@ AdsTargetingEditor.prototype.getUiCriterionData = function(criterionName) {
     case 'schools':
       var citiesOnlyIds = this.getCitiesOnly();
       if (citiesOnlyIds) {
-        return '/select.php?act=aschools&cities=' + escape(citiesOnlyIds);
+        return '/select.php?act=aschools&cities=' + escape(citiesOnlyIds) + '&schools_type=' + this.criteria.schools_type.value;
       } else {
         return [];
       }
@@ -3298,22 +3438,22 @@ AdsTargetingEditor.prototype.getUiCriterionData = function(criterionName) {
       return '/select.php?act=apositions';
     case 'age_from':
       var ageFromMax = (this.criteria.age_to.value || this.criteriaRanges.age_max);
-      return this.getUiCriterionDataRange(this.criteriaRanges.age_min, ageFromMax, 1, getLang('ads_age_from'));
+      return this.getUiCriterionDataRange(this.criteriaRanges.age_min, ageFromMax, 1, getLang('ads_age_from'), getLang('ads_age_any'));
     case 'age_to':
       var ageToMin = (this.criteria.age_from.value || this.criteriaRanges.age_min);
-      return this.getUiCriterionDataRange(ageToMin, this.criteriaRanges.age_max, 1, getLang('ads_age_to'));
+      return this.getUiCriterionDataRange(ageToMin, this.criteriaRanges.age_max, 1, getLang('ads_age_to'), getLang('ads_age_any'));
     case 'school_from':
       var schoolFromMax = (this.criteria.school_to.value || this.criteriaRanges.school_max);
-      return this.getUiCriterionDataRange(this.criteriaRanges.school_min, schoolFromMax, -1, getLang('ads_school_from'));
+      return this.getUiCriterionDataRange(this.criteriaRanges.school_min, schoolFromMax, -1, getLang('ads_school_from'), getLang('ads_school_from_placeholder'));
     case 'school_to':
       var schoolToMin = (this.criteria.school_from.value || this.criteriaRanges.school_min);
-      return this.getUiCriterionDataRange(schoolToMin, this.criteriaRanges.school_max, -1, getLang('ads_school_to'));
+      return this.getUiCriterionDataRange(schoolToMin, this.criteriaRanges.school_max, -1, getLang('ads_school_to'), getLang('ads_school_to_placeholder'));
     case 'uni_from':
       var uniFromMax = (this.criteria.uni_to.value || this.criteriaRanges.uni_max);
-      return this.getUiCriterionDataRange(this.criteriaRanges.uni_min, uniFromMax, -1, getLang('ads_uni_from'));
+      return this.getUiCriterionDataRange(this.criteriaRanges.uni_min, uniFromMax, -1, getLang('ads_uni_from'), getLang('ads_uni_from_placeholder'));
     case 'uni_to':
       var uniToMin = (this.criteria.uni_from.value || this.criteriaRanges.uni_min);
-      return this.getUiCriterionDataRange(uniToMin, this.criteriaRanges.uni_max, -1, getLang('ads_uni_to'));
+      return this.getUiCriterionDataRange(uniToMin, this.criteriaRanges.uni_max, -1, getLang('ads_uni_to'), getLang('ads_uni_to_placeholder'));
     case 'statuses':
       return ((this.criteria.sex.value == 1) ? this.criteria.statuses.data.female : this.criteria.statuses.data.male);
     default:
@@ -3339,15 +3479,15 @@ AdsTargetingEditor.prototype.updateUiCriterionData = function(criterionName) {
   }
 }
 
-AdsTargetingEditor.prototype.getUiCriterionDataRange = function(min, max, step, langKey) {
+AdsTargetingEditor.prototype.getUiCriterionDataRange = function(min, max, step, langValue, langValueAny) {
   if (min > max) return [];
-  var data = [[0, getLang('ads_age_any')]];
+  var data = [[0, langValueAny]];
   if (step < 0) {
     for (var i = max; i >= min; i += step)
-    data.push([i, langNumeric(i, langKey)]);
+    data.push([i, langNumeric(i, langValue)]);
   } else if (step > 0) {
     for (var i = min; i <= max; i += step)
-    data.push([i, langNumeric(i, langKey)]);
+    data.push([i, langNumeric(i, langValue)]);
   }
   return data;
 }
@@ -3510,32 +3650,46 @@ AdsTargetingEditor.prototype.getUiCriterionVisibility = function(criterionName, 
 
   checkCriterionValue = !!checkCriterionValue;
 
-  var allowed = !!(!('allowed' in this.criteria[criterionName]) || this.criteria[criterionName].allowed);
   var visible = null;
-
-  switch (criterionName) {
-    case 'districts':
-    case 'stations':
-      var citiesOnlyIds = this.getCitiesOnly();
-      visible = !!(!citiesOnlyIds || this.criteria[criterionName].data.length || this.criteria[criterionName].value);
-      break;
-    case 'pays_money':
-      var viewParams = this.viewEditor.getParams();
-      allowed = !!(allowed && (this.criteria[criterionName].allowed_any || viewParams.link_type == 4));
-      visible = !!(this.criteria[criterionName].value);
-      break;
-    case 'retargeting_groups':
-    case 'retargeting_groups_not':
-      var viewParams = this.viewEditor.getParams();
-      allowed = !!(allowed && (!this.criteria[criterionName].allowed_apps_only || viewParams.link_type == 4));
-      visible = !!(this.criteria[criterionName].value);
-      break;
+  if (visible !== false && 'allowed' in this.criteria[criterionName]) {
+    visible = !!(this.criteria[criterionName].allowed);
+  }
+  if (visible !== false && 'hidden_more' in this.criteria[criterionName]) {
+    visible = !!(!this.criteria[criterionName].hidden_more);
   }
 
-  if (checkCriterionValue) {
-    visible = (allowed || visible)
-  } else {
-    visible = allowed;
+  if (visible !== false) {
+    switch (criterionName) {
+      case 'districts':
+      case 'stations':
+        var citiesOnlyIds = this.getCitiesOnly();
+        visible = !!(!citiesOnlyIds || this.criteria[criterionName].data.length);
+        break;
+      case 'schools':
+        visible = !!(this.criteria.schools_type.value);
+        break;
+      case 'school_from':
+      case 'school_to':
+        visible = !!(this.criteria.schools_type.value == 1);
+        break;
+      case 'uni_from':
+      case 'uni_to':
+        visible = !!(this.criteria.schools_type.value == 2);
+        break;
+      case 'pays_money':
+        var viewParams = this.viewEditor.getParams();
+        visible = !!(this.criteria[criterionName].allowed_any || viewParams.link_type == 4);
+        break;
+      case 'retargeting_groups':
+      case 'retargeting_groups_not':
+        var viewParams = this.viewEditor.getParams();
+        visible = !!(!this.criteria[criterionName].allowed_apps_only || viewParams.link_type == 4);
+        break;
+    }
+  }
+
+  if (visible === false && checkCriterionValue) {
+    visible = !!(this.criteria[criterionName].value);
   }
 
   return visible;
@@ -3550,11 +3704,13 @@ AdsTargetingEditor.prototype.updateUiCriterionVisibility = function(criterionNam
 
   this.criteria[criterionName].hidden = !visible;
 
+  var rowName = (this.criteria[criterionName].row_name ? this.criteria[criterionName].row_name : criterionName);
+
   if (visible) {
     this.initUiCriterion(criterionName);
-    show('ads_edit_criterion_row_' + criterionName);
+    show('ads_edit_criterion_row_' + rowName);
   } else if (!('dataInited' in this.criteria[criterionName]) || this.criteria[criterionName].dataInited) {
-    hide('ads_edit_criterion_row_' + criterionName);
+    hide('ads_edit_criterion_row_' + rowName);
   }
 }
 
@@ -3691,10 +3847,29 @@ AdsTargetingEditor.prototype.getUiCriterionDisabledText = function(criterionName
     case 'cities_not': return getLang('ads_first_select_country');
     case 'districts':
     case 'stations':
-    case 'streets':
-    case 'schools':    return getLang('ads_first_select_city');
-    default:           return '';
+    case 'streets':    return getLang('ads_first_select_city');
+    case 'schools':
+      if (this.criteria.schools_type.value == 1) {
+        return getLang('ads_first_select_city_for_school');
+      } else {
+        return getLang('ads_first_select_city_for_university');
+      }
+    default: return '';
   }
+}
+
+AdsTargetingEditor.prototype.updateUiCriterionDisabledText = function(criterionName) {
+  if (!('data' in this.criteria[criterionName])) {
+    try { console.error("Can't update disabled text"); } catch (e) {}
+    return;
+  }
+
+  if (!this.criteria[criterionName].ui) {
+    return;
+  }
+
+  var disabledText = this.getUiCriterionDisabledText(criterionName);
+  this.criteria[criterionName].ui.setOptions({disabledText: disabledText});
 }
 
 AdsTargetingEditor.prototype.correctCriterion = function(criterionName) {
@@ -3709,6 +3884,18 @@ AdsTargetingEditor.prototype.correctCriterion = function(criterionName) {
   }
 
   switch (criterionName) {
+    case 'schools':
+    case 'school_from':
+    case 'school_to':
+    case 'uni_from':
+    case 'uni_to':
+      if (this.criteria[criterionName].value != '') {
+        this.onCriterionUpdate(criterionName, '', false, true);
+        if (this.criteria[criterionName].value == '') {
+          this.criteria[criterionName].ui.clear();
+        }
+      }
+      break;
     case 'pays_money':
       if (this.criteria[criterionName].value != 0) {
         this.onCriterionUpdate(criterionName, 0, false, true);
@@ -3810,6 +3997,20 @@ AdsTargetingEditor.prototype.onCriterionUpdate = function(criterionName, criteri
       case 'schools':
         this.updateUiCriterionEnabled(criterionName);
         break;
+      case 'schools_type':
+        this.updateUiCriterionDisabledText('schools');
+        this.updateUiCriterionData('schools');
+        this.correctCriterion('schools');
+        this.correctCriterion('school_from');
+        this.correctCriterion('school_to');
+        this.correctCriterion('uni_from');
+        this.correctCriterion('uni_to');
+        this.updateUiCriterionVisibility('schools');
+        this.updateUiCriterionVisibility('school_from');
+        this.updateUiCriterionVisibility('school_to');
+        this.updateUiCriterionVisibility('uni_from');
+        this.updateUiCriterionVisibility('uni_to');
+        break;
       case 'age_from':
         this.updateUiCriterionData('age_to');
         break;
@@ -3849,6 +4050,10 @@ AdsTargetingEditor.prototype.onCriterionUpdate = function(criterionName, criteri
   }
 }
 
+AdsTargetingEditor.prototype.onUiSelect = function(criterionName, criterionValue) {
+  this.onCriterionUpdate(criterionName, criterionValue);
+}
+
 AdsTargetingEditor.prototype.onUiChange = function(criterionName, criterionValue) {
   switch (criterionName) {
     case 'country':
@@ -3874,9 +4079,30 @@ AdsTargetingEditor.prototype.onUiChange = function(criterionName, criterionValue
       newValue |= (intval(criterionValue) && (1 << 1));
       this.onCriterionUpdate('birthday', newValue);
       return;
+    case 'birthday_week':
+      var newValue = this.criteria.birthday.value;
+      newValue &= (-1 ^ (1 << 2));
+      newValue |= (intval(criterionValue) && (1 << 2));
+      this.onCriterionUpdate('birthday', newValue);
+      setTimeout(updateBirhday.bind(this, newValue), 1);
+      return;
   }
 
   this.onCriterionUpdate(criterionName, criterionValue);
+
+  function updateBirhday(newValue) {
+    var isCheckedToday    = !!(newValue & (1 << 0));
+    var isCheckedTomorrow = !!(newValue & (1 << 1));
+    var isCheckedWeek     = !!(newValue & (1 << 2));
+    if (isCheckedWeek && !isCheckedToday) {
+      this.criteria.birthday.ui_today.checked(true);
+    }
+    if (isCheckedWeek && !isCheckedTomorrow) {
+      this.criteria.birthday.ui_tomorrow.checked(true);
+    }
+    this.criteria.birthday.ui_today.disable(isCheckedWeek);
+    this.criteria.birthday.ui_tomorrow.disable(isCheckedWeek);
+  }
 }
 
 AdsTargetingEditor.prototype.onUiTagAdd = function(criterionName, criterionValue, criterionTag) {
@@ -3922,6 +4148,22 @@ AdsTargetingEditor.prototype.onUiTagRemove = function(criterionName, criterionVa
 
 AdsTargetingEditor.prototype.onUiEvent = function(criterionName, event) {
   switch (criterionName) {
+    case 'group_geography_more':
+      this.showGroupMore('geography');
+      return false;
+      break;
+    case 'group_geography_less':
+      this.hideGroupMore('geography');
+      return false;
+      break;
+    case 'group_interests_more':
+      this.showGroupMore('interests');
+      return false;
+      break;
+    case 'group_interests_less':
+      this.hideGroupMore('interests');
+      return false;
+      break;
     case 'tags':
       var targetElem = ge(this.options.targetIdPrefix + criterionName);
       var criterionValueOriginal = targetElem.value;
@@ -3988,17 +4230,19 @@ AdsTargetingEditor.prototype.getCriteria = function() {
 }
 
 AdsTargetingEditor.prototype.showGroup = function(groupName) {
-  var group = this.targetingGroups[groupName]
+  var group = this.targetingGroups[groupName];
   if (!group) {
     return;
   }
   for (var criterionNameIndex in group['criteria']) {
-    this.initUiCriterion(group['criteria'][criterionNameIndex]);
+    var criterionName = group['criteria'][criterionNameIndex];
+    this.initUiCriterion(criterionName);
   }
+  this.initUiGroup(groupName);
 }
 
 AdsTargetingEditor.prototype.showGroupEnd = function(groupName) {
-  var group = this.targetingGroups[groupName]
+  var group = this.targetingGroups[groupName];
   if (!group) {
     return;
   }
@@ -4007,6 +4251,44 @@ AdsTargetingEditor.prototype.showGroupEnd = function(groupName) {
     if (this.criteria[criterionName] && ('data' in this.criteria[criterionName])) {
       this.updateUiCriterionEnabled(criterionName); // Fix disabling introText
     }
+  }
+}
+
+AdsTargetingEditor.prototype.showGroupMore = function(groupName) {
+  var group = this.targetingGroups[groupName];
+  if (!group) {
+    return;
+  }
+  hide('ads_edit_targeting_group_' + groupName + '_more_row');
+  show('ads_edit_targeting_group_' + groupName + '_less_row');
+  for (var criterionNameIndex in group['criteria_more']) {
+    var criterionName = group['criteria_more'][criterionNameIndex];
+    this.criteria[criterionName].hidden_more = false;
+  }
+  for (var criterionNameIndex in group['criteria_more']) {
+    var criterionName = group['criteria_more'][criterionNameIndex];
+    this.updateUiCriterionVisibility(criterionName);
+  }
+  for (var criterionNameIndex in group['criteria_more']) {
+    var criterionName = group['criteria_more'][criterionNameIndex];
+    this.initUiCriterion(criterionName);
+  }
+}
+
+AdsTargetingEditor.prototype.hideGroupMore = function(groupName) {
+  var group = this.targetingGroups[groupName];
+  if (!group) {
+    return;
+  }
+  show('ads_edit_targeting_group_' + groupName + '_more_row');
+  hide('ads_edit_targeting_group_' + groupName + '_less_row');
+  for (var criterionNameIndex in group['criteria_more']) {
+    var criterionName = group['criteria_more'][criterionNameIndex];
+    this.criteria[criterionName].hidden_more = true;
+  }
+  for (var criterionNameIndex in group['criteria_more']) {
+    var criterionName = group['criteria_more'][criterionNameIndex];
+    this.updateUiCriterionVisibility(criterionName);
   }
 }
 

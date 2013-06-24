@@ -376,7 +376,7 @@ input.join_big_text {
   padding-top: 5px;
   padding-bottom: 2px;
 }
-#join_country_wrap .disabled .selector_dropdown {
+#join_country_wrap .disabled.selector_container .selector_dropdown {
   background-color: #F2F2F2;
   border-color: #F2F2F2;
 }

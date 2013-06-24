@@ -1845,7 +1845,7 @@ span.post_video_duration {
 .big_wall_post #submit_post_box textarea::-webkit-input-placeholder { color:#FFF; }
 .big_wall_post #submit_post_box textarea::-moz-placeholder { color:#FFF; }
 
-.wall_module .mini_editor_cont .result_list {
+.wall_module .mini_editor_cont .selector_container .result_list {
   display: none;
 }
 #page_add_media {

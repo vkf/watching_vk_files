@@ -372,7 +372,7 @@ ul.vk_com_only_good {
   padding-top: 5px;
   padding-bottom: 2px;
 }
-#validation_country_row .disabled .selector_dropdown {
+#validation_country_row .disabled.selector_container .selector_dropdown {
   background-color: #F2F2F2;
   border-color: #F2F2F2;
 }

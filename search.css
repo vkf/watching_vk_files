@@ -14,9 +14,6 @@
   outline: none;
 }
 /* iSearch */
-.search_isearch .results_container, .search_isearch .result_list, search_isearch .result_list_shadow {
-  /* position: relative; */
-}
 #search_query_reset {
   cursor: pointer;
   display: none;

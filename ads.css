@@ -66,6 +66,9 @@ a .ads_sub_link:hover {
 #ads_page {
   padding: 20px;
 }
+#ads_page.ads_page_no_padding {
+  padding: 0;
+}
 
 .ads_page_extra_wide #ads_page_wrap2,
 .ads_page_extra_wide #ads_page_wrap1 {

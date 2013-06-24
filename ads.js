@@ -204,6 +204,34 @@ Ads.scrollToError = function(errorElem) {
   }
 }
 
+Ads.initFixed = function(elemWrap) {
+  elemWrap = ge(elemWrap);
+  if (!elemWrap) return;
+  var elemFixed = elemWrap.firstChild;
+  if (!elemFixed) return;
+
+  var scrolledNode = browser.msie6 ? pageNode : window;
+  addEvent(scrolledNode, 'scroll', onScroll);
+  cur.destroy.push(function() { removeEvent(scrolledNode, 'scroll', onScroll); });
+
+  var poistionTop = 20;
+
+  var elemWrapSize = getSize(elemWrap);
+  setStyle(elemWrap, {width: elemWrapSize[0] + 'px', height: elemWrapSize[1] + 'px'});
+
+  onScroll();
+
+  function onScroll() {
+    var elemWrapXY = getXY(elemWrap);
+    var scrollY = scrollGetY();
+    if (scrollY + poistionTop < elemWrapXY[1]) {
+      setStyle(elemFixed, {position: 'static', top: 'auto', left: 'auto'});
+    } else {
+      setStyle(elemFixed, {position: 'fixed', top: poistionTop, left: elemWrapXY[0]});
+    }
+  }
+}
+
 //////////////////////////////////////////////////////////////////////
 // OLD
 //////////////////////////////////////////////////////////////////////

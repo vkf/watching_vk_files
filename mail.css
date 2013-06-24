@@ -390,7 +390,7 @@ td.mail_actions a {
 .mail_envelope_form {
   padding: 20px 0 10px;
 }
-#mail_content .mail_envelope td.selector_dropdown {
+#mail_content .mail_envelope .selector_container td.selector_dropdown {
   background-image: url(/images/darr_dd_out_blue.gif);
 }
 #mail_write_topic {

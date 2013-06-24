@@ -81,10 +81,10 @@
   display: block;
 }
 
-#feed_search_bar .results_container {
+#feed_search_bar .selector_container .results_container {
   top: 30px;
 }
-#feed_search_bar #feed_search_extform .results_container {
+#feed_search_bar #feed_search_extform .selector_container .results_container {
   top: auto;
 }
 

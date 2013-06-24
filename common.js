@@ -844,16 +844,18 @@ function getStyle(elem, name, force) {
       ret = 0;
     }
 
-    if (!/^\d+(px)?$/i.test(ret) && /^\d/.test(ret)) {
-      var style = elem.style, left = style.left, rsLeft = elem.runtimeStyle.left;
-
-      elem.runtimeStyle.left = elem.currentStyle.left;
-      style.left = ret || 0;
-      ret = style.pixelLeft + 'px';
-
-      style.left = left;
-      elem.runtimeStyle.left = rsLeft;
-    }
+    ret = (ret + '').split(' ');
+    each(ret, function(i,v) {
+      if (!/^\d+(px)?$/i.test(v) && /^\d/.test(v)) {
+        var style = elem.style, left = style.left, rsLeft = elem.runtimeStyle.left;
+        elem.runtimeStyle.left = elem.currentStyle.left;
+        style.left = v || 0;
+        ret[i] = style.pixelLeft + 'px';
+        style.left = left;
+        elem.runtimeStyle.left = rsLeft;
+      }
+    });
+    ret = ret.join(' ');
   }
 
   if (force && (name == 'width' || name == 'height')) {
@@ -884,10 +886,10 @@ function setStyle(elem, name, value){
     elem.style.opacity = value;
   } else {
     try{
-    var isN = typeof(value) == 'number';
-    if (isN && (/height|width/i).test(name)) value = Math.abs(value);
-    elem.style[name] = isN && !(/z-?index|font-?weight|opacity|zoom|line-?height/i).test(name) ? value + 'px' : value;
-    } catch(e){debugLog([name, value]);}
+      var isN = typeof(value) == 'number';
+      if (isN && (/height|width/i).test(name)) value = Math.abs(value);
+      elem.style[name] = isN && !(/z-?index|font-?weight|opacity|zoom|line-?height/i).test(name) ? value + 'px' : value;
+    } catch(e){debugLog('setStyle error: ', [name, value]);}
   }
 }
 
@@ -2351,7 +2353,7 @@ window._fMenu = window._fMenuShown = false;
 window._fMenuHidden = true;
 window._fMenuLnks = {};
 function initFixedMenu() {
-  var lnks = {fr: 'friends?section=requests', ph: 'albums?act=added', vid: 'video?section=tagged', msg: 'im', gr: 'groups', nws: 'feed?section=notifications', ap: 'apps'}, text = [], i, el;
+  var lnks = {fr: '/friends?section=requests', ph: '/albums?act=added', vid: '/video?section=tagged', msg: '/im', gr: '/groups', nws: '/feed?section=notifications', ap: '/apps'}, text = [], i, el;
   for (i in lnks) {
     text.push('<a class="fmenu_item fl_r" onmouseover="Pads.preload(\'' + i + '\')" onmousedown="return Pads.show(\'' + i + '\', event)" href="' + lnks[i] + '"><span class="fmenu_text inl_bl"></span><span id="fmenu_' + i + '" class="fmenu_icon inl_bl"></span></a>');
   }
@@ -3278,6 +3280,7 @@ var ajax = {
     var res = [d, p, r, o, ajax.tModule];
     for (var i in res) {
       if (res[i] < 0) return false;
+      if (!res[i] && res[i] !== 0) return false;
     }
     ajax.tStart = false;
     return res.join(',');
@@ -4469,14 +4472,17 @@ function __phCheck(el, back, editable, focus, blur) {
   }
 }
 function placeholderSetup(id, opts) {
-  var el = ge(id), ph, o = opts ? clone(opts) : {};
+  var el = ge(id);
+  var ph;
+  var o = opts ? clone(opts) : {};
   if (!el || (el.phevents && !o.reload) || !(ph = (el.getAttribute('placeholder') || el.placeholder))) {
     return;
   }
 
   el.removeAttribute('placeholder');
 
-  var pad = {}, dirs = ['Top', 'Bottom', 'Left', 'Right'];
+  var pad = {};
+  var dirs = ['Top', 'Bottom', 'Left', 'Right'];
   if (o.pad) {
     pad = o.pad;
   } else {
@@ -4504,9 +4510,12 @@ function placeholderSetup(id, opts) {
     var prel = el.previousSibling;
     if (prel && hasClass(prel, 'input_back_wrap')) re(prel);
   }
-  var b1 = el.phcont = el.parentNode.insertBefore(ce('div', {className: 'input_back_wrap no_select', innerHTML: '\
-<div class="input_back"><div class="input_back_content">' + ph + '</div></div>\
-  '}), el), b = domFC(b1), c = domFC(b);
+  var b1 = el.phcont = el.parentNode.insertBefore(ce('div', {
+    className: 'input_back_wrap no_select',
+    innerHTML: '<div class="input_back"><div class="input_back_content' + (o.big ? ' big' : '') + '">' + ph + '</div></div>'
+  }), el);
+  var b = domFC(b1);
+  var c = domFC(b);
   setStyle(b, pad);
 
   var cv = __phCheck.pbind(el, o.back, o.editable), checkValue = browser.mobile ? cv : function(f, b) {

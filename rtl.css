@@ -553,7 +553,8 @@ body.is_rtl1 {
   padding: 0 0 0 5px;
 }
 
-.is_rtl1 .result_list, .is_rtl1 .result_list_shadow {
+.is_rtl1 .selector_container .result_list,
+.is_rtl1 .selector_container .result_list_shadow {
   left: auto;
   right: 0;
 }

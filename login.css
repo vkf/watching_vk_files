@@ -258,7 +258,7 @@ input.login_big_text {
   font-family: tahoma, tahoma, verdana, arial, sans-serif, Lucida Sans;
   font-size: 1.09em !important;
 }
-#blocked_country_wrap .disabled .selector_dropdown {
+#blocked_country_wrap .disabled.selector_container .selector_dropdown {
   background-color: #F2F2F2;
   border-color: #F2F2F2;
 }

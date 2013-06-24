@@ -147,7 +147,7 @@
 .is_2x #im_log_fav_btn i,
 .is_2x .im_important_toggler,
 .is_2x .im_important_icon {
-  background-image: url(/images/icons/im_actions_iconset2_2x.png?7);
+  background-image: url(/images/icons/im_actions_iconset2_2x.png?8);
   background-size: 20px 300px;
 }
 
@@ -663,12 +663,6 @@
 }
 .fave_photo_inner {
   background-size: 130px auto;
-}
-.is_2x .token span.x_hover,
-.is_2x .token span.x,
-{
-  background-image: url('/images/blob_x.gif');
-  background-size: 9px 10px;
 }
 .is_2x .counts_module .fans .thumb {
   background-position: center -23px;

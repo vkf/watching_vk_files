@@ -72,7 +72,7 @@ if (window._ui === undefined) {
       }
       return _ui._uids[_ui._sel];
     }
-  }
+  };
 
   addEvent(document, 'keypress keydown mousedown', function(e) {
     if (_ui.sel()) {
@@ -140,15 +140,17 @@ function Dropdown(input, data, options) {
   if (!options) options = {};
   return new Selector(
     input,
-    options.autocomplete ? data : [], extend({
-      introText: '',
-      multiselect: false,
-      autocomplete: false,
-      selectedItems: options.selectedItem
-    }, options, {
-      defaultItems: data
-    }
-  ));
+    options.autocomplete ? data : [],
+    extend({
+        introText: '',
+        multiselect: false,
+        autocomplete: false,
+        selectedItems: options.selectedItem
+      }, options, {
+        defaultItems: data
+      }
+    )
+  );
 }
 
 // Alias
@@ -167,10 +169,54 @@ createChildClass('Selector', UiControl, {
     selectedItems: [],
     defaultItems: [],
     multiselect: true,
+    multinostop: false,
     autocomplete: true,
     dropdown: true,
-    cacheLength: 100,
     maxItems: 50,
+    selectFirst: true,
+    dividingLine: 'smart',
+    resultField: undefined,
+    customField: undefined,
+    enableCustom: false,
+    valueForCustom: -1,
+    width: 300,
+    height: 250,
+    resultListWidth: 0,
+    progressBar: false,
+    imageId: undefined,
+    noImageSrc: 'http://vk.com/images/question_s.gif',
+    hrefPrefix: 'id',
+    noBlur: false,
+    zeroDefault: false,
+    customArrow: false,
+    customArrowWidth: 0,
+    big: false,
+
+    // Text options
+    placeholder: '',
+    placeholderColor: '#777777',
+    placeholderColorBack: '#AFB8C2',
+    zeroPlaceholder: false, // Use zero element of data as placeholder
+    introText: 'Start typing',
+    disabledText: '',
+    noResult: getLang('search_nothing_found'),
+
+    // Cache options
+    cacheLength: 100,
+
+    // Indexer options
+    indexkeys: undefined,
+
+    // Functions
+    onShow: undefined, // function() {}
+    onHide: undefined, // function() {}
+    onChange: undefined, // function(valueResult) {}
+    onTagAdd: undefined, // function(itemAdded, valueResult) {}
+    onTagRemove: undefined, // function(itemRemoved, valueResult) {}
+    onItemSelect: undefined, // ???
+    onTokenSelected: undefined, // function(tokenId) {}
+    customSearch: false, // function(term) {}
+    chooseFirst: false, // ???
     maxItemsShown: function(query_length) {
       if (query_length > 6) {
         return 500;
@@ -182,13 +228,6 @@ createChildClass('Selector', UiControl, {
         return 100;
       }
     },
-    selectFirst: true,
-    dividingLine: 'smart',
-    enableCustom: false,
-    valueForCustom: -1,
-    width: 300,
-    height: 250,
-    progressBar: false,
     highlight: function(label, term) {
       label = term.indexOf(' ') == -1 ? label.split(' ') : [label];
       var tmp = '';
@@ -203,15 +242,9 @@ createChildClass('Selector', UiControl, {
       }
       return tmp;
     },
-    placeholder: '',
-    placeholderColor: '#afb8c2',
-    introText: 'Start typing',
-    noResult: getLang('search_nothing_found'),
-    noImageSrc: 'http://vk.com/images/question_s.gif',
     formatResult: function(data) {
       return data[1] + (typeof(data[2]) == 'string' ? ' <span>' + data[2] + '</span>' : '');
     },
-    hrefPrefix: 'id'
   },
   controlName: 'Selector',
 
@@ -224,27 +257,27 @@ createChildClass('Selector', UiControl, {
     this.guid = _ui.reg(this);
   },
   initOptions: function(input, data, options) {
-    var opts = this.options = extend({}, this.defaultOptions, {
+    this.options = extend({}, this.defaultOptions, {
       resultField: input['name'] || 'selectedItems',
       customField: input['name'] ? (input['name'] + '_custom') : 'selectedItems_custom'
     }, this.prepareOptionsText(options || {}));
 
     // if highlight is set to false, replace it with a do-nothing function
-    opts.highlight = opts.highlight || function(label) { return label; };
+    this.options.highlight = this.options.highlight || function(label) { return label; };
 
     // Get selected value
-    if (!isArray(opts.selectedItems) && isEmpty(opts.selectedItems)) {
-      opts.selectedItems = [];
+    if (!isArray(this.options.selectedItems) && isEmpty(this.options.selectedItems)) {
+      this.options.selectedItems = [];
     }
-    if (input['value'] && !opts.selectedItems.length) {
-      opts.selectedItems = input['value'];
+    if (input['value'] && !this.options.selectedItems.length) {
+      this.options.selectedItems = input['value'];
     }
 
-    opts.width = parseInt(opts.width) > 0 ? parseInt(opts.width) : this.defaultOptions.width;
-    opts.height = parseInt(opts.height) > 0 ? parseInt(opts.height) : this.defaultOptions.height;
-    opts.resultListWidth = parseInt(opts.resultListWidth) > 0 ? parseInt(opts.resultListWidth) : opts.width;
-    if (opts.imageId) {
-      opts.imageId = ge(opts.imageId);
+    this.options.width = parseInt(this.options.width) > 0 ? parseInt(this.options.width) : this.defaultOptions.width;
+    this.options.height = parseInt(this.options.height) > 0 ? parseInt(this.options.height) : this.defaultOptions.height;
+    this.options.resultListWidth = parseInt(this.options.resultListWidth) > 0 ? parseInt(this.options.resultListWidth) : this.options.width;
+    if (this.options.imageId) {
+      this.options.imageId = ge(this.options.imageId);
     }
   },
   init: function(input, data) {
@@ -270,20 +303,27 @@ createChildClass('Selector', UiControl, {
     this.selectedTokenId = 0;
     this.selectorWidth = this.options.width;
   },
-  initDOM: function(input, data, options) {
-    var opts = this.options, self = this;
+  initDOM: function(input, data) {
+    var self = this;
 
     this.container = ce('div', {
       id: 'container' + this.guid,
-      className: 'selector_container' + (!opts.autocomplete ? ' dropdown_container' : '') + (browser.mobile ? ' mobile_selector_container' : ''),
+      className: 'selector_container' + (!self.options.autocomplete ? ' dropdown_container' : '') + (self.options.big ? ' big' : '') + (browser.mobile ? ' mobile_selector_container' : ''),
       innerHTML:
   '<table cellspacing="0" cellpadding="0" class="selector_table">\
     <tr>\
       <td class="selector">\
+        <div class="placeholder_wrap1">\
+          <div class="placeholder_wrap2">\
+            <div class="placeholder_content"></div>\
+            <div class="placeholder_cover"></div>\
+          </div>\
+        </div>\
         <span class="selected_items"></span>\
         <input type="text" class="selector_input" ' + this.readOnly + ' />\
-        <input type="hidden" name="' + opts.resultField + '" id="' + opts.resultField + '" value="" class="resultField"><input type="hidden" name="' + opts.customField + '" id="' + opts.customField + '" value="" class="customField">\
-      </td>' + (opts.dropdown ? '<td id="dropdown' + this.guid + '" class="selector_dropdown">&nbsp;</td>' : '') + '\
+        <input type="hidden" name="' + self.options.resultField + '" id="' + self.options.resultField + '" value="" class="resultField">\
+        <input type="hidden" name="' + self.options.customField + '" id="' + self.options.customField + '" value="" class="customField">\
+      </td>' + (self.options.dropdown ? '<td id="dropdown' + this.guid + '" class="selector_dropdown">&nbsp;</td>' : '') + '\
     </tr>\
   </table>\
   <div class="results_container">\
@@ -294,7 +334,7 @@ createChildClass('Selector', UiControl, {
     </div>\
   </div>'
     }, {
-      width: opts.width + 'px'
+      width: self.options.width + 'px'
     });
     input.parentNode.replaceChild(this.container, input);
     each ({
@@ -302,6 +342,8 @@ createChildClass('Selector', UiControl, {
       resultList: 'result_list',
       resultListShadow: 'result_list_shadow',
       input: 'selector_input',
+      placeholder: 'placeholder_wrap1',
+      placeholderContent: 'placeholder_content',
       selectedItemsContainer: 'selected_items',
       resultField: 'resultField',
       customField: 'customField',
@@ -315,22 +357,23 @@ createChildClass('Selector', UiControl, {
     }
 
     //if (!this.disabled) // always enabled at init
-    input.style.color = opts.placeholderColor;
     input.autocomplete = '1';
 
-    if (opts.dividingLine) {
+    if (self.options.dividingLine) {
       addClass(this.resultList, 'dividing_line')
     }
 
-    this.resultList.style.width = this.resultListShadow.style.width = opts.resultListWidth + 'px';
+    this.resultList.style.width = this.resultListShadow.style.width = self.options.resultListWidth + 'px';
 
     if (this.options.dropdown) {
       this.initDropdown();
     }
 
+    this.updatePlaceholder();
+
     this.select = new Select(this.resultList, this.resultListShadow, {
-      selectFirst: opts.selectFirst,
-      height: opts.height,
+      selectFirst: self.options.selectFirst,
+      height: self.options.height,
       onItemActive: function(value) {
         self.showImage(value);
         self.activeItemValue = value;
@@ -339,15 +382,15 @@ createChildClass('Selector', UiControl, {
       onShow: function() {
         _ui.sel(self.guid);
         self.highlightInput(true);
-        if (options.onShow) {
-          options.onShow();
+        if (isFunction(self.options.onShow)) {
+          self.options.onShow();
         }
       },
       onHide: function() {
         _ui.sel(false);
         self.highlightInput(false);
-        if (options.onHide) {
-          options.onHide();
+        if (isFunction(self.options.onHide)) {
+          self.options.onHide();
         }
       }
     });
@@ -361,7 +404,8 @@ createChildClass('Selector', UiControl, {
     var keyev2 = browser.opera ? 'keypress' : 'keydown';
     this.onEvent = function(e) {
       if (e.type == 'mousedown') {
-        var outside = true, t = e.target;
+        var outside = true;
+        var t = e.target;
         while (t && t != t.parentNode) {
           if (t == self.container) {
             outside = false;
@@ -382,7 +426,7 @@ createChildClass('Selector', UiControl, {
       }
     }
 
-    addEvent(this.input, 'paste keypress keydown focus blur', this.handleKeyboardEvent, false, {self: this});
+    addEvent(this.input, 'keydown keypress change paste cut drop input focus blur', this.handleKeyboardEvent, false, {self: this});
     addEvent(this.selector, 'mousedown', function(e) {
       var click_over_token = false;
       var el = e.target;
@@ -401,14 +445,14 @@ createChildClass('Selector', UiControl, {
   },
   afterInit: function() {
     this.updateInput();
-    var opt = this.options, self = this;
-    if (opt.selectedItems !== undefined) {
-      if (isArray(opt.selectedItems)) {
-        for (var i in opt.selectedItems) {
-          this._selectItem(opt.selectedItems[i], false);
+    var self = this;
+    if (this.options.selectedItems !== undefined) {
+      if (isArray(this.options.selectedItems)) {
+        for (var i in this.options.selectedItems) {
+          this._selectItem(this.options.selectedItems[i], false);
         }
       } else {
-        each((opt.selectedItems + '').split(','), function(i, x) {
+        each((this.options.selectedItems + '').split(','), function(i, x) {
           self._selectItem(x, false);
         });
       }
@@ -429,7 +473,7 @@ createChildClass('Selector', UiControl, {
     return options;
   },
   fadeButtonToColor: function() {
-    if (this.options.customArrow) return;
+    if (this.options.customArrow || this.options.big) return;
     var state = window.is_rtl ? {backgroundColor: '#E1E8ED', borderRightColor: '#D2DBE0'} : {backgroundColor: '#E1E8ED', borderLeftColor: '#D2DBE0'};
     var self = this;
     animate(this.dropdownButton, state, 200, function() {
@@ -443,7 +487,7 @@ createChildClass('Selector', UiControl, {
     });
   },
   fadeButtonToWhite: function() {
-    if (this.options.customArrow) return;
+    if (this.options.customArrow || this.options.big) return;
     var self = this;
     animate(this.dropdownButton, {backgroundColor: '#FFFFFF', borderLeftColor: '#FFFFFF'}, 200, function() {
       self.dropdownButton.style.backgroundColor = self.dropdownButton.style[window.is_rtl ? 'borderRightColor' : 'borderLeftColor'] = '';
@@ -453,7 +497,7 @@ createChildClass('Selector', UiControl, {
     });
   },
   initDropdown: function() {
-    this.scrollbarWidth = this.options.customArrowWidth || window.sbWidth();
+    this.scrollbarWidth = this.options.customArrowWidth || this.options.big && 25 || window.sbWidth();
     if (this.scrollbarWidth <= 3) {
       this.scrollbarWidth = browser.mobile ? 20 : 14;
     }
@@ -508,155 +552,177 @@ createChildClass('Selector', UiControl, {
     var img = ge(this.options.imageId);
     if (img) removeEvent(img, 'click');
     this.select.destroy();
-    cleanElems(this.container, this.input, this.selector, this.resultList, this.resultListShadow);
+    cleanElems(this.container, this.input, this.selector, this.resultList, this.resultListShadow, this.placeholderContent);
     for (var el = this.selectedItemsContainer.firstChild; el; el = el.nextSibling) {
       cleanElems(el, el.firstChild.nextSibling);
     }
     this.destroyed = true;
   },
   updateInput: function() {
-    if (!this._selectedItems.length && !this.hasFocus) {
-      this.input.value = ((this.disabled && this.options.disabledText) ? this.options.disabledText : this.options.placeholder);
-      if (!this.disabled) this.input.style.color = this.options.placeholderColor;
-    }
     if (!this.options.autocomplete && this.options.multiselect && this._selectedItems.length){
       hide(this.input);
     } else {
       if (!isVisible(this.input)) show(this.input);
       this.input.style.width = '20px';
-      var offset = this._selectedItems.length ? this.input.offsetLeft : (window.is_rtl ? this.selectorWidth - 9 : 0);
-      var w = window.is_rtl ? offset : (this.selectorWidth - offset - 9);
+      var extra = (this.options.big ? 12 : 9);
+      var offset = this._selectedItems.length ? this.input.offsetLeft : (window.is_rtl ? this.selectorWidth - extra : 0);
+      var w = window.is_rtl ? offset : (this.selectorWidth - offset - extra);
       this.input.style.width = Math.max(20, w) + 'px';
     }
+    this.updatePlaceholder();
+  },
+  updatePlaceholder: function() {
+    var zeroPlaceholder          = (this.resultField.value == '0' && this.options.zeroPlaceholder);
+    var placeholderTextNew       = ((this.disabled && this.options.disabledText) ? this.options.disabledText : this.options.placeholder);
+    var placeholderColorNew      = (this.hasFocus ? this.options.placeholderColorBack : this.options.placeholderColor);
+    var placeholderInputColorNew = ((zeroPlaceholder || this.disabled) && this.options.placeholderColor || '#000');
+    var placeholderVisibleNew    = !(this._selectedItems.length || this.input.value.length || zeroPlaceholder);
+    if (placeholderTextNew !== this.placeholderTextPrev) {
+      this.placeholderContent.innerHTML = placeholderTextNew;
+    }
+    if (placeholderColorNew !== this.placeholderColorPrev) {
+      animate(this.placeholderContent, {color: placeholderColorNew}, 200);
+    }
+    if (placeholderInputColorNew !== this.placeholderInputColorPrev) {
+      this.input.style.color = placeholderInputColorNew;
+    }
+    if (placeholderVisibleNew !== this.placeholderVisiblePrev) {
+      toggle(this.placeholder, placeholderVisibleNew);
+    }
+    this.placeholderTextPrev       = placeholderTextNew;
+    this.placeholderColorPrev      = placeholderColorNew;
+    this.placeholderInputColorPrev = placeholderInputColorNew;
+    this.placeholderVisiblePrev    = placeholderVisibleNew;
   },
   handleKeyboardEvent: function(e) {
     var self = e.data.self;
 
     switch (e.type) {
-
-    case 'paste':
-      clearTimeout(self.timeout);
-      self.timeout = setTimeout(function(){ self.onChange(); }, 0);
-    break;
-
-    case 'keypress':
-      if (e.which == KEY.RETURN && browser.opera && self.options.enableCustom && (self.select.selectedItem() === null || self.select.selectedItem() === undefined)) {
-        self.select.hide();
-        if (!self.options.noBlur) { self.input.blur(); }
-        else if (isFunction(self.options.onChange)) {
-          self.updateCustom();
-          self.options.onChange(self.resultField.value);
-        }
-        return false;
-      } else if (e.which == KEY.SPACE || e.which > 40 && !e.metaKey) {
+      case 'change':
+      case 'paste':
+      case 'cut':
+      case 'drop':
+      case 'input':
         clearTimeout(self.timeout);
         self.timeout = setTimeout(function(){ self.onChange(); }, 0);
-      }
-    break;
-
-    case 'keydown':
-      switch (e.keyCode) {
-        case KEY.DOWN:
-          if (!self.select.isVisible()) {
-            setTimeout(self.showDefaultList.bind(self), 0);
-            return false;
-          }
         break;
-        case KEY.DEL:
-          if (self.input.value.length > 0) {
-            clearTimeout(self.timeout);
-            self.timeout = setTimeout(self.onChange.bind(self), 0);
-          } else {
-            if (self.selectedTokenId) {
-              var nextTokenId = 0;
-              for (var i = self._selectedItems.length - 2; i >= 0; i--) {
-                if (self._selectedItems[i][0] == self.selectedTokenId && self._selectedItems[i+1]) {
-                  nextTokenId = self._selectedItems[i+1][0];
+
+      case 'keypress':
+        if (e.which == KEY.RETURN && browser.opera && self.options.enableCustom && (self.select.selectedItem() === null || self.select.selectedItem() === undefined)) {
+          self.select.hide();
+          if (!self.options.noBlur) { self.input.blur(); }
+          else if (isFunction(self.options.onChange)) {
+            self.updateCustom();
+            self.options.onChange(self.resultField.value);
+          }
+          return false;
+        } else if (e.which == KEY.SPACE || e.which > 40 && !e.metaKey) {
+          clearTimeout(self.timeout);
+          self.timeout = setTimeout(function(){ self.onChange(); }, 0);
+        }
+        break;
+
+      case 'keydown':
+        switch (e.keyCode) {
+          case KEY.DOWN:
+            if (!self.select.isVisible()) {
+              setTimeout(self.showDefaultList.bind(self), 0);
+              return false;
+            }
+          break;
+          case KEY.DEL:
+            if (self.input.value.length > 0) {
+              clearTimeout(self.timeout);
+              self.timeout = setTimeout(self.onChange.bind(self), 0);
+            } else {
+              if (self.selectedTokenId) {
+                var nextTokenId = 0;
+                for (var i = self._selectedItems.length - 2; i >= 0; i--) {
+                  if (self._selectedItems[i][0] == self.selectedTokenId && self._selectedItems[i+1]) {
+                    nextTokenId = self._selectedItems[i+1][0];
+                  }
                 }
-              }
-              self.removeTagData(self.selectedTokenId);
+                self.removeTagData(self.selectedTokenId);
 
-              if (nextTokenId) {
-                self.selectToken(nextTokenId);
-              } else if (!self.readOnly && !self.hasFocus) {
-                self.input.focus();
+                if (nextTokenId) {
+                  self.selectToken(nextTokenId);
+                } else if (!self.readOnly) {
+                  setTimeout(function() { self.input.focus(); }, 0);
+                }
+              } else if (self.hasFocus && self._selectedItems.length) {
+                self.selectToken(self._selectedItems[self._selectedItems.length - 1][0]);
               }
-            } else if (self.hasFocus && self._selectedItems.length) {
-              self.selectToken(self._selectedItems[self._selectedItems.length - 1][0]);
+              cancelEvent(e);
             }
-            cancelEvent(e);
-          }
-          return true;
+            return true;
+          break;
+          case KEY.RETURN:
+            if (!browser.opera && self.options.enableCustom && (self.select.selectedItem() === null || self.select.selectedItem() === undefined)) {
+              self.select.hide();
+              if (!self.options.noBlur) { self.input.blur(); }
+              else if (isFunction(self.options.onChange)) {
+                self.updateCustom();
+                self.options.onChange(self.resultField.value);
+              }
+              return false;
+            }
+            break;
+          case KEY.ESC:
+            self.input.blur();
+            break;
+        }
         break;
-        case KEY.RETURN:
-          if (!browser.opera && self.options.enableCustom && (self.select.selectedItem() === null || self.select.selectedItem() === undefined)) {
-            self.select.hide();
-            if (!self.options.noBlur) { self.input.blur(); }
-            else if (isFunction(self.options.onChange)) {
-              self.updateCustom();
-              self.options.onChange(self.resultField.value);
-            }
-            return false;
-          }
-          break;
-        case KEY.ESC:
+
+      case 'focus':
+        if (!self.disabled && !self.select.isVisible() && !self.focusSelf) {
+          self.showDefaultList();
+        }
+        self.focusSelf = false;
+        if (self.disabled || self.readOnly) {
           self.input.blur();
-          break;
-      }
-    break;
+          return true;
+        }
 
-    case 'focus':
-      if (!self.disabled && !self.select.isVisible() && !self.focusSelf) {
-        self.showDefaultList();
-      }
-      self.focusSelf = false;
-      if (self.disabled || self.readOnly) {
-        self.input.blur();
-        return true;
-      }
-
-      if ((self._selectedItems.length == 0) || self.options.multiselect) {
-        if (browser.mozilla) {
-          setTimeout(function () {
+        if ((self._selectedItems.length == 0) || self.options.multiselect) {
+          if (browser.mozilla) {
+            setTimeout(function () {
+              self.input.value = '';
+            }, 0);
+          } else {
             self.input.value = '';
-          }, 0);
-        } else {
-          self.input.value = '';
-        }
-      }
-      addClass(self.input, 'focused');
-      self.input.style.color = '#000';
-      self.hasFocus++;
-    break;
-
-    case 'blur':
-      if (self.options.chooseFirst && self.options.chooseFirst(self.input.value)) { // email field
-        // todo
-        self.select.active = 0;
-        if (isFunction(self.select.options.onItemSelect)) {
-          self.select.options.onItemSelect(self.select.selectedItem(), undefined, true);
-        }
-        return cancelEvent(e);
-      }
-      if (self.readOnly) return true;
-      if (!self.disabled) {
-        self.updateCustom();
-        clearTimeout(self.requestTimeout);
-        if (self.changeAfterBlur && isFunction(self.options.onChange)) {
-          if (!self.options.enableCustom || !self._selectedItems.length) {
-            self.options.onChange('');
           }
-          self.changeAfterBlur = false;
         }
-        if (self.options.onBlur) { self.options.onBlur(); }
-      }
-      if (!hasClass(self.input, 'selected')) {
-        self.input.style.color = self.options.placeholderColor;
-      }
-      removeClass(self.input, 'focused');
-      self.hasFocus = 0;
-    break;
+        addClass(self.input, 'focused');
+        self.input.style.color = '#000';
+        self.hasFocus++;
+        self.updatePlaceholder();
+        break;
 
+      case 'blur':
+        if (isFunction(self.options.chooseFirst) && self.options.chooseFirst(self.input.value)) { // email field
+          // todo
+          self.select.active = 0;
+          if (isFunction(self.select.options.onItemSelect)) {
+            self.select.options.onItemSelect(self.select.selectedItem(), undefined, true);
+          }
+          return cancelEvent(e);
+        }
+        if (self.readOnly) return true;
+        if (!self.disabled) {
+          self.updateCustom();
+          clearTimeout(self.requestTimeout);
+          if (self.changeAfterBlur && isFunction(self.options.onChange)) {
+            if (!self.options.enableCustom || !self._selectedItems.length) {
+              self.options.onChange('');
+            }
+            self.changeAfterBlur = false;
+          }
+          if (self.options.onBlur) { self.options.onBlur(); }
+        }
+        removeClass(self.input, 'focused');
+        self.hasFocus = 0;
+        self.updatePlaceholder();
+        break;
     }
     return true;
   },
@@ -670,10 +736,11 @@ createChildClass('Selector', UiControl, {
         self._selectItem([self.options.valueForCustom, custom_val]);
       }
     } else if (self._selectedItems.length == 0) {
-      self.input.value = self.options.placeholder;
+      self.input.value = '';
     } else if (self.options.multiselect) {
       self.input.value = '';
     }
+    self.updatePlaceholder();
   },
   handleKeyboardEventOutside: function(e) {
     if (this.disabled || this.input.value.length > 0 && this.hasFocus || !this.hasFocus && this.selectedTokenId == 0) {
@@ -748,14 +815,14 @@ createChildClass('Selector', UiControl, {
     removeClass(ge('bit_' + this.guid + '_' + this.selectedTokenId), 'token_selected');
     addClass(ge('bit_' + this.guid + '_' +  id), 'token_selected');
     this.selectedTokenId = id;
-    if (this.options.onTokenSelected) this.options.onTokenSelected(id);
+    if (isFunction(this.options.onTokenSelected)) this.options.onTokenSelected(id);
     this.showImage(id);
   },
   deselectTokens: function() {
     if (!this.selectedTokenId || !this.options.multiselect) return;
     removeClass(ge('bit_' + this.guid + '_' + this.selectedTokenId), 'token_selected');
     this.selectedTokenId = 0;
-    if (this.options.onTokenSelected) this.options.onTokenSelected();
+    if (isFunction(this.options.onTokenSelected)) this.options.onTokenSelected();
     this.showImage();
   },
   _blur: function() {
@@ -841,13 +908,8 @@ createChildClass('Selector', UiControl, {
         this.showImage();
         if (this.input.value.length || !this.options.placeholder) {
           addClass(this.input, 'selected');
-          if (!this.disabled) {
-            this.input.style.color = this.resultField.value == '0' && this.options.zeroPlaceholder && this.options.placeholderColor || '#000';
-          }
-        } else {
-          this.input.value = this.options.placeholder;
-          if (!this.disabled) this.input.style.color = this.options.placeholderColor;
         }
+        this.updatePlaceholder();
       }
       return;
     }
@@ -870,9 +932,7 @@ createChildClass('Selector', UiControl, {
     } else {
       this.input.value = winToUtf(stripHTML(data[1]));
       addClass(this.input, 'selected');
-      if (!this.disabled) {
-        this.input.style.color = this.resultField.value == '0' && this.options.zeroPlaceholder && this.options.placeholderColor || '#000';
-      }
+      this.updatePlaceholder();
     }
 
     this.select.hide();
@@ -995,8 +1055,8 @@ createChildClass('Selector', UiControl, {
 
     this.resultField.value = resultArr.join(',');
 
-    if (this.options.onTagRemove) {
-      this.options.onTagRemove(this._selectedItems[i], this.resultField.value);
+    if (isFunction(this.options.onTagRemove)) {
+      this.options.onTagRemove(this._selectedItems[index], this.resultField.value);
     }
     if (isFunction(this.options.onChange)) {
       this.options.onChange(this.resultField.value);
@@ -1010,21 +1070,21 @@ createChildClass('Selector', UiControl, {
     return false;
   },
   onChange: function() {
-    var term = trim(this.input.value.toLowerCase()),
-      self = this;
+    var term = trim(this.input.value.toLowerCase());
     if (!this.options.multiselect) {
       if (this._selectedItems.length) {
         this.changeAfterBlur = true;
       }
       this._clear();
     }
+    this.updatePlaceholder();
     clearTimeout(this.requestTimeout);
     if (term.length == 0) {
       this.showDefaultList();
       return;
     }
     this.curTerm = term;
-    var custom = this.options.customSearch, res = custom && custom(term);
+    var res = isFunction(this.options.customSearch) && this.options.customSearch(term);
     if (res) {
       this.receiveData(term, res);
       return;
@@ -1033,8 +1093,8 @@ createChildClass('Selector', UiControl, {
       var data = this.cache.getData(term);
       if (data == null) {
           this.requestTimeout = setTimeout(function() {
-            self.request(self.receiveData.bind(self), self.showNoDataList.bind(self));
-          }, 300);
+            this.request(this.receiveData.bind(this), this.showNoDataList.bind(this));
+          }.bind(this), 300);
       } else {
         // receive the cached data
         if (data && data.length) {
@@ -1059,7 +1119,8 @@ createChildClass('Selector', UiControl, {
     }
   },
   showDefaultList: function() {
-    var reversed = hasClass(this.resultList, 'reverse'), rev = this.needsReverse();
+    var reversed = hasClass(this.resultList, 'reverse');
+    var rev = this.needsReverse();
     if (reversed != rev && this.currenDataItems) {
       this.setSelectContent(this.currenDataText || '', this.currenDataItems);
       toggleClass(this.resultList, 'reverse', rev);
@@ -1073,7 +1134,7 @@ createChildClass('Selector', UiControl, {
         this.select.show(this._selectedItems[0][0]);
     } else {
       this.defaultList = true;
-      var text = this.options.autocomplete ? this.options.introText : null;
+      var text = null;//this.options.autocomplete ? this.options.introText : null;
       this._showSelectList(text, (this.options.defaultItems.length || this.options.zeroDefault) ? this.options.defaultItems : this.dataItems);
     }
     if (reversed) {
@@ -1090,13 +1151,14 @@ createChildClass('Selector', UiControl, {
     this._showSelectList(null, items, query);
   },
   needsReverse: function() {
-    var scrollY = window.scrollGetY ? scrollGetY() : getScroll()[1],
-        contY = getXY(this.container)[1] || 0,
-        contH = getSize(this.container)[1] || 22,
-        maxListH = this.options.height || 250,
-        minListH = this.options.minHeight || 0,
-        wh = (window.pageNode && window.browser.mozilla ? Math.min(getSize(pageNode)[1], window.lastWindowHeight) : window.lastWindowHeight) || getScroll()[3],
-        list_ul = this.resultList && this.resultList.firstChild, listH;
+    var scrollY = window.scrollGetY ? scrollGetY() : getScroll()[1];
+    var contY = getXY(this.container)[1] || 0;
+    var contH = getSize(this.container)[1] || 22;
+    var maxListH = this.options.height || 250;
+    var minListH = this.options.minHeight || 0;
+    var wh = (window.pageNode && window.browser.mozilla ? Math.min(getSize(pageNode)[1], window.lastWindowHeight) : window.lastWindowHeight) || getScroll()[3];
+    var list_ul = this.resultList && this.resultList.firstChild;
+    var listH;
     if (list_ul && list_ul.firstChild) {
       var disp = getStyle(this.resultList, 'display'), vis = getStyle(this.resultList, 'visibility');
       setStyle(this.resultList, {visibility: 'hidden', display: 'block'});
@@ -1131,7 +1193,8 @@ createChildClass('Selector', UiControl, {
           }
         }
       }
-      var itemsToShow = (this.options.autocomplete && query) ? this.options.maxItemsShown(query.length) : items.length, self = this;
+      var itemsToShow = (this.options.autocomplete && query) ? this.options.maxItemsShown(query.length) : items.length;
+      var self = this;
       for (var i = 0; i < items.length; ++i) {
         var it = items[i];
         if (!itemsToShow) break;
@@ -1164,10 +1227,12 @@ createChildClass('Selector', UiControl, {
     }
 
     this.setSelectContent(text, items, query);
-    if (this.options.multiselect || !this._selectedItems.length) {
-      this.select.show();
-    } else {
-      this.select.show(this._selectedItems[0][0]);
+    if (this.select.hasItems()) {
+      if (this.options.multiselect || !this._selectedItems.length) {
+        this.select.show();
+      } else {
+        this.select.show(this._selectedItems[0][0]);
+      }
     }
     return true;
   },
@@ -1181,7 +1246,8 @@ createChildClass('Selector', UiControl, {
     }
   },
   filterData: function(items) {
-    var result = [], self = this;
+    var result = [];
+    var self = this;
     each(items, function(i) {
       for (var j in self._selectedItems) {
         if (this[0] == self._selectedItems[j][0])
@@ -1193,7 +1259,8 @@ createChildClass('Selector', UiControl, {
   },
   request: function(success, failure) {
     if (!this.dataURL) return;
-    var term = trim(this.input.value.toLowerCase()), self = this;
+    var term = trim(this.input.value.toLowerCase());
+    var self = this;
     if (term.length == 0) return;
     var sep = this.dataURL.indexOf('?') == -1 ? '?' : '&';
     var url = this.dataURL + sep + 'str=' + encodeURIComponent(term);
@@ -1347,19 +1414,18 @@ createChildClass('Selector', UiControl, {
   setOptions: function(new_options) {
     new_options = this.prepareOptionsText(new_options);
     extend(this.options, new_options);
+
     if ('maxItems' in new_options && this.options.maxItems >= 0) {
       for (var i = this._selectedItems.length - 1; i >= this.options.maxItems; i--) {
         this.removeTagData(this._selectedItems[i][0]);
       }
     }
-
     if ('defaultItems' in new_options) {
       this.select.clear();
       if (this.select.isVisible(this.container)) { // todo: check and remove arg
         this.showDefaultList();
       }
     }
-
     if ('enableCustom' in new_options) {
       if (this.options.enableCustom && !this.options.autocomplete) {
         this.options.autocomplete = new_options.autocomplete = true;
@@ -1371,6 +1437,7 @@ createChildClass('Selector', UiControl, {
 
       this.selectorWidth = this.options.width - this.scrollbarWidth;
     }
+
     if ('dropdown' in new_options) {
       var dd = geByClass('selector_dropdown', this.container)[0];
       if (!this.options.dropdown && dd) {
@@ -1386,9 +1453,6 @@ createChildClass('Selector', UiControl, {
         this.initDropdownEvents();
       }
     }
-    if (('width' in new_options) || ('autocomplete' in new_options) || ('dropdown' in new_options)) {
-      this.updateInput();
-    }
     if ('autocomplete' in new_options) {
       if (this.options.autocomplete) {
         removeClass(this.container, 'dropdown_container');
@@ -1400,6 +1464,9 @@ createChildClass('Selector', UiControl, {
         this.options.enableCustom = false;
         this.readOnly = 'readonly="true"';
       }
+    }
+    if (('width' in new_options) || ('autocomplete' in new_options) || ('dropdown' in new_options) || ('placeholder' in new_options) || ('disabledText' in new_options)) {
+      this.updateInput();
     }
   },
   val: function(value, fireEvent) {
@@ -1495,12 +1562,13 @@ createChildClass('Select', UiControl, {
         }
       }
     } else if (this.options.selectFirst) {
-      var reversed = false;//this.container && hasClass(this.container, 'reverse'), ind;
+      var reversed = false;//this.container && hasClass(this.container, 'reverse');
+      var index;
       for (var i = 0; i < this.list.childNodes.length; i++) {
-        ind = reversed ? this.list.childNodes.length - 1 - i : i;
-        childNode = this.list.childNodes[ind];
+        index = reversed ? this.list.childNodes.length - 1 - i : i;
+        childNode = this.list.childNodes[index];
         if (!childNode.getAttribute('dis')) {
-          this.highlight(ind, childNode);
+          this.highlight(index, childNode);
           break;
         }
       }
@@ -1650,9 +1718,9 @@ createChildClass('Select', UiControl, {
     }
   },
   content: function(items) {
-    var html = [],
-        i, it, v, t, d, a, ind,
-        len = items.length;
+    var html = [];
+    var i, it, v, t, d, a, ind;
+    var len = items.length;
     for (i = 0; i < len; ++i) {
       // value, text, disabled, attributes, index
       it = items[i];
@@ -1682,7 +1750,9 @@ createChildClass('Select', UiControl, {
     return true;
   },
   removeItem: function(value) {
-    var undefined, l = this.list.childNodes, len = l.length;
+    var undefined;
+    var l = this.list.childNodes;
+    var len = l.length;
     if (value === undefined) return;
     for (var i = 0; i < len; ++i) {
       var node = l[i];
@@ -2017,7 +2087,7 @@ function Radiobuttons(input, buttons, options) {
   Radiobutton.select(id, options.selected !== undefined ? options.selected : input.value);
   Radiobutton.setChangeEvent(id, function(value) {
     input.value = value;
-    if(isFunction(options.onChange)) {
+    if (isFunction(options.onChange)) {
       options.onChange(value);
     }
   });
@@ -2099,7 +2169,9 @@ createChildClass('Autosize', UiControl, {
 
   // Extended methods
   updateSize: function(event) {
-    var self = event.data.self, value = self.input.value, newHeight;
+    var self = event.data.self;
+    var value = self.input.value;
+    var newHeight;
     if (event.type != 'keyup') {
       if (event.keyCode == 13 && !event.ctrlKey && !event.altKey) {
         value += '\n';
@@ -2235,7 +2307,9 @@ createChildClass('DropdownMenu', UiControl, {
     var self = this;
     onDomReady(function() {
       (self.common.pageContainer || window.pageNode).appendChild(self.container);
-      var header = self.header, body = self.body, target = self.options.target;
+      var header = self.header;
+      var body = self.body;
+      var target = self.options.target;
       ge('dd_rows_'+ self.guid).appendChild(self.rows);
       self.setOptions(self.options);
       if (target) {
@@ -2253,7 +2327,7 @@ createChildClass('DropdownMenu', UiControl, {
           if (self.parentMenu) { self.parentMenu.childIsOver = false; }
           if (!self.visible) hide(header);
           removeClass(header, 'dd_header_hover');
-        }
+        };
         self.showTargetHover = function() {
           if (self.parentMenu) { self.parentMenu.childIsOver = true; }
           addClass(header, 'dd_header_hover');
@@ -2333,8 +2407,8 @@ createChildClass('DropdownMenu', UiControl, {
   addItem: function(item) {
     if (!item) return false;
     var link = ce('a');
-    if(isArray(item))item = {i: item[0], l: item[1], onClick: item[2], c: item[3], s: item[4], b: item[5], h: item[6], el: link};
-    if(item.onClick && !isFunction(item.onClick)){
+    if (isArray(item)) item = {i: item[0], l: item[1], onClick: item[2], c: item[3], s: item[4], b: item[5], h: item[6], el: link};
+    if (item.onClick && !isFunction(item.onClick)){
       var funcs = item.onClick;
       item.onClick = funcs.onClick;
       item.onMouseOver = funcs.onMouseOver;
@@ -2360,7 +2434,7 @@ createChildClass('DropdownMenu', UiControl, {
       }
       if (hide) self.hide();
       else cancelEvent(e);
-      if(self.options.updateTarget && hide) {
+      if (self.options.updateTarget && hide) {
         var text = self.options.updateHeader(e.target.index, e.target.innerHTML);
         self.header.innerHTML = '<div>'+text+'</div>';
         if (self.options.target) {
@@ -2435,10 +2509,10 @@ createChildClass('DropdownMenu', UiControl, {
     if (this.options.alwaysMenuToUp) {
       return true;
     }
-    var h = window.innerHeight,
-    bh = getSize(this.body)[1],
-    hh = getSize(this.header)[1],
-    ht = getXY(this.header)[1];
+    var h = window.innerHeight;
+    var bh = getSize(this.body)[1];
+    var hh = getSize(this.header)[1];
+    var ht = getXY(this.header)[1];
 
     if (!h && document.documentElement) {
       h = document.documentElement.clientHeight;
@@ -2497,7 +2571,8 @@ createChildClass('DropdownMenu', UiControl, {
     if (inArray(e.type, ['keydown', 'keypress', 'keyup']) && inArray(e.keyCode, [16, 17, 18, 91])) {
       return;
     }
-    var outside = true, t = e.target;
+    var outside = true;
+    var t = e.target;
     while (t && t != t.parentNode) {
       if (t == this.container) {
         outside = false;
@@ -2630,7 +2705,10 @@ createChildClass('Indexer', UiUtil, {
     debug('createIndex ended');
   },
   indexItem: function(k, v) {
-    var i, j, current_words = '', index_key, already_indexed = {};
+    var i, j;
+    var current_words = '';
+    var index_key;
+    var already_indexed = {};
     for (i = 0; i < this.options.indexkeys.length; i++) {
       if (!v[this.options.indexkeys[i]]) continue;
       current_words += ' ' + v[this.options.indexkeys[i]].replace(this.options.delimeter, ' ').replace(/<[^>]*>/, '');
@@ -2667,7 +2745,9 @@ createChildClass('Indexer', UiUtil, {
     }
 
     pattern = pattern.split(' ');
-    var min_size = 0, min_pattern = '', self = this;
+    var min_size = 0;
+    var min_pattern = '';
+    var self = this;
     each (pattern, function() {
       var items = self.storage.index[this.substr(0, self.options.chars)];
       if (!min_pattern || !items || items.length < min_size) {
@@ -2683,7 +2763,10 @@ createChildClass('Indexer', UiUtil, {
 
     each (self.storage.index[min_pattern.substr(0, self.options.chars)], function(k, v) {
       var item = self.storage.data[v];
-      var i, fail = false, current_words = '', index_key;
+      var i;
+      var fail = false;
+      var current_words = '';
+      var index_key;
       for (i = 0; i < self.options.indexkeys.length; i++) {
         current_words += ' ' + item[self.options.indexkeys[i]].replace(self.options.delimeter, ' ').replace('<b>', '').replace('</b>', '');
       }
@@ -2710,7 +2793,8 @@ if (!window.inlineOnEvent) {
   window.inlineOnEvent = function(e) {
     if (!curInlineEdit) return;
     if (e.type == 'mousedown') {
-      var outside = true, t = e.target;
+      var outside = true;
+      var t = e.target;
       while (t && t != t.parentNode) {
         if (t == curInlineEdit.container) {
           outside = false;

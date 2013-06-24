@@ -641,7 +641,7 @@ span.post_video_duration {
   margin: 0;
   line-height: normal;
 }
-.wall_module .mini_editor_cont .result_list {
+.wall_module .mini_editor_cont .selector_container .result_list {
   display: none;
 }
 #wcomments_form #page_add_media {
@@ -998,11 +998,11 @@ img.wcomments_userpic {
   padding: 6px 10px;
   background-position: 50% 50%;
 }
-.wcomments_input .results_container {
+.wcomments_input .selector_container .results_container {
   margin: 1px -4px 0;
 }
-.wcomments_input .result_list_shadow,
-.wcomments_input .result_list {
+.wcomments_input .selector_container .result_list_shadow,
+.wcomments_input .selector_container .result_list {
   display: none;
 }
 #wcomments_export {

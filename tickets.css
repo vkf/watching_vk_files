@@ -1699,7 +1699,7 @@ a.tickets_question_row_tt:hover {
   left: -20px;
   position: absolute;
 }
-.tickets_dmca_row .selector input {
+.tickets_dmca_row .selector_container td.selector input {
   height: 17px;
   margin-bottom: 2px;
 }

@@ -2438,6 +2438,17 @@ div.audio td {
   white-space: nowrap;
   line-height: normal;
 }
+.big.input_back_content {
+  padding-left: 0;
+  padding-top: 2px;
+}
+@-moz-document url-prefix() {
+.big.input_back_content {
+  padding-left: 1px;
+  padding-top: 1px;
+}
+}
+
 
 .sort_blank {
   border: 1px dashed #D8DFEA;

@@ -1325,7 +1325,7 @@ var GroupsEdit = {
     ajax.post('al_groups.php', {act: 'add_link_box', lnk: lnk}, {onDone: function(code, innerlnk, html, js) {
       if (code > 0) {
         if (code & 1) { // inner link
-          ajax.plainpost(innerlnk, {}, function(text) {
+          ajax.plainpost(innerlnk, {_tmp: 1}, function(text) {
             var title = trim((text.match(/<title>([^<]*)/i) || {})[1] || '');
             cur.lnkImages = ['/images/lnkinner100.gif'];
             cur.lnk = innerlnk;

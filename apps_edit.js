@@ -487,6 +487,13 @@ initUpload: function(cont, opts, lang, resObj) {
           if (opts.errorObj) {
             hide(opts.errorObj);
           }
+        },
+        onFail: function(error) {
+          AppsEdit.showError(error, opts.errorObj);
+          if (!opts.lite) {
+            Upload.embed(i);
+          }
+          return true;
         }
       });
     },

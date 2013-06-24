@@ -583,6 +583,14 @@ var OwnerPhoto = {
         hideProgress: unlockButton.pbind(btn)
       });
     }
+  },
+
+  remove: function(oid, hash) {
+    ajax.post('al_page.php', {act: 'owner_photo_remove', oid: oid, hash: hash}, {
+      onDone: window.IM ? IM.chatPhotoSaved : nav.reload,
+      showProgress: addClass.pbind('owner_photo_remove', 'owner_photo_removing'),
+      hideProgress: removeClass.pbind('owner_photo_remove', 'owner_photo_removing')
+    });
   }
 }
 

@@ -175,13 +175,21 @@
   width: 16px;
   cursor: default;
   background: url(/images/darr_dd_out.gif) transparent no-repeat center;
+  background-size: 7px 4px;
   border: none;
   border-left: 1px solid #FFFFFF;
   padding: 0;
 }
+.is_2x .selector_container td.selector_dropdown {
+  background-image: url(/images/darr_dd_out_2x.gif);
+}
 .big.selector_container td.selector_dropdown {
   width: 25px;
   background: url(/images/wide_dd.gif) transparent no-repeat 2px 2px;
+  background-size: 21px 24px;
+}
+.is_2x .big.selector_container td.selector_dropdown {
+  background-image: url(/images/wide_dd_2x.png);
 }
 .big.selector_container td.selector_dropdown:hover {
   cursor: pointer;
@@ -473,8 +481,15 @@
 .radiobtn_container table td .radiobtn_off_over div {
   width: 14px;
   height: 56px;
-  background: transparent url(/images/icons/radio.png?1) 0 0 no-repeat;
+  background: transparent url(/images/icons/radio.gif) 0 0 no-repeat;
+  background-size: 14px 56px;
   behavior: url(/js/iepngfix.htc);
+}
+.is_2x .radiobtn_container table td .radiobtn_on div,
+.is_2x .radiobtn_container table td .radiobtn_off div,
+.is_2x .radiobtn_container table td .radiobtn_on_over div,
+.is_2x .radiobtn_container table td .radiobtn_off_over div {
+  background-image: url(/images/icons/radio_2x.gif);
 }
 
 .radiobtn_container table td .radiobtn_on div {

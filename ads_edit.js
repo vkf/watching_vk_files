@@ -200,7 +200,7 @@ AdsEdit.onHelpTooltipEvent = function(event, helpTooltipName, context, showToolt
           context.overTimeout = setTimeout(function(){
             showHelp();
             delete context.overTimeout;
-          }, 500);
+          }, 100);
         }
       }, 100);
       break;
@@ -3104,6 +3104,7 @@ AdsTargetingEditor.prototype.initHelpCriterion = function(criterionName) {
 
   switch (criterionName) {
     case 'cities':
+    case 'interest_categories':
     case 'interests':
     case 'group_types':
     case 'travellers':

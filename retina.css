@@ -526,10 +526,6 @@
   background-image: url(/images/upload_inv_mono_2x.gif);
   background-size: 64px 16px;
 }
-.is_2x .selector_container td.selector_dropdown {
-  background-image: url(/images/darr_dd_out_2x.gif);
-  background-size: 7px 4px;
-}
 .is_2x #filters_td .filter_open div.arrow_back,
 .is_2x #filters_td .filter_shut div.arrow_back {
   background-image: url(/images/gray_corner_2x.gif);

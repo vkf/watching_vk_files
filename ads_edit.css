@@ -140,43 +140,27 @@
   margin: 10px 0 20px 0;
 }
 
-.ads_edit_targeting_group_hider_title {
-  color: #555555;
-  font-size: 1.09em;
-  cursor: pointer;
+.ads_edit_value_header {
+  color: #36638E;
+  font-size: 1.18em;
   font-weight: bold;
-  padding: 5px 0 5px 20px;
-  margin-left: -21px;
-}
-.ads_edit_targeting_group_hider_title.on {
-  background: url(/images/filterset_on.gif) no-repeat scroll 1px 9px transparent;
-}
-.ads_edit_targeting_group_hider_title.off {
-  background: url(/images/filterset_off.gif) no-repeat scroll 2px 8px transparent;
-}
-.ads_edit_targeting_group_hider_info {
-  color: #909090;
-  cursor: pointer;
-}
-.ads_edit_value.ads_edit_targeting_group_hider {
-  padding-top: 8px;
-  padding-bottom: 12px;
-}
-#ads_edit_targeting_group_demography_hider.ads_edit_value.ads_edit_targeting_group_hider,
-#ads_edit_targeting_group_graduation_hider.ads_edit_value.ads_edit_targeting_group_hider {
-  padding-bottom: 6px;
-}
-#ads_edit_targeting_group_interests_hider.ads_edit_value.ads_edit_targeting_group_hider,
-#ads_edit_targeting_group_additional_hider.ads_edit_value.ads_edit_targeting_group_hider {
-  padding-top: 14px;
-}
-.ads_edit_targeting_group {
   padding-bottom: 5px;
 }
 
 /* ---------------- */
 /* Edit ad - common */
 /* ---------------- */
+
+#ads_edit_ad_row_main_header td {
+  padding-bottom: 4px;
+}
+#ads_edit_ad_row_targeting_header td,
+#ads_edit_ad_row_targeting_header .ads_edit_value_header {
+  padding-bottom: 0;
+}
+#ads_edit_ad_row_view_header .ads_edit_value_header {
+  padding-top: 10px;
+}
 
 .ads_param_title_remain_wrap,
 .ads_param_description_remain_wrap,
@@ -257,13 +241,6 @@
   padding: 6px 0 0 5px;
 }
 
-.ads_edit_value_header {
-  color: #36638E;
-  font-size: 1.18em;
-  font-weight: bold;
-  padding-bottom: 5px;
-}
-
 #ads_edit_ad_row_additional .ads_edit_value_checkbox_wrap {
   height: 26px;
 }
@@ -326,6 +303,48 @@
 /* ------------------- */
 /* Edit ad - targeting */
 /* ------------------- */
+
+.ads_edit_targeting_group_hider_title {
+  color: #555555;
+  font-size: 1.09em;
+  cursor: pointer;
+  font-weight: bold;
+  padding: 5px 0 5px 20px;
+  margin-left: -21px;
+}
+.ads_edit_targeting_group_hider_title.on {
+  background: url(/images/filterset_on.gif) no-repeat scroll 1px 9px transparent;
+  background-size: 9px 7px;
+}
+.is_2x .ads_edit_targeting_group_hider_title.on {
+  background-image: url(/images/filterset_on_2x.png);
+}
+.ads_edit_targeting_group_hider_title.off {
+  background: url(/images/filterset_off.gif) no-repeat scroll 2px 8px transparent;
+  background-size: 7px 9px;
+}
+.is_2x .ads_edit_targeting_group_hider_title.off {
+  background-image: url(/images/filterset_off_2x.png);
+}
+.ads_edit_targeting_group_hider_info {
+  color: #909090;
+  cursor: pointer;
+}
+.ads_edit_value.ads_edit_targeting_group_hider {
+  padding-top: 7px;
+  padding-bottom: 12px;
+}
+#ads_edit_targeting_group_demography_hider.ads_edit_value.ads_edit_targeting_group_hider,
+#ads_edit_targeting_group_graduation_hider.ads_edit_value.ads_edit_targeting_group_hider {
+  padding-bottom: 6px;
+}
+#ads_edit_targeting_group_interests_hider.ads_edit_value.ads_edit_targeting_group_hider,
+#ads_edit_targeting_group_additional_hider.ads_edit_value.ads_edit_targeting_group_hider {
+  padding-top: 13px;
+}
+.ads_edit_targeting_group {
+  padding-bottom: 5px;
+}
 
 .ads_edit_value_birthday_today {
   padding-right: 5px;

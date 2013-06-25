@@ -281,6 +281,8 @@ createChildClass('Selector', UiControl, {
     }
   },
   init: function(input, data) {
+    this.disableSomeFeatures = (location.pathname.indexOf('/join') === 0);
+
     this.dataURL = typeof(data) == 'string' ? data : null;
     this.dataItems = isArray(data) ? data : [];
     this.currentList = this.dataItems;
@@ -426,7 +428,11 @@ createChildClass('Selector', UiControl, {
       }
     }
 
-    addEvent(this.input, 'keydown keypress change paste cut drop input focus blur', this.handleKeyboardEvent, false, {self: this});
+    if (this.disableSomeFeatures) {
+      addEvent(this.input, 'paste keypress keydown focus blur', this.handleKeyboardEvent, false, {self: this});
+    } else {
+      addEvent(this.input, 'keydown keypress change paste cut drop input focus blur', this.handleKeyboardEvent, false, {self: this});
+    }
     addEvent(this.selector, 'mousedown', function(e) {
       var click_over_token = false;
       var el = e.target;
@@ -572,6 +578,9 @@ createChildClass('Selector', UiControl, {
     this.updatePlaceholder();
   },
   updatePlaceholder: function() {
+    if (this.disableSomeFeatures) {
+      return;
+    }
     var zeroPlaceholder          = (this.resultField.value == '0' && this.options.zeroPlaceholder);
     var placeholderTextNew       = ((this.disabled && this.options.disabledText) ? this.options.disabledText : this.options.placeholder);
     var placeholderColorNew      = (this.hasFocus ? this.options.placeholderColorBack : this.options.placeholderColor);

@@ -226,12 +226,12 @@
 
 /* Autocompleter */
 
-.selector_container .results_container {
+.results_container {
   position: absolute;
   z-index: 100;
 }
 
-.selector_container .result_list_shadow {
+.result_list_shadow {
   margin: 0;
   position: absolute;
   left: 0;
@@ -241,24 +241,24 @@
   height: 2px;
   display: none;
 }
-.selector_container .result_list_shadow.reverse {
+.result_list_shadow.reverse {
   visibility: hidden;
 }
 
-.selector_container .result_list_shadow .shadow1,
-.selector_container .result_list_shadow .shadow2 {
+.result_list_shadow .shadow1,
+.result_list_shadow .shadow2 {
   height: 1px;
   background-color: #000;
   opacity: 0.12;
   filter: alpha(opacity=12);
   overflow: hidden;
 }
-.selector_container .result_list_shadow .shadow2 {
+.result_list_shadow .shadow2 {
   opacity: 0.05;
   filter: alpha(opacity=5);
 }
 
-.selector_container .result_list {
+.result_list {
   margin: -1px 0 0;
   position: absolute;
   opacity: 0.95;
@@ -270,16 +270,16 @@
   z-index: 100;
 }
 
-.selector_container .result_list_scrollable {
+.result_list_scrollable {
   border: 1px solid #ADADAD;
   border-width: 1px 0;
   overflow-y: scroll;
 }
-.selector_container .result_list_scrollable.reverse {
+.result_list_scrollable.reverse {
   border-top: 1px solid #CCC;
 }
 
-.selector_container .result_list ul {
+.result_list ul {
   margin: 0;
   padding: 0;
   background: #FFF;
@@ -287,7 +287,7 @@
   zoom: 1; /* negative margin IE fix */
 }
 
-.selector_container .result_list li.disabled {
+.result_list li.disabled {
   background: #eee;
   padding: 5px 5px 4px 6px;
   cursor: default;
@@ -295,11 +295,11 @@
   border-top: none;
   text-align: left;
 }
-.selector_container .result_list.reverse li.disabled {
+.result_list.reverse li.disabled {
   border-top: 1px solid #CCC;
 }
 
-.selector_container .result_list ul li {
+.result_list ul li {
   color: #000000;
   padding: 3px 0 3px 10px;
   list-style-type: none;
@@ -314,81 +314,81 @@
   line-height: 1.18em;
   font-size: 1em;
 }
-.big.selector_container .result_list ul li {
+.big .result_list ul li {
   padding-top: 5px;
   padding-bottom: 5px;
 }
 
-.selector_container .dividing_line ul li {
+.dividing_line ul li {
   border-bottom: 1px solid #CCC;
 }
 
-.selector_container .result_list ul li.first {
+.result_list ul li.first {
   border-top: 1px solid #CCC;
   padding-top: 3px;
 }
-.big.selector_container .result_list ul li.first {
+.big .result_list ul li.first {
   padding-top: 5px;
 }
-.selector_container .result_list ul li.last {
+.result_list ul li.last {
   border-bottom: 1px solid #ADADAD;
 }
-.selector_container .result_list ul li.active {
+.result_list ul li.active {
   background: #587DA1;
   color: #FFFFFF;
   border: 1px solid #2A5883;
   padding-top: 2px;
   z-index: 1;
 }
-.big.selector_container .result_list ul li.active {
+.big .result_list ul li.active {
   padding-top: 4px;
 }
-.selector_container .result_list ul li.first.active {
+.result_list ul li.first.active {
   padding-top: 2px;
   margin-top: 0;
 }
-.big.selector_container .result_list ul li.first.active {
+.big .result_list ul li.first.active {
   padding-top: 4px;
 }
 
-.selector_container .result_list_scrollable ul li.last {
+.result_list_scrollable ul li.last {
   border-bottom: 0 solid #FFF;
   padding-bottom: 3px;
 }
-.big.selector_container .result_list_scrollable ul li.last {
+.big .result_list_scrollable ul li.last {
   padding-bottom: 5px;
 }
-.selector_container .result_list_scrollable ul li.first.active {
+.result_list_scrollable ul li.first.active {
   border-top: 1px solid #2A5883;
 }
-.selector_container .result_list_scrollable ul li.last.active {
+.result_list_scrollable ul li.last.active {
   border-bottom: 1px solid #2A5883;
   padding-bottom: 2px;
 }
-.big.selector_container .result_list_scrollable ul li.last.active {
+.big .result_list_scrollable ul li.last.active {
   padding-bottom: 4px;
 }
 
-.selector_container .result_list ul li span {
+.result_list ul li span {
   display: block;
   padding-top: 2px;
   color: #777777;
   font-size: 7pt;
 }
-.big.selector_container .result_list ul li span {
+.big .result_list ul li span {
   padding-top: 3px;
   font-size: 11px;
 }
-.selector_container .result_list ul li em {
+.result_list ul li em {
   font-weight: bold;
   font-style: normal;
   background: #DAE2E8;
   color: #000000;
 }
-.selector_container .result_list ul li.active span {
+.result_list ul li.active span {
   color: #AABBD4;
 }
-.selector_container .result_list ul li.active em {
+.result_list ul li.active em {
   background: #2A5883;
   color: #FFFFFF;
 }

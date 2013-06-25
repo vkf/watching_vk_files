@@ -74,7 +74,7 @@ var Join = {
       removeEvent(Join.scrollnode(), 'scroll', Join.scrollResize);
       removeEvent(window, 'resize', Join.scrollResize);
       if (browser.msie6) c.nextButtonWrap.appendChild(c.nextButton);
-    })
+    });
   },
 
   showMore: function() {
@@ -89,11 +89,12 @@ var Join = {
   },
   showRows: function(fromStart, rows, from, preload) {
     cur.from = from;
+    var params;
     if (fromStart) {
       if (!rows) return Join.showNone(getLang('join_no_found_' + cur.section), true);
       val(cur.rowsEl, rows);
       if (preload && preload[0]) {
-        var params = extend(cur.params, {from: cur.from});
+        params = extend(cur.params, {from: cur.from});
         ajax.preload('join.php', params, preload);
         show(cur.moreLink);
       } else {
@@ -102,7 +103,7 @@ var Join = {
     } else {
       val(cur.rowsEl, val(cur.rowsEl) + rows);
       hide(cur.moreLink);
-      var params = extend(cur.params, {from: cur.from});
+      params = extend(cur.params, {from: cur.from});
       ajax.post('join.php', params, {
         cache: 1,
         onDone: function(rows) {
@@ -134,19 +135,20 @@ var Join = {
 
   init: function(section, selData) {
     selectsData.setCountries(selData.countries_list);
-    for (var i in selData.countries) {
+    var i;
+    for (i in selData.countries) {
       selectsData.setCountryInfo(i, selData.countries[i]);
     }
-    for (var i in selData.cities) {
+    for (i in selData.cities) {
       selectsData.setCityInfo(i, selData.cities[i]);
     }
     if (selData.universities) {
-      for (var i in selData.universities) {
+      for (i in selData.universities) {
         selectsData.setUniversityInfo(i, selData.universities[i]);
       }
     }
     if (selData.faculties) {
-      for (var i in selData.faculties) {
+      for (i in selData.faculties) {
         selectsData.setFacultyInfo(i, selData.faculties[i]);
       }
     }
@@ -488,7 +490,7 @@ var Join = {
       },
       hideProgress: function() {
         if (prg.parentNode == prnt) prnt.replaceChild(el, prg);
-      },
+      }
     });
   },
 

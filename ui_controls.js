@@ -598,7 +598,7 @@ createChildClass('Selector', UiControl, {
     var self = e.data.self;
 
     switch (e.type) {
-      case 'change':
+      //case 'change': // Breaks scrolling by mouse in results list populated by search
       case 'paste':
       case 'cut':
       case 'drop':

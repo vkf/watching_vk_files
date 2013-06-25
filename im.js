@@ -1153,9 +1153,6 @@ var IM = {
       if (cur.peer != peer && cur.tabs[peer].auto) {
         IM.closeTab(peer);
       } else {
-        if (cur.peer === peer) {
-          setTimeout(IM.scroll.pbind(false), 100);
-        }
         removeClass(ge('im_tab' + peer), 'im_tab_over');
       }
     }

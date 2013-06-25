@@ -233,7 +233,7 @@ createChildClass('Selector', UiControl, {
       var tmp = '';
       var termRus = parseLatin(term);
 
-      if (termRus != null) {
+      if (termRus !== null) {
         term = term + '|' + termRus;
       }
       var re = new RegExp('(?![^&;]+;)(?!<[^<>]*)((\\(*)(' + escapeRE(term) + '))(?![^<>]*>)(?![^&;]+;)', 'gi');
@@ -245,13 +245,13 @@ createChildClass('Selector', UiControl, {
     formatResult: function(data) {
       return data[1] + (typeof(data[2]) == 'string' ? ' <span>' + data[2] + '</span>' : '');
     },
-    lastOptionWithoutCommaAtEnd: false
+    lastOptionWithoutCommaAtEnd: false // Do nothing
   },
   controlName: 'Selector',
 
   // Standart object methods
   beforeInit: function(input) {
-    if (input == null || input['autocomplete']) {
+    if (input === null || input['autocomplete']) {
       try { console.error("Can't init ", input); } catch (e) {}
       return false;
     }
@@ -363,7 +363,7 @@ createChildClass('Selector', UiControl, {
     input.autocomplete = '1';
 
     if (self.options.dividingLine) {
-      addClass(this.resultList, 'dividing_line')
+      addClass(this.resultList, 'dividing_line');
     }
 
     this.resultList.style.width = this.resultListShadow.style.width = self.options.resultListWidth + 'px';
@@ -437,7 +437,7 @@ createChildClass('Selector', UiControl, {
     addEvent(this.selector, 'mousedown', function(e) {
       var click_over_token = false;
       var el = e.target;
-      while (el != null) {
+      while (el !== null) {
         if (hasClass(el, 'token')) {
           click_over_token = true;
           break;
@@ -753,6 +753,7 @@ createChildClass('Selector', UiControl, {
     self.updatePlaceholder();
   },
   handleKeyboardEventOutside: function(e) {
+    var i;
     if (this.disabled || this.input.value.length > 0 && this.hasFocus || !this.hasFocus && this.selectedTokenId == 0) {
       return true;
     }
@@ -761,7 +762,7 @@ createChildClass('Selector', UiControl, {
         return false;
       break;
       case KEY.LEFT:
-        for (var i = this._selectedItems.length - 1; i >= 0; i--) {
+        for (i = this._selectedItems.length - 1; i >= 0; i--) {
           if (!this.selectedTokenId || this._selectedItems[i][0] == this.selectedTokenId && i > 0) {
             if (this.selectedTokenId) {
               i--;
@@ -775,7 +776,7 @@ createChildClass('Selector', UiControl, {
         break;
 
       case KEY.RIGHT:
-        for (var i = 0; i < this._selectedItems.length; i++) {
+        for (i = 0; i < this._selectedItems.length; i++) {
           if (this._selectedItems[i][0] == this.selectedTokenId) {
             if (i < this._selectedItems.length - 1) {
               this.selectToken(this._selectedItems[i+1][0]);
@@ -877,7 +878,7 @@ createChildClass('Selector', UiControl, {
     return true;
   },
   _selectItem: function(item, fireEvent, focusIfMultiselect) {
-    if (item == null) {
+    if (item === null) {
       return;
     }
     if (fireEvent === undefined) {
@@ -907,7 +908,7 @@ createChildClass('Selector', UiControl, {
 
     if (typeof data != 'object') {
       data = [item, item]; // value and text
-    };
+    }
     data[0] = data[0].toString();
     data[1] = data[1].toString();
 
@@ -1095,13 +1096,14 @@ createChildClass('Selector', UiControl, {
     }
     this.curTerm = term;
     var res = isFunction(this.options.customSearch) && this.options.customSearch(term);
+    var data;
     if (res) {
       this.receiveData(term, res);
       return;
     }
     if (this.dataURL) {
-      var data = this.cache.getData(term);
-      if (data == null) {
+      data = this.cache.getData(term);
+      if (data === null) {
           this.requestTimeout = setTimeout(function() {
             this.request(this.receiveData.bind(this), this.showNoDataList.bind(this));
           }.bind(this), 300);
@@ -1114,7 +1116,7 @@ createChildClass('Selector', UiControl, {
         }
       }
     } else {
-      var data = this.indexer.search(term);
+      data = this.indexer.search(term);
       if (data && data.length) {
         this.receiveData(term, data);
       } else {
@@ -1188,8 +1190,9 @@ createChildClass('Selector', UiControl, {
       adding.push(['', text, true]);
     }
 
+    var i;
     if (items.length) {
-      for (var i in items) {
+      for (i in items) {
         if (typeof items[i] != 'object') items[i] = [items[i], items[i]];
       }
       if (this.options.multiselect) {
@@ -1197,7 +1200,7 @@ createChildClass('Selector', UiControl, {
       }
       if (this.options.dividingLine == 'smart') {
         removeClass(this.resultList, 'dividing_line');
-        for (var i in items) {
+        for (i in items) {
           if (typeof(items[i][2]) == 'string' && items[i][2].length) {
             addClass(this.resultList, 'dividing_line');
           }
@@ -1205,7 +1208,7 @@ createChildClass('Selector', UiControl, {
       }
       var itemsToShow = (this.options.autocomplete && query) ? this.options.maxItemsShown(query.length) : items.length;
       var self = this;
-      for (var i = 0; i < items.length; ++i) {
+      for (i = 0; i < items.length; ++i) {
         var it = items[i];
         if (!itemsToShow) break;
         var formatted = self.options.formatResult(it);
@@ -1248,7 +1251,7 @@ createChildClass('Selector', UiControl, {
   },
   receiveData: function(q, data) {
     if (q != this.curTerm) return;
-    if (q != '' && data && data.length && this.hasFocus) {
+    if (q !== '' && data && data.length && this.hasFocus) {
       this.receivedData = data;
       this.showDataList(data, q);
     } else {
@@ -1392,7 +1395,7 @@ createChildClass('Selector', UiControl, {
             var item = this.options.defaultItems[i][0] || this.options.defaultItems[i];
             if (item == this._selectedItems[0][0] || item == this._selectedItems[0][0]) {
               exists = true;
-              break
+              break;
             }
           }
           if (!exists) {
@@ -1563,8 +1566,9 @@ createChildClass('Select', UiControl, {
       this.performShow();
     }
     var childNode;
+    var i;
     if (selectedItem) {
-      for (var i = 0; i < this.list.childNodes.length; i++) {
+      for (i = 0; i < this.list.childNodes.length; i++) {
         childNode = this.list.childNodes[i];
         if (childNode.getAttribute('val') == selectedItem) {
           this.highlight(i, childNode);
@@ -1574,7 +1578,7 @@ createChildClass('Select', UiControl, {
     } else if (this.options.selectFirst) {
       var reversed = false;//this.container && hasClass(this.container, 'reverse');
       var index;
-      for (var i = 0; i < this.list.childNodes.length; i++) {
+      for (i = 0; i < this.list.childNodes.length; i++) {
         index = reversed ? this.list.childNodes.length - 1 - i : i;
         childNode = this.list.childNodes[index];
         if (!childNode.getAttribute('dis')) {
@@ -1763,21 +1767,22 @@ createChildClass('Select', UiControl, {
     var undefined;
     var l = this.list.childNodes;
     var len = l.length;
+    var i;
     if (value === undefined) return;
-    for (var i = 0; i < len; ++i) {
+    for (i = 0; i < len; ++i) {
       var node = l[i];
       if (node.getAttribute('val') != value && node.innerHTML != value) continue;
       node.setAttribute('dis', '1');
       hide(node);
       break;
     }
-    for (var i = 0; i < len; ++i) {
+    for (i = 0; i < len; ++i) {
       if (isVisible(l[i])) {
         addClass(l[i], this.CSS.FIRST);
         break;
       }
     }
-    for (var i = len; i > 0; --i) {
+    for (i = len; i > 0; --i) {
       if (isVisible(l[i - 1])) {
         addClass(l[i - 1], this.CSS.LAST);
         break;
@@ -2757,7 +2762,6 @@ createChildClass('Indexer', UiUtil, {
     pattern = pattern.split(' ');
     var min_size = 0;
     var min_pattern = '';
-    var self = this;
     each (pattern, function() {
       var items = self.storage.index[this.substr(0, self.options.chars)];
       if (!min_pattern || !items || items.length < min_size) {

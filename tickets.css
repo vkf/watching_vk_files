@@ -227,6 +227,9 @@ h4.tickets_template.my {
   font-size: 1.09em;
   overflow: hidden;
 }
+#tickets_flood_msg {
+  padding-top: 4px;
+}
 #tickets_name .info {
   padding-top: 6px;
   color: #000;
@@ -906,7 +909,7 @@ h4.tickets_template.my {
 .tickets_faq_title {
   color: #45688E;
   font-weight: bold;
-  padding-bottom: 5px;
+  padding-bottom: 2px;
   line-height: 140%;
 }
 .tickets_faq_full_text {

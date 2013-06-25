@@ -245,6 +245,7 @@ createChildClass('Selector', UiControl, {
     formatResult: function(data) {
       return data[1] + (typeof(data[2]) == 'string' ? ' <span>' + data[2] + '</span>' : '');
     },
+    lastOptionWithoutCommaAtEnd: false
   },
   controlName: 'Selector',
 

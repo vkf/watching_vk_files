@@ -809,3 +809,6 @@ div.validation_last_button .button {
   font-size: 0.9em;
   color: #777;
 }
+#audios_list .audio_edited a {
+  color: #777777;
+}

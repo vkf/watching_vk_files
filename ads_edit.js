@@ -2123,7 +2123,7 @@ AdsViewEditor.prototype.updatePreview = function(previewParamName) {
       break;
     case 'community_join':
       var isAppGame = (this.params.link_type.value == 4 && this.params.link_id.app_game_links_ids[this.params.link_id.value]);
-      if (this.params.cost_type.value == 3 && (this.params.link_type.value != 4 || isAppGame)) {
+      if (this.params.cost_type.value == 3 && (this.params.link_type.value != 4 || false && isAppGame)) {
         switch (this.params.link_type.value) {
            case 1:  this.preview[previewParamName].innerHTML = getLang('global_group_join'); break;
            case 2:  this.preview[previewParamName].innerHTML = getLang('global_event_join'); break;

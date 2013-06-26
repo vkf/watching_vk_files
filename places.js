@@ -629,9 +629,9 @@ onEditScroll: function(resize) {
   }
 },
 
-savePhotos: function(btn) {
+savePhotos: function(btn, hash) {
   var loc = cur.placeMarker.location;
-  var params = {act: 'save_photos_places', pids: cur.mapPids, lat: loc.lat, lng: loc.lon};
+  var params = {act: 'save_photos_places', pids: cur.mapPids, lat: loc.lat, lng: loc.lon, hash: hash};
   if (cur.lastSelectedPlace) {
     var place = cur.lastSelectedPlace;
     extend(params, {

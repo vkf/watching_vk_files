@@ -936,7 +936,7 @@ var Audio = {
     var res = [];
     for (var i = 0; i < len; i++) {
       var t = arr[i];
-      if (cur.audios && cur.audios[t[1]] && (!(cur.audios[t[1]][11] && parseInt(cur.audios[t[1]][11])) || cur.audios[t[1]][12] && parseInt(cur.audios[t[1]][12]) || nav.objLoc.claim)) {
+      if (t && (!(t[11] && parseInt(t[11])) || t[12] && parseInt(t[12])) || nav.objLoc.claim) {
         res.push(t);
       }
     }

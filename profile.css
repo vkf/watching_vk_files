@@ -815,21 +815,6 @@ div.profile_grad {
   color: #777;
 }
 
-/* Verified accounts */
-.profile_verified {
-  background: url(/images/profile_icons.gif?7) no-repeat 0 -73px;
-  width: 13px;
-  height: 11px;
-  display:-moz-inline-stack;
-  display:inline-block;
-  _overflow:hidden;
-  zoom:1;
-  *display:inline;
-  position: relative;
-  top: 1px;
-  margin: 0 3px 0 6px;
-}
-
 .profile_about_webcam {
   line-height: 160%;
   padding-top: 20px;

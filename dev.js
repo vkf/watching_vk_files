@@ -303,7 +303,7 @@ methodRun: function(hash, btn) {
   });
 },
 
-wrapObject: function(obj, noCover) {
+wrapObject: function(obj, rootNode) {
   var html = '';
   if (!cur.wrapNum) {
     cur.wrapNum = 0;
@@ -321,7 +321,7 @@ wrapObject: function(obj, noCover) {
           items.push('<span class="dev_result_key">'+i+':</span> '+Dev.wrapObject(obj[i]));
         }
         var res = '<div class="dev_result_obj">'+items.join(',<br/>')+'</div>';
-        if (noCover) {
+        if (rootNode) {
           html += res;
         } else {
           html += '<span class="dev_result_block"><span id="dev_wrap_open_'+cur.wrapNum+'" class="dev_result_bracket">{</span><br/>'+res+'<span id="dev_wrap_close_'+cur.wrapNum+'" class="dev_result_bracket">}</span></span>';
@@ -345,6 +345,9 @@ wrapObject: function(obj, noCover) {
       debugLog('unknown type', typeof obj);
       break;
   }
+  if (rootNode && obj.response && obj.response['upload_url']) {
+    html += '<div class="dev_upload_form"><form action="'+obj.response['upload_url']+'" target="dev_upload_iframe" enctype="multipart/form-data" method="post"><input type="file" name="file" onchange="this.parentNode.submit(); show(\'dev_upload_iframe_wrap\')" class="dev_upload_input" /></form></div><div id="dev_upload_iframe_wrap"><iframe id="dev_upload_iframe" name="dev_upload_iframe"></iframe></div>';
+  }
   return html;
 },
 
@@ -355,7 +358,6 @@ requestResult: function(res) {
 
 resultMove: function(el) {
   var res = ge('dev_result');
-  debugLog(el);
   while(el) {
     if (hasClass(el, 'dev_result_block')) {
       addClass(el, 'dev_result_highlight')

@@ -872,7 +872,7 @@ runFunc: function(row, btn) {
     onDone: function(code) {
       var res = parseJSON(code);
       var html = Dev.wrapObject(res, true);
-      showFastBox({title: cur.lang['developers_run_result'], dark: 1, width: 500}, '<div id="dev_result" onmousemove="Dev.resultMove(event.target);" onmouseout="Dev.resultMove(false);">'+html+'</div>');
+      showFastBox({title: cur.lang['developers_run_result'], dark: 1, width: 500, bodyStyle: 'padding: 16px 16px 16px 2px;'}, '<div id="dev_result" onmousemove="Dev.resultMove(event.target);" onmouseout="Dev.resultMove(false);">'+html+'</div>');
     },
     onFail: function(msg) {
       setTimeout(showFastBox(getLang('global_error'), msg).hide, 2000);

@@ -219,9 +219,13 @@
   color: #777777;
   background: #E7E7E7;
 }
-.disabled.selector_container .selector_dropdown {
-  background: url(/images/darr_dd_disabled.gif) no-repeat center;
+.disabled.selector_container td.selector_dropdown {
+  background-image: url(/images/darr_dd_disabled.gif);
+  background-position: center;
   border-left-color: transparent;
+}
+.is_2x .disabled.selector_container td.selector_dropdown {
+  background-image: url(/images/darr_dd_disabled_2x.gif);
 }
 
 /* Autocompleter */

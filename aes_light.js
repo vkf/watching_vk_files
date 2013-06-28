@@ -8,8 +8,7 @@ var uaLight = navigator.userAgent.toLowerCase();
 var browserLight = {
   msie6: (/msie 6/i.test(uaLight) && !/opera/i.test(uaLight)),
   msie7: (/msie 7/i.test(uaLight) && !/opera/i.test(uaLight)),
-  msie8: (/msie 8/i.test(uaLight) && !/opera/i.test(uaLight)),
-  mobile: /iphone|ipod|ipad|opera mini|opera mobi|iemobile/i.test(uaLight)
+  msie8: (/msie 8/i.test(uaLight) && !/opera/i.test(uaLight))
 };
 
 if (isVkDomain) {
@@ -23,10 +22,6 @@ AdsLight.init = function() {
   }
 
   window.vk__adsLight = {};
-
-  if (browserLight.mobile) {
-    return;
-  }
 
   AdsLight.initUserHandlers();
 
@@ -247,39 +242,29 @@ AdsLight.initUserHandlers = function() {
   }
 }
 
-AdsLight.initWeb = function(adsSection, loaderParams, adsScriptVersion) {
+AdsLight.initWeb = function(adsSection, loaderParams, adsScriptVersion, adsParamsExport) {
   vk__adsLight.adsSection = adsSection;
 
   if (top === window) {
     return;
   }
 
-  var isVisibleWeb = AdsLight.isVisibleBlockWrap(true);
-
   var rpcMethods = {
     adsPublish: function() {
       AdsLight.handleEvent.apply(AdsLight, arguments);
     },
     onAdsAttached: function() {
-      if (isVisibleWeb) {
-        vk__adsLight.rpc.callMethod('publish', 'ads.subscribeEvents');
-      }
+      vk__adsLight.rpc.callMethod('publish', 'ads.subscribeEvents');
     },
     onInit: function() {
-      if (isVisibleWeb) {
-        vk__adsLight.rpc.callMethod('publish', 'ads.subscribeEvents');
-      } else {
-        vk__adsLight.rpc.callMethod('resizeWidget', 0, 0);
-        vk__adsLight.rpc.callMethod('adsOnInit', -1);
-      }
+      vk__adsLight.rpc.callMethod('publish', 'ads.subscribeEvents');
     }
   };
   try {
     vk__adsLight.rpc = new fastXDM.Client(rpcMethods);
-    if (isVisibleWeb) {
-      vk__adsLight.rpc.callMethod('adsOnInitLoader', adsScriptVersion);
-      vk__adsLight.loaderParams = loaderParams;
-    }
+    vk__adsLight.rpc.callMethod('adsOnInitLoader', adsScriptVersion);
+    vk__adsLight.loaderParams = loaderParams;
+    vk__adsLight.adsParamsExport = adsParamsExport;
   } catch (e) {
     debugLog(e);
   }
@@ -927,10 +912,13 @@ AdsLight.resizeBlockWrap = function(newSize, oldSize, lastSize, forceResize) {
 }
 
 AdsLight.loadAds = function() {
-  if (!vk__adsLight.loaderParams || vk__adsLight.loadComplete) {
+  if (!isVkDomain || !vk__adsLight.loaderParams || vk__adsLight.loadComplete) {
     return;
   }
   vk__adsLight.loadComplete = 1;
+
+  var adsParamsExport = vk__adsLight.adsParamsExport;
+  delete vk__adsLight.adsParamsExport;
 
   var ajaxParams = {};
 
@@ -940,6 +928,11 @@ AdsLight.loadAds = function() {
 
   ajaxParams.url = document.referrer;
   try { ajaxParams.url_top = top.location.toString(); } catch (e) {}
+
+  var isVisibleWeb = AdsLight.isVisibleBlockWrap(true);
+  if (!isVisibleWeb) {
+    ajaxParams.web_invisible = 1;
+  }
 
   if (document.documentMode) {
     ajaxParams.ie_document_mode = document.documentMode;
@@ -968,7 +961,7 @@ AdsLight.loadAds = function() {
       headNode.appendChild(styleElemNew);
 
       AdsLight.setNewBlock(response.ads_html, response.ads_section, response.ads_can_show, response.ads_showed, response.ads_params);
-      vk__adsLight.rpc.callMethod('adsOnInit', response.ads_count);
+      vk__adsLight.rpc.callMethod('adsOnInit', response.ads_count, response.ads_params_export);
 
       vk__adsLight.loadComplete = 2;
     } else {
@@ -979,12 +972,12 @@ AdsLight.loadAds = function() {
           debugLog(e);
         }
       }
-      AdsLight.loadAdsFailed(-1);
+      AdsLight.loadAdsFailed(-3001, adsParamsExport);
     }
   }
 }
 
-AdsLight.loadAdsFailed = function(errorCode) {
+AdsLight.loadAdsFailed = function(errorCode, adsParamsExport) {
   if (!vk__adsLight.rpc) {
     return false;
   }
@@ -994,7 +987,7 @@ AdsLight.loadAdsFailed = function(errorCode) {
   vk__adsLight.loadComplete = -1;
 
   vk__adsLight.rpc.callMethod('resizeWidget', 0, 0);
-  vk__adsLight.rpc.callMethod('adsOnInit', errorCode);
+  vk__adsLight.rpc.callMethod('adsOnInit', errorCode, adsParamsExport);
 
   return true;
 }
@@ -1024,7 +1017,7 @@ AdsLight.handleAllAds = function(box, adsIdsMore, adsIdsApply, adsHeightMore) {
     hide('ads_ads_all_ads_more');
   }
   function checkDeinit() {
-    if (!adsIdsMore && isEmpty(adsIdsApply)) {
+    if (!adsIdsMore && (!adsIdsApply || isEmpty(adsIdsApply) || adsIdsApply.length == 0)) {
       deinit();
     }
   }
@@ -1119,11 +1112,11 @@ AdsLight.handleAllAds = function(box, adsIdsMore, adsIdsApply, adsHeightMore) {
       setTimeout(applyAds.pbind(true), 100);
       return;
     }
-    if (isEmpty(adsIdsApply)) {
+    if (!adsIdsApply || isEmpty(adsIdsApply) || adsIdsApply.length == 0) {
       checkDeinit();
       return;
     }
-    if (isEmpty(needAdsApply)) {
+    if (!needAdsApply || isEmpty(needAdsApply) || needAdsApply.length == 0) {
       return;
     }
     if (applyLocked) {

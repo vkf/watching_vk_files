@@ -8,14 +8,14 @@ AdsWeb.showAds = function() {
   ge('ads_web_widget_result').innerHTML = '';
   ge('ads_web_widget_resize').innerHTML = '';
 
-  var adsCount = intval(ge('ads_web_site_code_ads_count').value);
-  if (!AdsWeb.updateSiteCodeAdsParams('ads_count', adsCount, false, true)) {
+  var adsCount = intval(ge('ads_web_site_code_ads_ads_count').value);
+  if (!AdsWeb.updateSiteCodeAdsParams('ads_ads_count', adsCount, false, true)) {
     return;
   }
 
   var adsParamsFix = {};
   for (var key in cur.adsParams) {
-    var keyFix = (inArray(key, ['ads_count']) ? key : key.substr(4));
+    var keyFix = key.substr(4);
     adsParamsFix[keyFix] = cur.adsParams[key];
   }
   if (adsParamsFix['handler'] && adsParamsFix['handler'].substr(0, 8) === 'function') {
@@ -74,7 +74,7 @@ AdsWeb.updateSiteCodeAdsParams = function(paramName, paramValue, paramElem, show
     checkbox(paramElem);
     paramValue = (isChecked(paramElem) ? '1' : '');
   }
-  if (paramName === 'ads_count') {
+  if (paramName === 'ads_ads_count') {
     paramValue = intval(paramValue);
     if (paramValue < 1 || paramValue > 4) {
       if (showError) {
@@ -110,7 +110,7 @@ AdsWeb.updateSiteCodeAdsParams = function(paramName, paramValue, paramElem, show
   try {
     var adsParamsFix = [];
     for (var key in cur.adsParams) {
-      var keyFix = (inArray(key, ['ads_count']) ? key : key.substr(4));
+      var keyFix = key.substr(4);
       var value;
       if (key === 'ads_handler' && cur.adsParams[key].substr(0, 8) === 'function') {
         value = '"' + keyFix + '":' + cur.adsParams[key];

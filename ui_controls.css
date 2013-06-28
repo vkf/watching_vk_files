@@ -227,6 +227,12 @@
 .is_2x .disabled.selector_container td.selector_dropdown {
   background-image: url(/images/darr_dd_disabled_2x.gif);
 }
+.big.disabled.selector_container td.selector_dropdown {
+  background-image: url(/images/wide_dd.gif);
+}
+.is_2x .big.disabled.selector_container td.selector_dropdown {
+  background-image: url(/images/wide_dd_2x.png);
+}
 
 /* Autocompleter */
 

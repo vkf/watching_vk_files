@@ -4515,10 +4515,10 @@ function initAddMedia(lnk, previewId, mediaTypes, opts) {
         handler = showBox.pbind('al_photos.php', extend(params, {act: 'choose_photo', max_files: opts.limit || 10}), {cache: 1, stat: ['photos.js', 'photos.css', 'upload.js'], dark: 1});
         break;
       case 'video':
-        handler = showBox.pbind('al_video.php', extend(params, {act: 'a_choose_video_box'}), {cache: 1});
+        handler = showBox.pbind('al_video.php', extend(params, {act: 'a_choose_video_box'}), {cache: 1, dark: 1});
         break;
       case 'audio':
-        handler = showBox.pbind('audio', extend(params, {act: 'a_choose_audio_box'}), {cache: 1});
+        handler = showBox.pbind('audio', extend(params, {act: 'a_choose_audio_box'}), {cache: 1, dark: 1});
         break;
       case 'poll':
         handler = function () {addMedia.chooseMedia('poll', '', v[2])};

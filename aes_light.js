@@ -884,11 +884,11 @@ AdsLight.resizeBlockWrap = function(newSize, oldSize, lastSize, forceResize) {
 
   var newWidth  = newSize[0];
   var newHeight = newSize[1];
-  if (newWidth && vk__adsLight.adsParams && vk__adsLight.adsParams.ads_ad_unit_width > newWidth) {
-    newWidth = vk__adsLight.adsParams.ads_ad_unit_width;
+  if (newWidth && vk__adsLight.adsParams && vk__adsLight.adsParams.ads_ad_unit_width_real > newWidth) {
+    newWidth = vk__adsLight.adsParams.ads_ad_unit_width_real;
   }
-  if (newHeight && vk__adsLight.adsParams && vk__adsLight.adsParams.ads_ad_unit_height > newHeight) {
-    newHeight = vk__adsLight.adsParams.ads_ad_unit_height;
+  if (newHeight && vk__adsLight.adsParams && vk__adsLight.adsParams.ads_ad_unit_height_real > newHeight) {
+    newHeight = vk__adsLight.adsParams.ads_ad_unit_height_real;
   }
   var isResizeWidth  = !!(forceResize || oldSize && newWidth > oldSize[0] || lastSize && lastSize[0] && newWidth > lastSize[0]);
   var isResizeHeight = !!(forceResize || oldSize && newHeight > oldSize[1] || lastSize && lastSize[1] && newHeight > lastSize[1]);

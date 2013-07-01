@@ -2259,11 +2259,13 @@ b.im_friend_mob_onl {
 .im_add_row .im_important_toggler {
   visibility: hidden;
   margin-top: -1px;
+  margin-left: -2px;
 }
 .im_sel_row .im_important_toggler {
   visibility: visible;
 }
 .im_important_msg .im_important_toggler {
+  background-position: 0 -239px;
   opacity: 1;
   filter: none;
   visibility: visible;
@@ -2274,19 +2276,20 @@ b.im_friend_mob_onl {
   background-color: rgba(237, 241, 245, 0.5);
 }
 
-.im_important_icon {
-  background: url(/images/icons/im_actions_iconset2.png?8) -1px -241px no-repeat;
+#im_important_btn {
+  margin-right: 10px;
+}
+#im_important_btn button {
+  padding: 3px 8px;
+}
+i.im_important_icon {
+  background: url(/images/icons/im_actions_iconset2.png?8) -2px -281px no-repeat;
   width: 15px;
   height: 15px;
-  padding: 0 3px 0 0;
-
-  opacity: 0.6;
-  filter: alpha(opacity=60);
+  cursor: pointer;
+  margin-right: 3px;
 }
-#im_important_link:hover .im_important_icon {
-  opacity: 1;
-  filter: none;
-}
-#im_important_count {
-  font-weight: bold;
+span#im_important_count {
+  line-height: 15px;
+  /*font-weight: bold;*/
 }

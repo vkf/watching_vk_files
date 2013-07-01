@@ -7,6 +7,10 @@
 
 .ads_web_simple_table .ads_unions_list.ads_web_stat_table .column_money,
 .ads_web_simple_table .ads_unions_list.ads_web_stat_table .column_money *,
+.ads_web_simple_table .ads_unions_list.ads_web_stat_table .column_cpc,
+.ads_web_simple_table .ads_unions_list.ads_web_stat_table .column_cpc *,
+.ads_web_simple_table .ads_unions_list.ads_web_stat_table .column_cpm,
+.ads_web_simple_table .ads_unions_list.ads_web_stat_table .column_cpm *,
 .ads_web_simple_table .ads_unions_list.ads_web_stat_table .column_ctr,
 .ads_web_simple_table .ads_unions_list.ads_web_stat_table .column_ctr *,
 .ads_web_simple_table .ads_unions_list.ads_web_stat_table .column_clicks,

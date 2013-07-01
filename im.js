@@ -6,8 +6,8 @@ var IM = {
 
     handlePageCount('msg', cnts[0]);
 
-    val('im_important_count', cnts[1] ? /*' +' + */cnts[1] : '');
-    toggle('im_important_link', cnts[1]);
+    val('im_important_count', cnts[1] ? cnts[1] : '');
+    toggle('im_important_btn', cnts[1] && cur.peer == -1);
 
     val('im_spam_cnt', cnts[2] ? ' +' + cnts[2] : '');
     toggle('im_spam_link', cnts[3]);
@@ -106,7 +106,7 @@ var IM = {
       var st = 0, to = toMsg ? ge('mess' + toMsg) : false;
       if (cur.tabs[cur.peer] && cur.tabs[cur.peer].q_offset && !to) return;
       if (!toTop) {
-        var winH = window.innerHeight || document.documentElement.clientHeight,
+        var winH = Math.max(intval(window.innerHeight), intval(document.documentElement.clientHeight)),
             contOH = cur.imEl.cont.offsetHeight,
             headH = cur.imEl.head.clientHeight,
             imNavH = cur.imEl.nav.offsetHeight,
@@ -140,7 +140,7 @@ var IM = {
       return IM.scrollOn();
     }
     appendedH = 0;
-    var winH = window.innerHeight || document.documentElement.clientHeight,
+    var winH = Math.max(intval(window.innerHeight), intval(document.documentElement.clientHeight)),
         contentST = scrollGetY(true),
         contentSH = Math.max(intval(bodyNode.scrollHeight), intval(pageNode.scrollHeight), intval(htmlNode.scrollHeight)),
         atBottom = contentST > contentSH - winH - (appendedH || 0) - 200;
@@ -3045,6 +3045,7 @@ var IM = {
     toggle('im_spam_flush', p == -4 && !cur.selSpam.length);
     toggle('im_write', p != 0 || !cur.multi && !cur.multi_appoint);
     toggle('im_top_multi', p > 2e9 && cur.tabs[p].data.top_controls);
+    toggle('im_important_btn', p == -1 && intval(val('im_important_count')));
     showBackLink(p != -1 ? 'im?sel=-1' : false, getLang('mail_im_back_to_dialogs'), 1);
     cur._noUpLink = (p > 0 || p < -2e9);
   },
@@ -3053,7 +3054,7 @@ var IM = {
     cur.imEl.nav.style.left = cur.imEl.controls.style.left = '';
   },
   updateScroll: function (e, noev) {
-    var winH = window.innerHeight || document.documentElement.clientHeight,
+    var winH = Math.max(intval(window.innerHeight), intval(document.documentElement.clientHeight)),
         headH = cur.imEl.head.clientHeight,
         imNavH = cur.imEl.nav.offsetHeight,
         contentY = headH + imNavH;
@@ -3072,7 +3073,7 @@ var IM = {
       }
     } else {
       var imControlsH = cur.imEl.controls.offsetHeight,
-          paddingBottom = imControlsH; //Math.max(imControlsH, winH - contentY - cur.imEl.rowsWrap.offsetHeight - 1);
+          paddingBottom = Math.max(imControlsH, winH - contentY - cur.imEl.rowsWrap.offsetHeight - 1);
 
       if (paddingBottom > 700/* && paddingBottom > imControlsH*/) {
         window.console && console.trace && console.trace();
@@ -3185,7 +3186,7 @@ var IM = {
       return;
     }
     cur.isPanelToTop = true;
-    var winH = window.innerHeight || document.documentElement.clientHeight;
+    var winH = Math.max(intval(window.innerHeight), intval(document.documentElement.clientHeight));
     cur.lastWinH = winH;
     setStyle(cur.imEl.controls, {
       bottom: '',
@@ -3197,7 +3198,7 @@ var IM = {
     if (!cur.isPanelToTop) return;
     cur.isPanelToTop = false;
     delete cur.wasBottom;
-    var winH = window.innerHeight || document.documentElement.clientHeight,
+    var winH = Math.max(intval(window.innerHeight), intval(document.documentElement.clientHeight)),
         diff = winH - cur.lastWinH,
         h = Math.max(0, Math.min(0.4 * winH, winH + cur.oldResizableH + diff - cur.lastContentH, cur.oldResizableH + diff));
     if (diff) {
@@ -3932,7 +3933,6 @@ var IM = {
       }
     });
     if (force) {
-      hide('im_important_link');
       show('im_progress');
     }
   },
@@ -4799,9 +4799,9 @@ var IM = {
           t.parentNode.replaceChild(se(rows), t);
           toggle('im_more-2', nextOffset);
         } else {
-          show('im_none-2');
           hide('im_log_search');
         }
+        toggle('im_none-2', none);
         IM.scrollOn();
         IM.updateLoc();
       }
@@ -5068,11 +5068,15 @@ var IM = {
       onDone: function (selMsgs, cnts) {
         var msgs = cur.tabs[cur.peer].msgs;
 
+        isImportant = isImportant ? 0 : 1;
         each (selMsgs, function (k, msg_id) {
           if (msgs[msg_id] !== undefined) {
-            msgs[msg_id][2] = isImportant ? 0 : 1;
+            msgs[msg_id][2] = isImportant;
           }
-          toggleClass('mess' + msg_id, 'im_important_msg', !isImportant);
+          var msgEl = ge('mess' + msg_id);
+          toggleClass(msgEl, 'im_important_msg', isImportant);
+          IM.updateImportantTT(msgEl, isImportant);
+
         });
         IM.uncheckLogMsgs();
         IM.updateCounts(cnts);
@@ -5088,7 +5092,33 @@ var IM = {
     });
   },
   showImportantTT: function (btn) {
-    showTooltip(btn, {text: getLang('mail_im_toggle_important'), showdt: 0, black: 1, shift: [10, -2, 0], className: 'im_important_tt'});
+    if (IM.r()) {
+      var msgEl = btn.parentNode.parentNode,
+          msg_id = msgEl.id.substr(5), // messq
+          isImportant = !intval(msgEl.getAttribute('data-notimportant'));
+    } else {
+      var msg_id = btn.parentNode.parentNode.id.substr(4), // mess
+          isImportant = cur.tabs[cur.peer].msgs[msg_id][2];
+    }
+
+    var text = isImportant ? getLang('mail_im_toggle_important_off') : getLang('mail_im_toggle_important');
+    showTooltip(btn, {text: text, showdt: 0, black: 1, shift: [10, -2, 0], className: 'im_important_tt'});
+  },
+  updateImportantTT: function (msgEl, isImportant) {
+    var toggler = geByClass1('im_important_toggler', msgEl),
+        tt = toggler && toggler.tt,
+        text = isImportant ? getLang('mail_im_toggle_important_off') : getLang('mail_im_toggle_important');
+    if (!tt) {
+      return;
+    }
+
+    if (isVisible(tt.container)) {
+      var textEl = geByClass1('tt_text', tt.container);
+      val(textEl, text);
+    } else {
+      tt.hide({fasthide: 1});
+      tt.destroy();
+    }
   },
   toggleImportant: function (msg_id) {
     var isImportant = cur.tabs[cur.peer].msgs[msg_id][2];
@@ -5096,11 +5126,14 @@ var IM = {
       onDone: function (selMsgs, cnts) {
         var msgs = cur.tabs[cur.peer].msgs;
 
+        isImportant = isImportant ? 0 : 1;
         each (selMsgs, function (k, msg_id) {
           if (msgs[msg_id] !== undefined) {
-            msgs[msg_id][2] = isImportant ? 0 : 1;
+            msgs[msg_id][2] = isImportant;
           }
-          toggleClass('mess' + msg_id, 'im_important_msg', !isImportant);
+          var msgEl = ge('mess' + msg_id);
+          toggleClass(msgEl, 'im_important_msg', isImportant);
+          IM.updateImportantTT(msgEl, isImportant);
         });
         IM.updateCounts(cnts);
         toggleClass('im_log_fav_btn', 'im_log_fav_btn__active', IM.checkLogIsImportant());
@@ -5117,6 +5150,8 @@ var IM = {
           msgEl = ge('messq' + msg_id);
           msgEl.setAttribute('data-notimportant', notImportant ? 0 : 1);
           toggleClass(msgEl, 'im_important_msg', notImportant);
+          IM.updateImportantTT(msgEl, notImportant);
+
         });
         IM.updateCounts(cnts);
       }

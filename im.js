@@ -3057,6 +3057,7 @@ var IM = {
     var winH = Math.max(intval(window.innerHeight), intval(document.documentElement.clientHeight)),
         headH = cur.imEl.head.clientHeight,
         imNavH = cur.imEl.nav.offsetHeight,
+        imControlsH = cur.imEl.controls.offsetHeight,
         contentY = headH + imNavH;
 
     if (!cur.fixedScroll) {
@@ -3072,15 +3073,31 @@ var IM = {
         });
       }
     } else {
-      var imControlsH = cur.imEl.controls.offsetHeight,
-          paddingBottom = Math.max(imControlsH, winH - contentY - cur.imEl.rowsWrap.offsetHeight - 1);
+      var st = scrollGetY(true),
+          stUpd = false;
 
-      if (paddingBottom > 700/* && paddingBottom > imControlsH*/) {
-        window.console && console.trace && console.trace();
-        debugLog('padding problem', cur.imEl.rowsWrap.offsetHeight, cur.imEl.rowsWrap, paddingBottom, imControlsH, cur.imEl.controls);
+      if (!IM.r(cur.peer) || cur.peer == -2 || cur.peer == -4 || cur.peer == -5) { // spam and search
+        var curHeight = cur.imEl.rows.clientHeight,
+            rowsEl = ge('im_rows' + (cur.peer == -5 ? -2 : cur.peer)),
+            newHeight = rowsEl.clientHeight;
+
+        newHeight = Math.max(newHeight, winH - imControlsH - contentY - 1);
+
+        setStyle(cur.imEl.rows, {height: newHeight});
+        if (e !== true && newHeight != curHeight) {
+          st += newHeight - curHeight;
+          stUpd = true;
+        }
+
+        if (IM.r(cur.peer)) {
+          setStyle(rowsEl, {minHeight: winH - imControlsH - contentY - 21});
+        }
+      } else {
+        setStyle(cur.imEl.rows, {height: 'auto'});
       }
 
-      var prevPaddTop = getStyle(cur.imEl.cont, 'paddingTop'),
+      var paddingBottom = Math.max(imControlsH, winH - contentY - cur.imEl.rowsWrap.offsetHeight - 1),
+          prevPaddTop = getStyle(cur.imEl.cont, 'paddingTop'),
           prevPaddBottom = getStyle(cur.imEl.cont, 'paddingBottom'),
           prevPadd = (getStyle(cur.imEl.cont, 'padding') || '').split(' ');
 
@@ -3102,46 +3119,13 @@ var IM = {
         setStyle(cur.imEl.cont, {padding: ''});
       }
 
-      if (!IM.r(cur.peer) || cur.peer == -2 || cur.peer == -4 || cur.peer == -5) { // spam and search
-        var curHeight = cur.imEl.rows.clientHeight,
-            rowsEl = ge('im_rows' + (cur.peer == -5 ? -2 : cur.peer)),
-            newHeight = rowsEl.clientHeight,
-            st = scrollGetY(true),
-            stUpd = false;
+      if (prevPaddTop != contentY && (!cur.bottom || contentY > prevPaddTop)) { // Chrome workaround
+        st += contentY - prevPaddTop;
+        stUpd = true;
+      }
 
-        newHeight = Math.max(newHeight, winH - imControlsH - contentY - 1);
-
-        setStyle(cur.imEl.rows, {height: newHeight});
-        if (e !== true && newHeight != curHeight) {
-          st += newHeight - curHeight;
-          stUpd = true;
-        }
-        if (prevPaddTop != contentY && (!cur.bottom || contentY > prevPaddTop)) { // Chrome workaround
-          st += contentY - prevPaddTop;
-          stUpd = true;
-        }
-        if (stUpd) {
-          debugLog('st upd', st, scrollGetY(true), contentY, (getStyle(cur.imEl.cont, 'padding') || '').split(' '), prevPadd, prevPaddTop, prevPaddBottom, newHeight - curHeight);
-          scrollToY(st, 0);
-        }
-        // debugLog();
-        // if (prevPaddTop != contentY) {
-        //   st += contentY - prevPaddTop;
-        // }
-
-        // if (cur.lastNavHeight) {
-        //   if (cur.lastNavHeight != imNavH) {
-        //     st += imNavH - cur.lastNavHeight;
-        //     scrollToY(st, 0);
-        //   }
-        //   delete cur.lastNavHeight;
-        // }
-
-        if (IM.r(cur.peer)) {
-          setStyle(rowsEl, {minHeight: winH - imControlsH - contentY - 21});
-        }
-      } else {
-        setStyle(cur.imEl.rows, {height: 'auto'});
+      if (stUpd) {
+        scrollToY(st, 0);
       }
 
       if (!browser.mozilla && !browser.msie && cur.lastWW !== lastWindowWidth) {

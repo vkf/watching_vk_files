@@ -67,6 +67,7 @@
 }
 .selector_container td.selector .placeholder_content {
   white-space: nowrap;
+  line-height: normal;
 }
 .selector_container td.selector .placeholder_cover {
   position: absolute;

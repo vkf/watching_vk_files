@@ -3819,7 +3819,8 @@ img.page_preview_video, img.page_preview_graffiti {
   color: #8BA1BC;
   line-height: 15px;
 }
-.page_media_poll .page_poll_row_percent {
+.page_media_poll .page_poll_row_percent,
+.im_log_t .post_media td.page_poll_row_percent {
   line-height: 13px;
   padding: 2px 0 0 6px;
   cursor: default;

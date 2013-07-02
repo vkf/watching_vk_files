@@ -1343,9 +1343,9 @@ var ProfileEditor = {
       }
     });
     cur.uiReligion.setData(peditData.religions);
-    if (peditData.religion_id > 0 || !peditData.religion.length) {
+    if (peditData.religion_id > 0) {
       cur.uiReligion.val(peditData.religion_id, true);
-    } else {
+    } else if (peditData.religion.length) {
       cur.uiReligion.customVal(peditData.religion);
     }
 

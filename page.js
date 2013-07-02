@@ -3706,7 +3706,14 @@ var Wall = {
 
 
         case 'upd_ci':
-          var edit = ge('current_info'), info = ev[2], el = edit || ge('page_current_info'), dataAudio = ' data-audio="' + ev[4] + '"';
+          var info = ev[2],
+              edit = ge('current_info'),
+              el = edit || ge('page_current_info'),
+              dataAudio = ' data-audio="' + ev[4] + '"';
+
+          if (!el) {
+            break;
+          }
           switch (ev[3]) {
             case 'audio':
               var curCntEl = geByClass1('current_audio_cnt');
@@ -5215,9 +5222,13 @@ function initAddMedia(lnk, previewId, mediaTypes, opts) {
     keyPoll: function(el, ev) {
       ev = ev || window.event;
       if (ev && (ev.keyCode == 10 || ev.keyCode == 13 || ev.keyCode == 9)) {
-        var n = hasClass(el, 'medadd_c_pollq') ? domFC(domNS(domNS(el))) : domNS(domPN(el));
+        var q = hasClass(el, 'medadd_c_pollq'), s = ev.shiftKey;
+        if (s && q) return;
+        var n = q ? domFC(domNS(domNS(el))) : (s ? domPS : domNS)(domPN(el));
         if (n) {
           elfocus(geByTag1('input', n));
+        } else if (s) {
+          elfocus(geByClass1('medadd_c_pollq', domPN(domPN(domPN(el)))));
         } else {
           this.incPoll();
         }

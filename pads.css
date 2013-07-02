@@ -568,6 +568,7 @@ b.pad_fr_mob_onl {
   line-height: 160%;
   overflow: hidden;
   width: 320px;
+  min-height: 17px;
 }
 .pad_nws_text.wall_module .post_media {
   width: 320px;

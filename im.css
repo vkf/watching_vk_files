@@ -1210,7 +1210,7 @@ div.im_preview_photo_doc {
 .im_fixed_nav #im_controls_wrap {
   z-index: 103;
 }
-.im_fixed_nav .im_rows_wrap {
+.im_fixed_nav #im_rows_wrap {
   height: auto;
 }
 .im_fixed_nav #footer_wrap {

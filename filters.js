@@ -542,7 +542,12 @@ fromStr: function(str) {
   var t = params[3];
   if (t) {
     cur.filterText = replaceEntities(t);
+    if (params[4] != undefined) {
+      cur.filtersFont = params[4];
+      ge('pv_filter_font').className = 'pv_filter_font pv_filter_font'+cur.filtersFont;
+    }
     val('pv_filter_text_ta', cur.filterText);
+    ge('pv_filter_text_ta').autosize.update();
     Filters.updateText(1);
   }
 
@@ -573,7 +578,7 @@ toStr: function() {
     str += cur.lastCrop.t+','+cur.lastCrop.l+','+cur.lastCrop.w+','+cur.lastCrop.h;
   }
   if (cur.filterText) {
-    str += '/'+cur.filterText.replace('/', '&#47;');
+    str += '/'+cur.filterText.replace('/', '&#47;')+'/'+cur.filtersFont;
   }
   if (str.match(/^\/*$/)) {
     str = '';

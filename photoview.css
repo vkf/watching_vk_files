@@ -1341,3 +1341,20 @@ div.pv_commdata i.no_like_hide {
 .wall_module .pv_comment .like_wrap {
   margin: 4px 1px 0px;
 }
+.pv_filter_font {
+  position: absolute;
+  right: 0px;
+  top: 0px;
+  padding: 8px 7px 4px 4px;
+}
+.pv_filter_font:active {
+  padding: 9px 7px 3px 4px;
+}
+.pv_filter_font_icon {
+  background: url('/images/icons/switch_fonts.png') 0px 0px no-repeat;
+  width: 17px;
+  height: 13px;
+}
+.pv_filter_font0 .pv_filter_font_icon {
+  background-position: 0px -14px;
+}

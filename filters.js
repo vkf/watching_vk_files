@@ -43,6 +43,7 @@ init: function(opts, vars, filterSaveOptions, filterParams, customOpts, photo, h
     setStyle(ge('pv_filter_panel'), {marginTop: 10});
     return;
   }
+  cur.filtersFont = 1;
   cur.filterFl = ge('pv_filter_embed');
   cur.filterApplied = 0;
   cur.filterSaveOptions = filterSaveOptions;
@@ -277,12 +278,19 @@ showText: function(ev) {
   }
   var textCont = ge('pv_filter_text_sl')
   show(textCont);
-  var params = {width: 200, opacity: 1}
+  var params = {width: 215, opacity: 1}
   params[vk.rtl ? 'marginRight' : 'marginLeft'] = 40;
   cssAnim(textCont, params, {duration: 100}, function() {
     elfocus('pv_filter_text_ta');
   });
   cur.textShown = true;
+  return cancelEvent(ev);
+},
+
+switchFont: function(btn, ev) {
+  cur.filtersFont = cur.filtersFont ? 0 : 1;
+  Filters.updateText(false, ev);
+  btn.className = 'pv_filter_font pv_filter_font'+cur.filtersFont;
   return cancelEvent(ev);
 },
 
@@ -301,7 +309,7 @@ updateText: function(force, ev) {
     if (!cur.filterFl.setText) {
       return false;
     }
-    cur.filterFl.setText(txt, 1, force || 0);
+    cur.filterFl.setText(txt, cur.filtersFont, force || 0);
   }, 0);
 },
 

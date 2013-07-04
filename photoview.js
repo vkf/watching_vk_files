@@ -1356,7 +1356,7 @@ if (ph.actions.edit/* & 2*/) {
       cur.pvCancelLoad();
     } else if (!cur.pvNoHistory && !noLoc && cur.pvHistoryLength > 0 && cur.pvHistoryLength < 10) {
       cur.pvNoHistory = true;
-      __adsLoaded = 0;
+      __adsUpdate('very_lazy');
       return history.go(-cur.pvHistoryLength);
     }
 
@@ -1379,7 +1379,7 @@ if (ph.actions.edit/* & 2*/) {
       if (nav.strLoc != nav.toStr(newLoc)) {
         nav.setLoc(newLoc);
       }
-      __adsLoaded = 0;
+      __adsUpdate('very_lazy');
     }
 
     window.__pvhideTimer = setTimeout(Photoview.doHide.pbind(cur), 0);

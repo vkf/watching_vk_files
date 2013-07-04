@@ -191,6 +191,9 @@
 .ads_ad_play.empty {
   background-image: url(/images/ad_video_empty.png);
 }
+.is_2x .ads_ad_play.empty {
+  background-image: url(/images/ad_video_empty_2x.png);
+}
 
 .ads_edit_ad_view_controls {
   padding-top: 5px;
@@ -313,14 +316,14 @@
   margin-left: -21px;
 }
 .ads_edit_targeting_group_hider_title.on {
-  background: url(/images/filterset_on.gif) no-repeat scroll 1px 9px transparent;
+  background: url(/images/filterset_on.gif) no-repeat 1px 9px;
   background-size: 9px 7px;
 }
 .is_2x .ads_edit_targeting_group_hider_title.on {
   background-image: url(/images/filterset_on_2x.png);
 }
 .ads_edit_targeting_group_hider_title.off {
-  background: url(/images/filterset_off.gif) no-repeat scroll 2px 8px transparent;
+  background: url(/images/filterset_off.gif) no-repeat 2px 8px;
   background-size: 7px 9px;
 }
 .is_2x .ads_edit_targeting_group_hider_title.off {
@@ -376,7 +379,8 @@
 }
 
 .ads_edit_tt_pointer {
-  background: url(/images/ddtooltip.png) 0 0 no-repeat;
+  background: url(/images/ddtooltip.png) no-repeat 0 0;
+  background-size: 16px 11px;
   width: 8px;
   height: 11px;
   position: absolute;
@@ -384,6 +388,9 @@
   top: 38px;
   overflow: hidden;
   z-index: 10;
+}
+.is_2x .ads_edit_tt_pointer {
+  background-image: url(/images/ddtooltip_2x.png);
 }
 
 .ads_edit_tt_pointer.ads_edit_tt_pointer_category1_id {
@@ -408,6 +415,48 @@
 
 .ads_edit_tt_pointer.ads_edit_tt_pointer_tags {
   top: 57px;
+}
+
+/* -------- */
+/* Last ads */
+/* -------- */
+
+#ads_edit_last_ads_search {
+  background: url(/images/magglass.png) no-repeat 5px 6px #FFFFFF;
+  background-size: 11px 11px;
+  padding: 5px 0 5px 21px;
+  width: 100%;
+}
+.is_2x #ads_edit_last_ads_search {
+  background-image: url(/images/magglass_2x.png);
+}
+
+.ads_edit_last_ads_search_wrap1 {
+  padding: 10px;
+  border-bottom: solid 1px #CAD0D6;
+  background-color: #F7F7F7;
+}
+
+.ads_edit_last_ads_search_wrap2 {
+  margin-right: 22px;
+}
+
+#ads_edit_last_ads_content {
+  height: 400px;
+  padding: 20px 0 0 20px;
+  overflow-y: scroll;
+}
+
+#ads_edit_last_ads_no_result {
+  display: none;
+  padding-top: 150px;
+  font-size: 1.09em;
+  text-align: center;
+  color: #777777;
+}
+
+.ads_edit_last_ads_ad_wrap {
+  padding-right: 20px;
 }
 
 /* ------ */
@@ -482,17 +531,4 @@
 #ads_edit_upload_video_external_error {
   padding-top: 5px;
   color: #777777;
-}
-
-/* Other */
-
-/* OLD */
-
-.last_ad_wrap {
-  min-height: 220px;
-  padding-right: 20px;
-}
-
-.last_ad_wrap td {
-  text-align: center;
 }

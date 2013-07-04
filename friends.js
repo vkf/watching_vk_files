@@ -70,8 +70,7 @@ var Friends = {
         }
 
         if (s == 'all' || s == 'online' || s == 'requests' || s == 'all_requests' || s == 'out_requests') {
-          __adsLoaded = 0;
-          __adsUpdate();
+          __adsUpdate('force');
         }
         if (s == 'all_requests' && !('sort' in changed) && !cur.sortByDate) {
           delete n.sort;

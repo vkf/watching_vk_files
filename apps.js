@@ -2948,7 +2948,7 @@ this.loadRows();
   featuredSlide: function(ev, left) {
     if (cur.featuredAnimate) return cancelEvent(ev);
     var cont = ge('apps_featured_inner');
-    if (window.curNotifier && curNotifier.idle_manager && curNotifier.idle_manager.is_idle && !(ev && ev.button)) {
+    if (window.curNotifier && curNotifier.idle_manager && curNotifier.idle_manager.is_idle && !(ev && (ev.button || ev.type == 'mousedown'))) {
       return false;
     }
     if (!cont) {

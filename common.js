@@ -1759,7 +1759,7 @@ function updSeenAdsInfo() {
 
   var friendsHeight = (isVisible('left_friends') ? getSize(ge('left_friends'))[1] : 0)
   var adsY = getXY('left_ads', true)[1];
-  var ads = Math.floor((lastWindowHeight - adsY + friendsHeight) / 211);
+  var ads = Math.floor((lastWindowHeight - adsY + friendsHeight) / 230);
   if (ads < 0) {
     ads = 0;
   } else if (ads > 2) {
@@ -1890,11 +1890,11 @@ function __adsGetAjaxParams(ajaxParams, ajaxOptions) {
   var result = stManager.add(['aes_light.js'], __adsGetAjaxParams.pbind(ajaxParams, ajaxOptions));
   return result || {al_ad: null};
 }
-function __adsUpdate() {
+function __adsUpdate(force) {
   __adsUpdate = function() {
-    window.AdsLight && AdsLight.updateBlock();
+    window.AdsLight && AdsLight.updateBlock.apply(AdsLight.updateBlock, arguments);
   };
-  stManager.add(['aes_light.js'], __adsUpdate);
+  stManager.add(['aes_light.js'], __adsUpdate.pbind(force));
 }
 function __adsSet(adsHtml, adsSection, adsCanShow, adsShowed, adsParams) {
   __adsSet = function() {
@@ -4253,7 +4253,7 @@ var nav = {
       }, browser.chrome ? 100 : 50);
     }
     updSeenAdsInfo();
-    __adsLoaded = vkNow();
+    __adsUpdate('already');
     if (_pads.shown) Pads.hide();
     ajax.post(where.url, where.params, {onDone: function() {
       var a = arguments;
@@ -6572,13 +6572,16 @@ TopSearch = {
     return false;
   },
   getNextNode: function(node, dir, tag) {
-    var curNode = node;
+    var curNode = node, par = domPN(node);
     while (1) {
       curNode = dir > 0 ? curNode.nextSibling : curNode.previousSibling;
       if (!curNode) {
-        return false;
-      } else if (tag && curNode.tagName && curNode.tagName.toLowerCase() == tag || !tag && curNode) {
+        curNode = dir > 0 ? par.firstChild : par.lastChild;
+      }
+      if (tag && curNode.tagName && curNode.tagName.toLowerCase() == tag || !tag && curNode) {
         return curNode;
+      } else if (curNode === node) {
+        return false;
       }
     }
   },

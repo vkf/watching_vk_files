@@ -606,7 +606,7 @@ hide: function(noLoc, force, ev) {
   /*if (!wkcur.noHistory && !noLoc) {
     wkcur.noHistory = 1;
     wkcur.forceHistoryHide = force;
-    __adsLoaded = 0;
+    __adsUpdate('lazy');
     return history.go(-1);
   }
   if (wkcur.forceHistoryHide) {
@@ -682,7 +682,7 @@ hide: function(noLoc, force, ev) {
       WkView.backLocation();
     }
     if (doUpdAds) {
-      __adsLoaded = 0;
+      __adsUpdate('lazy');
     }
   } else if (doUpdAds) {
     __adsUpdate();

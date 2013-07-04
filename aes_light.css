@@ -392,8 +392,12 @@ a.ads_ad_box2:hover {
   top: 46px;
   left: 33px;
   width: 46px;
+  background: url(/images/ad_video_play.png) no-repeat 0 0;
   height: 46px;
-  background: url("/images/ad_video_play.png") no-repeat scroll 0 0 transparent;
+  background-size: 46px 46px;
+}
+.is_2x .ads_ad_play {
+  background-image: url(/images/ad_video_play_2x.png);
 }
 .ads_ad_play.big {
   top: 66px;

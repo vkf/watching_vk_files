@@ -444,7 +444,7 @@ hide: function(noLoc, force, ev) {
   if (!mvcur.noHistory && !noLoc) {
     mvcur.noHistory = 1;
     mvcur.forceHistoryHide = force;
-    __adsLoaded = 0;
+    __adsUpdate('very_lazy');
     return history.go(-1);
   }
   if (mvcur.forceHistoryHide) {
@@ -550,7 +550,7 @@ hide: function(noLoc, force, ev) {
     } else {
       Videoview.backLocation();
     }
-    __adsLoaded = 0;
+    __adsUpdate('very_lazy');
   }
   __adsUpdate();
   return false;
@@ -1450,6 +1450,17 @@ report: function(oid, vid) {
   showBox('reports.php', {act: 'a_report_video_box', oid: oid, vid: vid}, {onHideAttempt: function() {
     Videoview.showPlayer();
   }, stat: ['ui_controls.js', 'ui_controls.css']});
+},
+
+setAdult: function(oid, vid, hash) {
+  ajax.post('al_video.php', {
+    act: 'set_adult_video',
+    vid: vid,
+    oid: oid,
+    hash: hash
+  }, {onDone: function(text) {
+    ge('mv_setadult_line').innerHTML = text;
+  }});
 },
 
 spamVideo: function(oid, vid, hash, obj, from, sure, callback) {

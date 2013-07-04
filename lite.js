@@ -1194,11 +1194,11 @@ function __adsGetAjaxParams(ajaxParams, ajaxOptions) {
   var result = stManager.add(['aes_light.js'], __adsGetAjaxParams.pbind(ajaxParams, ajaxOptions));
   return result || {al_ad: null};
 }
-function __adsUpdate() {
+function __adsUpdate(force) {
   __adsUpdate = function() {
-    window.AdsLight && AdsLight.updateBlock();
+    window.AdsLight && AdsLight.updateBlock.apply(AdsLight.updateBlock, arguments);
   };
-  stManager.add(['aes_light.js'], __adsUpdate);
+  stManager.add(['aes_light.js'], __adsUpdate.pbind(force));
 }
 function __adsSet(adsHtml, adsSection, adsCanShow, adsShowed, adsParams) {
   __adsSet = function() {

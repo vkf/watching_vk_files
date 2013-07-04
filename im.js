@@ -3119,7 +3119,7 @@ var IM = {
         setStyle(cur.imEl.cont, {padding: ''});
       }
 
-      if (prevPaddTop != contentY && (!cur.bottom || contentY > prevPaddTop)) { // Chrome workaround
+      if (prevPaddTop && prevPaddTop != contentY && (!cur.bottom || contentY > prevPaddTop)) { // Chrome workaround
         st += contentY - prevPaddTop;
         stUpd = true;
       }
@@ -3561,8 +3561,7 @@ var IM = {
       toggle('im_peer_controls_wrap', !r);
       toggle('im_sound_controls', r);
       try {
-        __adsLoaded = 0; // update ads
-        __adsUpdate();
+        __adsUpdate('force');
       } catch (e) {
         topError(e, {dt: -1, type: 5, answer: ''});
       }

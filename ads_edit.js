@@ -139,7 +139,10 @@ AdsEdit.initHelpTooltip = function(targetElem, handler, ttContainer, curLocal) {
 
 AdsEdit.showHelpCriterionTooltip = function(helpTooltipName, targetElem, ttHandler, ttContainer, helpText, shiftTop, curLocal) {
   if (cur.lastHelpTooltipName && cur.lastHelpTooltipName != helpTooltipName) {
-    cur.getLastTooltip().hide();
+    var lastTooltip = cur.getLastTooltip();
+    if (lastTooltip) {
+      lastTooltip.hide();
+    }
   }
   cur.getLastTooltip = function(){ return targetElem.tt; };
   cur.lastHelpTooltipName = helpTooltipName;
@@ -390,11 +393,10 @@ AdsEdit.cancelAd = function(cancelLink, event) {
   nav.go(cancelLink, event);
 }
 
-// TODO: Rewrite box JS
-AdsEdit.showLastAdsBox = function(clientId) {
+AdsEdit.showLastAdsBox = function(parentId) {
 
   var ajaxParams = {};
-  ajaxParams.client_id = clientId;
+  ajaxParams.parent_id = parentId;
 
   var showOptions = {params: {}};
   showOptions.cache = 1;
@@ -406,28 +408,33 @@ AdsEdit.showLastAdsBox = function(clientId) {
 }
 
 AdsEdit.initLastAdsBox = function(lastAdsBox, lastAds, lastAdsKeyMap) {
-  placeholderSetup('last_ads_search', {back: true});
+  if (!cur.lastAds) {
+    cur.lastAds       = lastAds;
+    cur.lastAdsKeyMap = lastAdsKeyMap;
+
+    cur.lastAdsIndex = new vkIndexer(lastAds, function(obj) {
+        return se(obj[lastAdsKeyMap.indexer_text]).nodeValue;
+      }
+    );
+  }
 
   var boxOptions = {}
-  boxOptions.onShow = function() { AdsEdit.searchLastAds(); };
+  boxOptions.onClean = function() {
+    cleanElems(ge('ads_edit_last_ads_search'), geByClass1('input_back_wrap', lastAdsBox.bodyNode), geByClass1('input_back_content', lastAdsBox.bodyNode));
+  };
   lastAdsBox.setOptions(boxOptions);
 
-  cur.lastAds       = lastAds;
-  cur.lastAdsKeyMap = lastAdsKeyMap;
-
-  cur.lastAdsIndex = new vkIndexer(lastAds, function(obj) {
-      var str = obj[lastAdsKeyMap.title] + ' ' + obj[lastAdsKeyMap.description];
-      return ce('div', {innerHTML: str}).firstChild.nodeValue;
-    }
-  );
-  cur.lastSearchStr = '';
-
   cur.lastAdsBox = lastAdsBox;
+
+  placeholderSetup('ads_edit_last_ads_search', {back: true});
+
+  ge('ads_edit_last_ads_content').scrollTop = 0;
+  AdsEdit.searchLastAds(true);
 }
 
-AdsEdit.searchLastAds = function() {
-  var searchStr = ge('last_ads_search').getValue();
-  if (searchStr == cur.lastSearchStr) {
+AdsEdit.searchLastAds = function(initial) {
+  var searchStr = ge('ads_edit_last_ads_search').getValue();
+  if (!initial && searchStr === cur.lastSearchStr) {
     return;
   }
 
@@ -438,28 +445,53 @@ AdsEdit.searchLastAds = function() {
   if (searchStr) {
     results = cur.lastAdsIndex.search(searchStr);
     for (var i in results) {
-      lastAdsIds['last_ad_' + results[i][cur.lastAdsKeyMap.ad_id]] = true;
+      lastAdsIds[results[i][cur.lastAdsKeyMap.ad_id]] = true;
     }
   } else {
     isShowAll = true;
-    //debugLog('Show all');
   }
-  //debugLog(lastAdsIds);
-  var lastAdsElems = geByClass('last_ad_wrap');
-  for (var i = 0, len = lastAdsElems.length; i < len; i++) {
-    if (isShowAll || lastAdsIds[lastAdsElems[i].id]) {
-      show(lastAdsElems[i]);
+
+  var lastAdsElemsAll = geByClass('ads_edit_last_ads_ad_wrap');
+  var lastAdsElemsShowed = [];
+  var elem;
+  var adId;
+  var row = 0;
+  for (var i = 0, len = lastAdsElemsAll.length; i < len; i++) {
+    elem = lastAdsElemsAll[i];
+    adId = elem.id.replace('ads_edit_last_ads_ad_', '');
+    if (isShowAll || lastAdsIds[adId]) {
+      show(elem);
+      if (!lastAdsElemsShowed[row]) {
+        lastAdsElemsShowed[row] = [];
+      }
+      lastAdsElemsShowed[row].push(elem);
+      if (lastAdsElemsShowed[row].length == 4) {
+        row++;
+      }
     } else {
-      hide(lastAdsElems[i]);
+      hide(elem);
+    }
+  }
+
+  for (var row in lastAdsElemsShowed) {
+    var maxHeight = 0;
+    for (var i in lastAdsElemsShowed[row]) {
+      elem = lastAdsElemsShowed[row][i];
+      var adHeight = getSize(geByClass1('ads_ad_box', elem))[1];
+      maxHeight = Math.max(maxHeight, adHeight);
+    }
+    for (var i in lastAdsElemsShowed[row]) {
+      elem = lastAdsElemsShowed[row][i];
+      setStyle(elem, 'minHeight', (maxHeight + 20) + 'px');
     }
   }
 
   if (isShowAll || results.length != 0) {
-    hide('no_last_ads_result');
-    show('last_ads_result');
+    hide('ads_edit_last_ads_no_result');
+    show('ads_edit_last_ads_result');
   } else {
-    hide('last_ads_result');
-    var noResultElem = ge('no_last_ads_result');
+    hide('ads_edit_last_ads_result');
+    var noResultElem = ge('ads_edit_last_ads_no_result');
     noResultElem.innerHTML = getLang('ads_edit_ad_choose_view_not_found').replace('{query}', Ads.escapeValue(searchStr));
     show(noResultElem);
   }

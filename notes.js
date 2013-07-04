@@ -272,8 +272,7 @@ cur.lang.notes_livejournal_delete + '</div></div>' : '';
   showNote: function(oid, nid, ncom, toComments) {
     cur.disableAutoMore = true;
 
-    __adsLoaded = 0; // update ads
-    __adsUpdate();
+    __adsUpdate('force');
 
     var summary = geByClass1('summary_wrap', document);
     summary.parentNode.removeChild(summary);

@@ -215,7 +215,20 @@ var audioPlayer = {
     var data = ge('audio_info' + aid).value.split(','), url = data[0], duration = parseInt(data[1]);
     dur = audioPlayer.formatTime(duration);
     data = aid.split('_');
-    var oid = data[0], aid = data[1], res = {
+    var oid = data[0], aid = data[1], canAdd = (oid != vk.id) ? 1 : 0;
+    if (!canAdd && data[2] && data[3]) {
+      var post = ge('post' + data[2] + '_' + data[3]);
+      if (post) {
+        var author = geByClass1('author', post);
+        if (author) {
+          var author_id = intval(author.getAttribute('data-from-id'));
+          if (author_id && author_id != vk.id) {
+            canAdd = 1;
+          }
+        }
+      }
+    }
+    var res = {
       0: oid,
       1: aid,
       2: url,
@@ -225,7 +238,7 @@ var audioPlayer = {
       6: title,
       7: 0,
       8: 0,
-      9: oid != vk.id ? 1 : 0
+      9: canAdd
     };
     res.full_id = full_id;
     return res;
@@ -594,13 +607,14 @@ var audioPlayer = {
         if (gp_play) {
           addClass(gp_play, 'playing');
         }
+        var a = window.audioPlaylist && audioPlaylist[aid];
         if (_a.controls) {
           for (var i in _a.controls) {
             var obj = _a.controls[i];
             if (obj.play) addClass(obj.play, 'playing');
             if (obj.add && obj.container) {
               var mid = aid.split('_')[0];
-              toggleClass(obj.container, 'add', mid != vk.id);
+              toggleClass(obj.container, 'add', mid != vk.id || a && a[9] && intval(a[9]));
             }
           }
         }

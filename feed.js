@@ -149,10 +149,6 @@ var Feed = {
       need_ignore: !isArray(cur.ignore_owners) ? 1 : 0
     };
     var options = {onDone: onDone};
-    if (cur.options.delay_ads) {
-      options.ads = 1;
-      delete cur.options.delay_ads;
-    }
     ajax.post('al_feed.php?queue', extend(feed.getSectionParams(cur.section), params), options);
     function onDone(key, ignore_owners) {
       if (key) {
@@ -208,7 +204,7 @@ var Feed = {
         flags = s != 'search' ? intval(ev.pop()) : 0,
         deltaH = 0;
 
-    if (ev_ver != cur.options.qversion) {
+    if (!cur.options || ev_ver != cur.options.qversion) {
       // location.reload();
       return;
     }

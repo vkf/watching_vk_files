@@ -242,6 +242,7 @@ var html5video = {
     }
     animate(ge('menu_layer'), {bottom: 46}, 200);
     animate(ge('popup_actions'), {opacity: 1}, 200);
+    removeClass(video, 'no_cursor');
     video.src = html5video.pathToHD(res);
     if (this.videoClicked) {
       video.load();
@@ -310,6 +311,7 @@ var html5video = {
     html5video.inside = 1;
     animate(ge('menu_layer'), {bottom: 46}, 200);
     animate(ge('popup_actions'), {opacity: 1}, 200);
+    removeClass(ge('the_video'), 'no_cursor');
   },
 
   hideMenu: function(e) {
@@ -319,6 +321,7 @@ var html5video = {
         if (html5video.inside == 0) {
           animate(ge('menu_layer'), {bottom: 0}, 200);
           animate(ge('popup_actions'), {opacity: 0}, 200);
+          addClass(ge('the_video'), 'no_cursor');
         }
       }, 0);
     }
@@ -738,6 +741,7 @@ var html5video = {
     html5video.centerPopup();
     animate(ge('menu_layer'), {bottom: 46}, 200);
     animate(ge('popup_actions'), {opacity: 1}, 200);
+    removeClass(video, 'no_cursor');
   },
 
   onDurationChange: function() {
@@ -814,6 +818,7 @@ var html5video = {
     html5video.updTime();
     setStyle(ge('menu_layer'), {bottom: 46});
     setStyle(ge('popup_actions'), {opacity: 0});
+    removeClass(ge('the_video'), 'no_cursor');
     if (fullScreenApi.isFullScreen()) {
       html5video.toggleFullscreen();
     }

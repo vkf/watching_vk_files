@@ -472,14 +472,16 @@ AdsLight.publish = function(delayBigPublish, publishEventName) {
   }
 }
 
-AdsLight.canUpdate = function() {
+AdsLight.canUpdate = function(forAjax) {
 
   var containerElem = ge('left_ads');
+
+  var initialAjax = (forAjax && __adsLoaded === false);
 
   var result = true;
 
   // Is visible
-  result = (result && vk__adsLight.activeTab > 0 && containerElem && isVisible(containerElem) && AdsLight.isVisibleBlockWrap());
+  result = (result && containerElem && isVisible(containerElem) && (vk__adsLight.activeTab > 0 && AdsLight.isVisibleBlockWrap() || initialAjax));
   // Is reasonable
   result = (result && vk.id && (vk__adsLight.adsCanShow >= 1 || vkNow() + vk__adsLight.adsCanShow > 3600000)); // hour
 
@@ -490,7 +492,7 @@ AdsLight.canUpdate = function() {
     // Is visible
     result = (result && isVisible('side_bar') && !layers.visible && !isVisible('left_friends'));
     // Is reasonable
-    result = (result && vk.loaded && !vk.no_ads);
+    result = (result && !vk.no_ads && (vk.loaded || initialAjax));
   }
 
   return result;
@@ -498,7 +500,7 @@ AdsLight.canUpdate = function() {
 
 AdsLight.getAjaxParams = function(ajaxParams, ajaxOptions) {
   var ajaxParamsNew = {};
-  var canUpdateBlock = AdsLight.canUpdate();
+  var canUpdateBlock = AdsLight.canUpdate(true);
   if (ajaxOptions.noAds) {
     ajaxParamsNew.al_ad = 0;
   } else if (canUpdateBlock || ajaxOptions.ads) {
@@ -581,22 +583,42 @@ AdsLight.getAdsShowed = function() {
   return adsShowed;
 }
 
-AdsLight.updateBlock = function(delayed) {
+AdsLight.updateBlock = function(force, delayed) {
 
-  if (__adsLoaded) {
+  if (force === 'very_lazy') {
+    __adsLoaded = 0;
+    return;
+  }
+  if (force === 'lazy') {
+    if (__adsLoaded) {
+      __adsLoaded = 0;
+      return;
+    } else {
+      __adsLoaded = 0; // if __adsLoaded === false
+    }
+  }
+  if (force === 'force') {
+    __adsLoaded = 0;
+  }
+  if (force === 'already') {
+    __adsLoaded = vkNow();
+    return;
+  }
+
+  if (__adsLoaded || __adsLoaded === false) {
     return;
   }
 
   if (!delayed) {
     clearTimeout(vk__adsLight.updateBlockTimer);
-    vk__adsLight.updateBlockTimer = setTimeout(AdsLight.updateBlock.pbind(1), 1000);
+    vk__adsLight.updateBlockTimer = setTimeout(AdsLight.updateBlock.pbind(false, 1), 1000);
     return;
   }
 
   var canUpdateBlock = AdsLight.canUpdate();
 
   if (delayed == 1) {
-    setTimeout(AdsLight.updateBlock.pbind(2), 500); // Period must be greater than in isVisibleBlockWrapCoords
+    setTimeout(AdsLight.updateBlock.pbind(false, 2), 500); // Period must be greater than in isVisibleBlockWrapCoords
     return;
   }
 

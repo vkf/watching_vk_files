@@ -69,6 +69,7 @@
  top: -293px;
  z-index: 10012;
  display: block;
+ -ms-touch-action: none;
 }
 
 #graffiti_common {
@@ -99,14 +100,15 @@
 }
 
 #graffiti_controls {
-width: 586px;
+  width: 586px;
   margin: 0 auto;
+  -ms-touch-action: none
 }
 
 #graffiti_cpwrap {
    display: none;
    opacity: 0;
-   margin: 0; 
+   margin: 0;
    position: relative;
    top: -210px;
    left: 62px;
@@ -119,12 +121,12 @@ width: 586px;
    background-color: #E5E5E5;
    z-index: 10013;
    box-shadow: 0 0 3px rgba(214,214,214,0.6);
-   -moz-box-shadow: 0 0 3px rgba(214,214,214,0.6); 
+   -moz-box-shadow: 0 0 3px rgba(214,214,214,0.6);
    -webkit-box-shadow: 0 0 3px rgba(214,214,214,0.6);
 }
 
 #graffiti_rewrap {
-   width: 586px; 
+   width: 586px;
    height: 0;
    display: block;
    margin: 0 auto;

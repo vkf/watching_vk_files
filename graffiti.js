@@ -50,6 +50,7 @@ var Graffiti = {
 
   mouse: {
     pressed: false,
+    touched: false,
     x:[], y:[]
   },
 
@@ -73,7 +74,9 @@ var Graffiti = {
       Graffiti.handleDrawingEvents(e);
       Graffiti.handleControlsEvents(e);
       Graffiti.handleResize(e);
-      return cancelEvent(e);
+      if (e.type == 'mousemove' || e.type == 'touchmove') {
+        return cancelEvent(e);
+      }
     },
     color: function(e) {
       Graffiti.handleColorPickerEvents(e);
@@ -84,8 +87,9 @@ var Graffiti = {
       return false;
     },
     keyboard: function(e) {
-      Graffiti.keyboardEvents(e);
-      return cancelEvent(e);
+      if (!Graffiti.keyboardEvents(e)) {
+        return cancelEvent(e);
+      }
     },
     cancel: function(e) {
       return cancelEvent(e);
@@ -98,10 +102,16 @@ var Graffiti = {
 
   attachEvents: function() {
     var evs = Graffiti.events;
-    addEvent(Graffiti.controlsCanv, "mousedown click" , evs.controls);
-    addEvent(window, "mousemove mouseup", evs.all);
-    addEvent(Graffiti.overlayCanv, "mousedown click", evs.drawing);
-    addEvent(Graffiti.cpCanv, "mousemove click", evs.color);
+    if (window.navigator.msPointerEnabled) {
+      addEvent(Graffiti.controlsCanv, "MSPointerDown MSPointerMove MSPointerUp" , evs.controls);
+      addEvent(Graffiti.overlayCanv, "MSPointerDown MSPointerMove MSPointerUp", evs.drawing); // no canceling
+      addEvent(Graffiti.cpCanv, "MSPointerDown MSPointerMove", evs.color);
+    } else {
+      addEvent(Graffiti.controlsCanv, "mousedown click touchstart touchmove touchend" , evs.controls);
+      addEvent(window, "mousemove mouseup touchmove touchend", evs.all);
+      addEvent(Graffiti.overlayCanv, "mousedown click touchstart touchmove touchend", evs.drawing);
+      addEvent(Graffiti.cpCanv, "mousemove click touchstart touchmove", evs.color);
+    }
     addEvent(Graffiti.controlsCanv, "DOMMouseScroll mousewheel", evs.controlsF);
     addEvent(document, "keydown keyup", evs.keyboard);
     addEvent(document, "contextmenu", evs.cancel);
@@ -112,10 +122,16 @@ var Graffiti = {
 
   detachEvents: function() {
     var evs = Graffiti.events;
-    removeEvent(Graffiti.controlsCanv, "mousedown click" , evs.controls);
-    removeEvent(window, "mousemove mouseup", evs.all);
-    removeEvent(Graffiti.overlayCanv, "mousedown click", evs.drawing);
-    removeEvent(Graffiti.cpCanv, "mousemove click", evs.color);
+    if (window.navigator.msPointerEnabled) {
+      removeEvent(Graffiti.controlsCanv, "MSPointerDown MSPointerMove MSPointerUp" , evs.controls);
+      removeEvent(Graffiti.overlayCanv, "MSPointerDown MSPointerMove MSPointerUp", evs.drawing); // no canceling
+      removeEvent(Graffiti.cpCanv, "MSPointerDown MSPointerMove", evs.color);
+    } else {
+      removeEvent(Graffiti.controlsCanv, "mousedown click touchstart touchmove touchend" , evs.controls);
+      removeEvent(window, "mousemove mouseup touchmove touchend", evs.all);
+      removeEvent(Graffiti.overlayCanv, "mousedown click touchstart touchmove touchend", evs.drawing);
+      removeEvent(Graffiti.cpCanv, "mousemove click touchstart touchmove touchend", evs.color);
+    }
     removeEvent(Graffiti.controlsCanv, "DOMMouseScroll mousewheel", evs.controlsF);
     removeEvent(document, "keydown keyup", evs.keyboard);
     removeEvent(document.body, "selectstart", evs.cancel);
@@ -200,7 +216,7 @@ var Graffiti = {
       case "keydown":
         if(e.shiftKey || e.keyCode == 16) {
           Graffiti.drawPath = true;
-          return;
+          return true;
         }
         switch(e.keyCode) {
           case 90:
@@ -208,20 +224,23 @@ var Graffiti = {
             if(Graffiti.keyboardBlocked) return;
             Graffiti.keyboardBlocked = true;
             Graffiti.backHistory();
+            return true;
           break;
           case 70:
             if(!e.ctrlKey) return;
             Graffiti.fullScreen();
+            return true;
           break;
         }
       break;
       case "keyup":
         if(e.shiftKey || e.keyCode == 16) {
           Graffiti.stopDrawPathLine();
-          return;
+          return true;
         }
         if(e.keyCode == 90) {
           Graffiti.keyboardBlocked = false;
+          return true;
         }
       break;
     }
@@ -229,6 +248,9 @@ var Graffiti = {
 
   handleControlsEvents: function(e) {
     switch(e.type) {
+      case "touchstart":
+      case "MSPointerDown":
+        Graffiti.handleColorBtn(e);
       case "mousedown":
         var mouse = Graffiti.getMouseXY(e, Graffiti.controlsCanv);
         var sl = Graffiti.sliders;
@@ -244,11 +266,13 @@ var Graffiti = {
           }
         }
       break;
+      case "touchmove":
+      case "MSPointerMove":
       case "mousemove":
-        if(!Graffiti.mouse.pressed && !Graffiti.resizing) {
+        if(!(Graffiti.mouse.pressed || Graffiti.mouse.touched) && !Graffiti.resizing) {
           var mouse = Graffiti.getMouseXY(e, Graffiti.controlsCanv);
           if(Graffiti.aboveSlider.status) {
-            var cs = Graffiti.sliders[Graffiti.aboveSlider.index];
+              var cs = Graffiti.sliders[Graffiti.aboveSlider.index];
             if(mouse.x > cs.x && mouse.x < cs.x + 95) {
               Graffiti.redrawSlider(cs.id, Graffiti.controlsCtx, {x:cs.x, y:cs.y}, mouse.x);
               Graffiti.sliders[Graffiti.aboveSlider.index].holder = mouse.x;
@@ -283,23 +307,10 @@ var Graffiti = {
         }
       break;
       case "click":
-        var xy = Graffiti.cpbXY;
-        var mouse = Graffiti.getMouseXY(e, Graffiti.controlsCanv);
-        if(mouse.x >= xy.x-8 && mouse.x <= xy.x + 23) {
-          if(mouse.y >= xy.y-5 && mouse.y <= xy.y + 25) {
-            if(!Graffiti.cpActive) {
-              Graffiti.cpActive = true;
-              Graffiti.cpWrapper.style.display = "block";
-              animate(Graffiti.cpWrapper, {opacity: 1, top: -250}, 200);
-            } else {
-              Graffiti.cpActive = false;
-              animate(Graffiti.cpWrapper, {opacity: 0, top: -210}, 200, function() {
-                Graffiti.cpWrapper.style.display = "none";
-              });
-            }
-          }
-        }
+        Graffiti.handleColorBtn(e);
       break;
+      case "MSPointerUp":
+      case "touchend":
       case "mouseup":
         if(Graffiti.aboveSlider.status) {
           Graffiti.aboveSlider.status = false;
@@ -315,6 +326,26 @@ var Graffiti = {
         throw new Error(e.type);
       break;
     }
+  },
+
+  handleColorBtn: function(e) {
+    var xy = Graffiti.cpbXY;
+    var mouse = Graffiti.getMouseXY(e, Graffiti.controlsCanv);
+    if(mouse.x >= xy.x-8 && mouse.x <= xy.x + 23) {
+      if(mouse.y >= xy.y-5 && mouse.y <= xy.y + 25) {
+        if(!Graffiti.cpActive) {
+          Graffiti.cpActive = true;
+          Graffiti.cpWrapper.style.display = "block";
+          animate(Graffiti.cpWrapper, {opacity: 1, top: -250}, 200);
+        } else {
+          Graffiti.cpActive = false;
+          animate(Graffiti.cpWrapper, {opacity: 0, top: -210}, 200, function() {
+            Graffiti.cpWrapper.style.display = "none";
+          });
+        }
+      }
+    }
+
   },
 
 
@@ -685,6 +716,15 @@ var Graffiti = {
       else if (e.button & 2) e.which = 3
     }
     switch(e.type) {
+      case "touchstart":
+        if(!Graffiti.drawPath) {
+          Graffiti.mouse.touched = true;
+          Graffiti.mouse.x = [mouse.x];
+          Graffiti.mouse.y = [mouse.y];
+          Graffiti.draw(Graffiti.overlayCtx);
+        }
+        break;
+      case "MSPointerDown":
       case "mousedown":
         if(e.which == 1) {
           if(!Graffiti.drawPath) {
@@ -700,7 +740,7 @@ var Graffiti = {
       break;
       case "click":
         if(e.which == 1) {
-          if(Graffiti.drawPath) {
+          if (Graffiti.drawPath) {
             Graffiti.overlayCtx.clearRect(0, 0, Graffiti.W, Graffiti.H);
             Graffiti.mouse.x.push(mouse.x);
             Graffiti.mouse.y.push(mouse.y);
@@ -708,36 +748,57 @@ var Graffiti = {
           }
         }
       break;
-      case "mousemove":
-        if(Graffiti.mouse.pressed) {
-          var _m = Graffiti.mouse;
-          if(_m.x == mouse.x && _m.y == mouse.y) {
-            return;
-          } else {
-            Graffiti.overlayCtx.clearRect(0, 0, Graffiti.W, Graffiti.H);
-          }
-          Graffiti.mouse.x.push(mouse.x);
-          Graffiti.mouse.y.push(mouse.y);
-          Graffiti.draw(Graffiti.overlayCtx);
+      case "touchmove":
+        if (Graffiti.mouse.touched) {
+          Graffiti.handleMouseMove(mouse);
         }
       break;
+      case "MSPointerMove":
+      case "mousemove":
+        if (Graffiti.mouse.pressed) {
+          Graffiti.handleMouseMove(mouse);
+        }
+      break;
+      case "touchend":
+        if (Graffiti.mouse.touched) {
+          Graffiti.handleMouseUp(mouse);
+        }
+        break;
+      case "MSPointerUp":
       case "mouseup":
         if(e.which == 1) {
-            if(Graffiti.mouse.pressed) {
-              Graffiti.mouse.pressed = false;
-              Graffiti.overlayCtx.clearRect(0, 0, Graffiti.W, Graffiti.H);
-              Graffiti.draw(Graffiti.mainCtx);
-              Graffiti.pushHistory({mouse : {x: Graffiti.mouse.x, y: Graffiti.mouse.y},
-              color: Graffiti.brush.color, size: Graffiti.brush.size * Graffiti.factor, opacity: Graffiti.brush.opacity, factor: Graffiti.factor});
-              Graffiti.mouse.x = [];
-              Graffiti.mouse.y = [];
-            }
+          if (Graffiti.mouse.pressed) {
+            Graffiti.handleMouseUp(mouse);
+          }
         }
         if(e.which == 3) {
           Graffiti.stopDrawPathLine();
         }
       break;
     }
+  },
+
+  handleMouseMove: function(mouse) {
+    var _m = Graffiti.mouse;
+    if(_m.x == mouse.x && _m.y == mouse.y) {
+      return;
+    } else {
+      Graffiti.overlayCtx.clearRect(0, 0, Graffiti.W, Graffiti.H);
+    }
+    Graffiti.mouse.x.push(mouse.x);
+    Graffiti.mouse.y.push(mouse.y);
+    Graffiti.draw(Graffiti.overlayCtx);
+  },
+
+  handleMouseUp: function(mouse) {
+    Graffiti.mouse.pressed = false;
+    Graffiti.mouse.touched = false;
+    Graffiti.overlayCtx.clearRect(0, 0, Graffiti.W, Graffiti.H);
+    Graffiti.draw(Graffiti.mainCtx);
+    Graffiti.pushHistory({mouse : {x: Graffiti.mouse.x, y: Graffiti.mouse.y},
+    color: Graffiti.brush.color, size: Graffiti.brush.size * Graffiti.factor, opacity: Graffiti.brush.opacity, factor: Graffiti.factor});
+    Graffiti.mouse.x = [];
+    Graffiti.mouse.y = [];
   },
 
   stopDrawPathLine: function() {
@@ -752,32 +813,14 @@ var Graffiti = {
 
   handleColorPickerEvents: function(e) {
     switch(e.type) {
+      case "MSPointerMove":
+      case "touchmove":
       case "mousemove":
-        var mouse = Graffiti.getMouseXY(e, Graffiti.cpCanv);
-        var cellX = Math.floor((mouse.x)/14);
-        var cellY = Math.floor((mouse.y)/14);
-        if(cellY > 11) return;
-        if(cellX > 17) return;
-        var ctx = Graffiti.cpCtx;
-        ctx.lineWidth = 1;
-        ctx.lineJoin = "miter";
-        ctx.lineCap = "butt";
-        var lc = Graffiti.cpLastCell;
-        if(lc.length > 0) {
-          ctx.strokeStyle = "rgba(0,0,0,1)";
-          ctx.beginPath();
-          ctx.strokeRect((lc[0].x * 14)+0.5, (lc[0].y * 14)+0.5, 14, 14);
-          ctx.closePath();
-          Graffiti.cpLastCell = [];
-        }
-        ctx.strokeStyle = "rgb(255,255,255)";
-        ctx.beginPath();
-        ctx.strokeRect((cellX * 14)+0.5, (cellY * 14)+0.5, 14, 14);
-        ctx.closePath();
-        Graffiti.cpLastCell.push({x : cellX, y : cellY});
-        Graffiti.cpActiveCell.cellX = cellX;
-        Graffiti.cpActiveCell.cellY = cellY;
+        Graffiti.handleColorMoveEvent(e);
       break;
+      case "MSPointerDown":
+      case "touchstart":
+        Graffiti.handleColorMoveEvent(e);
       case "click":
         var ctx = Graffiti.cpCtx;
         var ac = Graffiti.cpActiveCell;
@@ -797,6 +840,33 @@ var Graffiti = {
         throw new Error(e.type);
       break;
     }
+  },
+
+  handleColorMoveEvent: function(e) {
+    var mouse = Graffiti.getMouseXY(e, Graffiti.cpCanv);
+    var cellX = Math.floor((mouse.x)/14);
+    var cellY = Math.floor((mouse.y)/14);
+    if(cellY > 11) return;
+    if(cellX > 17) return;
+    var ctx = Graffiti.cpCtx;
+    ctx.lineWidth = 1;
+    ctx.lineJoin = "miter";
+    ctx.lineCap = "butt";
+    var lc = Graffiti.cpLastCell;
+    if(lc.length > 0) {
+      ctx.strokeStyle = "rgba(0,0,0,1)";
+      ctx.beginPath();
+      ctx.strokeRect((lc[0].x * 14)+0.5, (lc[0].y * 14)+0.5, 14, 14);
+      ctx.closePath();
+      Graffiti.cpLastCell = [];
+    }
+    ctx.strokeStyle = "rgb(255,255,255)";
+    ctx.beginPath();
+    ctx.strokeRect((cellX * 14)+0.5, (cellY * 14)+0.5, 14, 14);
+    ctx.closePath();
+    Graffiti.cpLastCell.push({x : cellX, y : cellY});
+    Graffiti.cpActiveCell.cellX = cellX;
+    Graffiti.cpActiveCell.cellY = cellY;
   },
 
   cpbXY: {}, gpXY: {},
@@ -843,7 +913,7 @@ var Graffiti = {
   blockResize: false,
   fsEnabled: false,
   fullScreen: function() {
-    if (Graffiti.mouse.pressed) return;
+    if (Graffiti.mouse.pressed || Graffiti.mouse.touched) return;
     if (Graffiti.blockResize) return;
     if (!this.fsEnabled) {
       this.fsEnabled = true;
@@ -1006,8 +1076,14 @@ var Graffiti = {
   getMouseXY: function(e, obj) {
       var cursor = {};
       var objpos = getXY(obj);
-      cursor.x = e.pageX - objpos[0];
-      cursor.y = e.pageY - objpos[1];
+      if (e.type && e.type.substr(0, 5) == 'touch') {
+        var touch = e.originalEvent.touches[0] || e.originalEvent.changedTouches[0];
+        cursor.x = touch.pageX - objpos[0];
+        cursor.y = touch.pageY - objpos[1];
+      } else {
+        cursor.x = e.pageX - objpos[0];
+        cursor.y = e.pageY - objpos[1];
+      }
       /*if (browser.opera && (obj == Graffiti.controlsCanv)) {
         cursor.y += scrollGetY();
       }*/

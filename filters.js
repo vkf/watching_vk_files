@@ -293,7 +293,7 @@ showText: function(ev) {
 },
 
 switchFont: function(btn, ev) {
-  cur.filtersFont = cur.filtersFont ? 0 : 1;
+  cur.filtersFont = parseInt(cur.filtersFont) ? 0 : 1;
   Filters.updateText(false, ev);
   ls.set('filter_font', cur.filtersFont);
   btn.className = 'pv_filter_font pv_filter_font'+cur.filtersFont;
@@ -542,10 +542,11 @@ fromStr: function(str) {
   var t = params[3];
   if (t) {
     cur.filterText = replaceEntities(t);
-    if (params[4] != undefined) {
-      cur.filtersFont = params[4];
-      ge('pv_filter_font').className = 'pv_filter_font pv_filter_font'+cur.filtersFont;
+    if (params[4] == undefined) {
+      params[4] = '1';
     }
+    cur.filtersFont = params[4];
+    ge('pv_filter_font').className = 'pv_filter_font pv_filter_font'+cur.filtersFont;
     val('pv_filter_text_ta', cur.filterText);
     ge('pv_filter_text_ta').autosize.update();
     Filters.updateText(1);

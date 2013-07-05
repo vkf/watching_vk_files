@@ -764,7 +764,7 @@ body.mobfixed #mv_layer_wrap {
 
 #mv_desc_warn {
   display: none;
-  margin-top: 14px;
+  margin-top: 5px;
   color: #777;
 }
 #mv_move_to {

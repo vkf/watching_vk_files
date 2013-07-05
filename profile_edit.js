@@ -1036,18 +1036,18 @@ var ProfileEditor = {
     } catch(e) { }
     window.socialCallback = function(data) {
       ge('export_service_3').innerHTML = '<img src="/images/upload.gif" />';
-      ProfileEditor.fetchFacebookName();
+      ProfileEditor.fetchServiceName(3);
     }
     return;
   },
 
-  fetchFacebookName: function() {
-    var nameService3 = setInterval(function() {
-      ajax.post('/al_profileEdit.php', {act: 'a_get_facebook_name'}, {
+  fetchServiceName: function(service) {
+    cur['nameService'+service] = setInterval(function() {
+      ajax.post('/al_profileEdit.php', {act: 'a_get_service_name', service: service}, {
         onDone: function(result) {
           if (result.msg) {
-            clearInterval(nameService3);
-            ge('export_service_3').innerHTML = result.msg;
+            clearInterval(cur['nameService'+service]);
+            ge('export_service_'+service).innerHTML = result.msg;
           }
         }
       });
@@ -1056,6 +1056,21 @@ var ProfileEditor = {
 
   setUpLiveJournal: function() {
     showBox('al_profileEdit.php', {act: 'lj_settings_box'});
+  },
+
+  setUpInstagram: function(redirectUrl) {
+    var clientId = '1fdcd1b154d54990892368072ab4d303';
+    var url = 'https://api.instagram.com/oauth/authorize/?client_id='+clientId+'&redirect_uri='+redirectUrl+'&response_type=code';
+    var params = 'scrollbars=0,resizable=1,menubar=0,location=0,left='+(Math.floor(screen.width / 2) - 300)+',top='+(Math.floor(screen.height / 2) - 240)+',width=600,height=400,toolbar=0,status=0';
+    var win = window.open(url, 'instagram', params);
+    try {
+      win.focus();
+    } catch(e) { }
+    window.socialCallback = function(data) {
+      ge('export_service_4').innerHTML = '<img src="/images/upload.gif" />';
+      ProfileEditor.fetchServiceName(4);
+    }
+    return;
   },
 
   getLiveJournalName: function(box) {

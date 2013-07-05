@@ -878,7 +878,7 @@ createChildClass('Selector', UiControl, {
     return true;
   },
   _selectItem: function(item, fireEvent, focusIfMultiselect) {
-    if (item === null) {
+    if (item === null || item === undefined) {
       return;
     }
     if (fireEvent === undefined) {

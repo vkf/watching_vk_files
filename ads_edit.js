@@ -498,7 +498,7 @@ AdsEdit.searchLastAds = function(initial) {
 }
 
 AdsEdit.applyLastAd = function(newAd) {
-  cur.viewEditor.setCostType(newAd[cur.lastAdsKeyMap.cost_type]);
+  cur.viewEditor.setFormatType(newAd[cur.lastAdsKeyMap.format_type]);
   cur.viewEditor.setLinkType(newAd[cur.lastAdsKeyMap.link_type]);
   if (intval(newAd[cur.lastAdsKeyMap.link_type]) == 7) {
     cur.viewEditor.setVideoData(newAd[cur.lastAdsKeyMap.link_id], newAd[cur.lastAdsKeyMap.link_owner_id], newAd[cur.lastAdsKeyMap.video_hash], newAd[cur.lastAdsKeyMap.video_preview_hash]);
@@ -508,7 +508,7 @@ AdsEdit.applyLastAd = function(newAd) {
   if (newAd[cur.lastAdsKeyMap.photo_size]) {
     cur.viewEditor.setPhotoData(newAd[cur.lastAdsKeyMap.photo_size], newAd[cur.lastAdsKeyMap.photo]);
   }
-  if (newAd[cur.lastAdsKeyMap.cost_type] == 3) {
+  if (newAd[cur.lastAdsKeyMap.format_type] == 4) {
     cur.viewEditor.setLinkId(newAd[cur.lastAdsKeyMap.link_id]);
   }
 
@@ -674,7 +674,7 @@ AdsEdit.showCropPhotoBox = function(photoData) {
   ajaxParams.photo = photoData.photo;
 
   var viewParams = cur.viewEditor.getParams();
-  ajaxParams.cost_type             = viewParams.cost_type;
+  ajaxParams.format_type           = viewParams.format_type;
   ajaxParams.title                 = viewParams.title;
   ajaxParams.description           = viewParams.description;
   ajaxParams.link_type             = viewParams.link_type;
@@ -1045,6 +1045,7 @@ function AdsEditor() {}
 AdsEditor.prototype.init = function(viewEditor, targetingEditor) {
 
   this.updateDataTimeout = null;
+  this.updateDataCounter = 0;
 
   this.lastViewData      = {};
   this.lastTargetingData = {};
@@ -1080,6 +1081,8 @@ AdsEditor.prototype.getUpdatedData = function(force, delayed) {
   }
   this.updateDataTimeout = null;
 
+  this.updateDataCounter++ || show('ads_edit_audience_progress');
+
   var lastData = {};
   lastData = extend({}, lastData, this.lastViewData);
   lastData = extend({}, lastData, this.lastTargetingData);
@@ -1093,10 +1096,12 @@ AdsEditor.prototype.getUpdatedData = function(force, delayed) {
   ajax.post('/adsedit?act=get_target_params', ajaxParams, {onDone: onDone.bind(this), onFail: onFail.bind(this)});
 
   function onDone(result) {
+    --this.updateDataCounter || hide('ads_edit_audience_progress');
     this.viewEditor.setUpdateData(lastData, result);
     this.targetingEditor.setUpdateData(lastData, result);
   }
   function onFail() {
+    --this.updateDataCounter || hide('ads_edit_audience_progress');
     var failResult = true;
     var setResult;
     setResult = this.viewEditor.setUpdateData(lastData, false);
@@ -1135,12 +1140,13 @@ AdsViewEditor.prototype.init = function(options, targetingEditor, params, params
 
   this.params = {
     ad_id:                 {value: 0},
-    cost_type:             {value: 0, allow_exclusive_ads: false},
-    link_type:             {value: 0,  data: [], data_normal: [], data_promotion_community: []},
+    format_type:           {value: 0, allow_exclusive_ads: false, allow_promotion_community: false},
+    cost_type:             {value: 0},
+    link_type:             {value: 0,  data: [], data_all: [], data_text_image: [], data_promotion_community: []},
     link_id:               {value: '', data: [], video_value: '', app_admin_links_ids: {}, app_game_links_ids: {}},
     link_owner_id:         {value: '',           video_value: ''},
     link_url:              {value: '', last_blur: true, video_value: '', video_preview_hash: ''},
-    link_url_vk:           {value: 0, link_type_value: 0, link_id_value: 0},
+    link_url_vk:           {value: 0,  link_type_value: 0, link_id_value: 0},
     link_domain:           {value: '', link_url: '', delayed_error: ''},
     link_domain_confirm:   {value: 0},
     title:                 {value: '', value_escaped: '', value_max: '', update_value_max: true},
@@ -1155,7 +1161,7 @@ AdsViewEditor.prototype.init = function(options, targetingEditor, params, params
     photo:                 {value: '', value_s: '', value_m: '', value_b: '', value_p: ''},
     photo_link:            {value: '', value_s: '', value_m: '', value_b: '', value_p: '', value_default_s: '', value_default_m: '', value_empty_m: '', value_default_b: '', value_empty_b: ''},
     video_hash:            {value: ''},
-    cost_per_click:        {value: '', value_cpc: '', value_cpm: '', value_cpm_exclusive: '', value_cpc_app: '', value_cpm_app: '', value_cpm_exclusive_app: '', recommended_cpc_short: '', recommended_cpm_short: '', recommended_cpm_exclusive_short: '', recommended_cpc_app_short: '', recommended_cpm_app_short: '', recommended_cpm_exclusive_app_short: '', recommended_cpc_long: '', recommended_cpm_long: '', recommended_cpm_exclusive_long: '', recommended_cpc_app_long: '', recommended_cpm_app_long: '', recommended_cpm_exclusive_app_long: '', edited: false, last_value: ''},
+    cost_per_click:        {value: '', edited: false, last_value: ''},
     views_places:          {value: 0, data: [], value_normal: 0, value_disabled: 0},
     views_limit_flag:      {value: 0},
     views_limit_exact:     {value: 0, data: []},
@@ -1251,14 +1257,14 @@ AdsViewEditor.prototype.initHelpParam = function(paramName) {
   var shiftTop;
 
   switch (paramName) {
-    case 'cost_type':        shiftTop = -55; break;
+    case 'format_type':      shiftTop = -55; break;
     case 'category1_id':     shiftTop = -44; break;
     case 'views_limit_flag': shiftTop = -32; break;
   }
 
   switch (paramName) {
-    case 'cost_type':
-      targetElem = ge('ads_param_cost_type_views_exclusive_wrap');
+    case 'format_type':
+      targetElem = ge('ads_param_format_type_exclusive_wrap');
       var showTooltip = function() { AdsEdit.showHelpCriterionTooltip(paramName, targetElem, handler, this.params[paramName], helpText, shiftTop, this.cur); }.bind(this);
       var hideTooltip = function() { AdsEdit.hideHelpTooltip(this.params[paramName].tt); }.bind(this);
       handler = function(event){ AdsEdit.onHelpTooltipEvent(event, paramName, context, showTooltip, hideTooltip); }.bind(this);
@@ -1305,6 +1311,45 @@ AdsViewEditor.prototype.initUiParam = function(paramName) {
   this.params[paramName].uiInited = false;
 
   switch (paramName) {
+    case 'format_type':
+      targetElem = ge(this.options.targetIdPrefix + 'format_type_text_image');
+      this.params[paramName].ui_text_image = new Radiobutton(targetElem, {
+        width:    this.options.uiWidth,
+        label:    getLang('ads_edit_ad_format_type_text_and_image'),
+        onSelect: function(value) { this.onUiSelect(paramName, value) }.bind(this)
+      });
+      this.cur.destroy.push(function(){ this.params[paramName].ui_text_image.destroy(); }.bind(this));
+
+      targetElem = ge(this.options.targetIdPrefix + 'format_type_big_image');
+      this.params[paramName].ui_big_image = new Radiobutton(targetElem, {
+        width:    this.options.uiWidth,
+        label:    getLang('ads_edit_ad_format_type_big_image'),
+        onSelect: function(value) { this.onUiSelect(paramName, value) }.bind(this)
+      });
+      this.cur.destroy.push(function(){ this.params[paramName].ui_big_image.destroy(); }.bind(this));
+
+      if (this.params[paramName].allow_exclusive_ads) {
+        targetElem = ge(this.options.targetIdPrefix + 'format_type_exclusive');
+        this.params[paramName].ui_exclusive = new Radiobutton(targetElem, {
+          width:    this.options.uiWidth,
+          label:    getLang('ads_edit_ad_format_type_exclusive'),
+          onSelect: function(value) { this.onUiSelect(paramName, value) }.bind(this)
+        });
+        this.cur.destroy.push(function(){ this.params[paramName].ui_exclusive.destroy(); }.bind(this));
+      }
+
+      if (this.params[paramName].allow_promotion_community) {
+        targetElem = ge(this.options.targetIdPrefix + 'format_type_promotion_community');
+        this.params[paramName].ui_promotion_community = new Radiobutton(targetElem, {
+          width:    this.options.uiWidth,
+          label:    getLang('ads_edit_ad_format_type_promotion_community'),
+          onSelect: function(value) { this.onUiSelect(paramName, value) }.bind(this)
+        });
+        this.cur.destroy.push(function(){ this.params[paramName].ui_promotion_community.destroy(); }.bind(this));
+      }
+
+      Radiobutton.select(this.options.targetIdPrefix + paramName, this.params[paramName].value);
+      break;
     case 'cost_type':
       targetElem = ge(this.options.targetIdPrefix + 'cost_type_clicks');
       this.params[paramName].ui_clicks = new Radiobutton(targetElem, {
@@ -1321,26 +1366,6 @@ AdsViewEditor.prototype.initUiParam = function(paramName) {
         onSelect: function(value) { this.onUiSelect(paramName, value) }.bind(this)
       });
       this.cur.destroy.push(function(){ this.params[paramName].ui_views.destroy(); }.bind(this));
-
-      if (this.params[paramName].allow_exclusive_ads) {
-        targetElem = ge(this.options.targetIdPrefix + 'cost_type_views_exclusive');
-        this.params[paramName].ui_views_exclusive = new Radiobutton(targetElem, {
-          width:    this.options.uiWidth,
-          label:    getLang('ads_edit_ad_cost_type_per_views_exclusive'),
-          onSelect: function(value) { this.onUiSelect(paramName, value) }.bind(this)
-        });
-        this.cur.destroy.push(function(){ this.params[paramName].ui_views_exclusive.destroy(); }.bind(this));
-      }
-
-      if (this.params[paramName].allow_promotion_community) {
-        targetElem = ge(this.options.targetIdPrefix + 'cost_type_clicks_promotion_community');
-        this.params[paramName].ui_views_promotion_community = new Radiobutton(targetElem, {
-          width:    this.options.uiWidth,
-          label:    getLang('ads_edit_ad_cost_type_per_click_promotion_community'),
-          onSelect: function(value) { this.onUiSelect(paramName, value) }.bind(this)
-        });
-        this.cur.destroy.push(function(){ this.params[paramName].ui_views_promotion_community.destroy(); }.bind(this));
-      }
 
       Radiobutton.select(this.options.targetIdPrefix + paramName, this.params[paramName].value);
       break;
@@ -1480,6 +1505,7 @@ AdsViewEditor.prototype.initUiParam = function(paramName) {
       targetElem.removeAttribute('autocomplete');
       this.params[paramName].ui = new Dropdown(targetElem, this.getUiParamData(paramName), {
         selectedItem: this.params[paramName].value,
+        big:          true,
         width:        this.options.uiWidth,
         onChange:     function(value) { this.onUiChange(paramName, value); }.bind(this)
       });
@@ -1595,7 +1621,7 @@ AdsViewEditor.prototype.updateUiParam = function(paramName) {
       break;
     case 'cost_per_click':
       var labelElem = geByClass1('ads_edit_label_cost_per_click', ge('ads_edit_ad_row_' + paramName));
-      if (inArray(this.params.cost_type.value, [0, 3])) {
+      if (this.params.cost_type.value == 0) {
         labelElem.innerHTML = getLang('ads_edit_ad_cost_per_click_label');
       } else {
         labelElem.innerHTML = getLang('ads_edit_ad_cost_per_views_label');
@@ -1605,9 +1631,11 @@ AdsViewEditor.prototype.updateUiParam = function(paramName) {
       var isAppAdminLink = (this.params.link_type.value == 4 && this.params.link_id.app_admin_links_ids[this.params.link_id.value]);
       var isApp = (isAppCampaign && isAppAdminLink);
 
-      var suffix1                      = ((this.params.cost_type.value == 2) ? '_cpm_exclusive' : ((this.params.cost_type.value == 1) ? '_cpm' : '_cpc'));
-      var suffix2                      = (isApp ? '_app' : '');
-      var suffixesAll                  = suffix1 + suffix2;
+      var suffixesAll = '';
+      suffixesAll    += ((this.params.cost_type.value == 0) ? '_click' : '_views');
+      suffixesAll    += ((this.params.format_type.value == 3) ? '_exclusive' : '');
+      suffixesAll    += (isApp ? '_app' : '');
+
       var costPerClickValue            = 'value' + suffixesAll;
       var costPerClickRecommendedShort = 'recommended' + suffixesAll + '_short';
       var costPerClickRecommendedLong  = 'recommended' + suffixesAll + '_long';
@@ -1628,13 +1656,25 @@ AdsViewEditor.prototype.updateUiParam = function(paramName) {
       recommendedLongElem.innerHTML  = this.params[paramName][costPerClickRecommendedLong];
       break;
     case 'views_places':
-      this.params[paramName].disabled = (this.params.campaign_type.value == 2 || this.params.campaign_type.value == 0 && this.params.campaign_id.value_app && this.params.campaign_id.value == this.params.campaign_id.value_app || this.params.cost_type.value != 0 || this.params.link_type.value == 7 || this.params.disclaimer_medical.value || this.params.disclaimer_specialist.value);
+      this.params[paramName].disabled = (this.params.campaign_type.value == 2 || this.params.campaign_type.value == 0 && this.params.campaign_id.value_app && this.params.campaign_id.value == this.params.campaign_id.value_app || this.params.format_type.value != 1 || this.params.cost_type.value != 0 || this.params.link_type.value == 7 || this.params.disclaimer_medical.value || this.params.disclaimer_specialist.value);
       this.params[paramName].value    = (this.params.views_places.disabled ? this.params.views_places.value_disabled : this.params.views_places.value_normal);
 
       this.initUiParam(paramName);
       if (this.params[paramName].uiInited) {
         this.params[paramName].ui.selectItem(this.params[paramName].value);
         this.params[paramName].ui.disable(this.params[paramName].disabled);
+      }
+      break;
+    case 'views_limit_flag':
+    case 'views_limit_exact':
+      var rowElem = ge('ads_edit_ad_row_views_limit');
+      targetElem = geByClass1('ads_edit_label_input_ui', rowElem) || geByClass1('ads_edit_label_checkbox', rowElem);
+      removeClass(targetElem, 'ads_edit_label_input_ui');
+      removeClass(targetElem, 'ads_edit_label_checkbox');
+      if (this.params.views_limit_exact.hidden) {
+        addClass(targetElem, 'ads_edit_label_checkbox');
+      } else {
+        addClass(targetElem, 'ads_edit_label_input_ui');
       }
       break;
     case 'campaign_id':
@@ -1665,6 +1705,12 @@ AdsViewEditor.prototype.updateUiParam = function(paramName) {
 
 AdsViewEditor.prototype.getUiParamData = function(paramName) {
   switch (paramName) {
+    case 'link_type':
+      switch (this.params.format_type.value) {
+        case 1:  return this.params[paramName].data_text_image;
+        case 4:  return this.params[paramName].data_promotion_community;
+        default: return this.params[paramName].data_all;
+      }
     case 'category1_id':
     case 'category2_id':
       return this.params.category1_id.data;
@@ -1735,9 +1781,9 @@ AdsViewEditor.prototype.updateUiParamEnabled = function(paramName) {
 
 AdsViewEditor.prototype.updateUiParamVisibility = function(paramName) {
   switch (paramName) {
-    case 'cost_type':
+    case 'format_type':
       var wrapElem = ge('ads_edit_ad_row_upload_photo');
-      if (this.params.cost_type.value == 3) {
+      if (this.params.format_type.value == 4) {
         hide(wrapElem);
       } else {
         show(wrapElem);
@@ -1923,7 +1969,7 @@ AdsViewEditor.prototype.updateLinkDomain = function(onCompleteNoError) {
   if (link == this.params.link_domain.link_url) {
     return true;
   }
-  if (this.params.cost_type.value == 3) {
+  if (this.params.format_type.value == 4) {
     return true;
   }
 
@@ -2045,7 +2091,7 @@ AdsViewEditor.prototype.updateLinkDomainTry = function(updateContext) {
 }
 
 AdsViewEditor.prototype.getPreviewDomain = function() {
-  if (this.params.cost_type.value == 3) {
+  if (this.params.format_type.value == 4) {
     return this.params.link_domain.value;
   }
 
@@ -2155,7 +2201,7 @@ AdsViewEditor.prototype.updatePreview = function(previewParamName) {
       break;
     case 'community_join':
       var isAppGame = (this.params.link_type.value == 4 && this.params.link_id.app_game_links_ids[this.params.link_id.value]);
-      if (this.params.cost_type.value == 3 && (this.params.link_type.value != 4 || false && isAppGame)) {
+      if (this.params.format_type.value == 4 && this.params.link_type.value != 0 && (this.params.link_type.value != 4 || false && isAppGame)) {
         switch (this.params.link_type.value) {
            case 1:  this.preview[previewParamName].innerHTML = getLang('global_group_join'); break;
            case 2:  this.preview[previewParamName].innerHTML = getLang('global_event_join'); break;
@@ -2199,7 +2245,7 @@ AdsViewEditor.prototype.updatePreview = function(previewParamName) {
         var specialValue = ((this.params.link_type.value == 7) ? 'value_empty_' : 'value_default_') + photoSize;
         this.preview[previewParamName].src = this.params.photo_link[specialValue];
       }
-      if (this.params.cost_type.value == 3) {
+      if (this.params.format_type.value == 4) {
         addClass(this.preview.photo_box, 'promotion');
       } else {
         removeClass(this.preview.photo_box, 'promotion');
@@ -2212,7 +2258,7 @@ AdsViewEditor.prototype.updatePreview = function(previewParamName) {
         } else {
           addClass(this.preview[previewParamName], 'empty');
         }
-        if (this.params.cost_type.value == 2) {
+        if (this.params.format_type.value == 3) {
           addClass(this.preview[previewParamName], 'big');
         } else {
           removeClass(this.preview[previewParamName], 'big');
@@ -2292,41 +2338,52 @@ AdsViewEditor.prototype.onParamUpdate = function(paramName, paramValue, forceDat
     //debugLog(paramName + ' updated: ' + paramValueOld + ' => ' + this.params[paramName].value);
 
     switch (paramName) {
-      case 'cost_type':
+      case 'format_type':
         var photoSize = this.getPhotoSize();
         this.params.description.hidden       = (photoSize !== 's');
-        this.params.link_domain.hidden       = (!inArray(this.params.link_type.value, [5, 7]) || this.params[paramName].value == 3);
-        this.params.stats_url.hidden         = (this.params[paramName].value != 2 || !this.params.stats_url.allow);
-        this.params.views_limit_flag.hidden  = (this.params[paramName].value == 0 || this.params[paramName].value == 2 && this.params.views_limit_exact.allow);
-        this.params.views_limit_exact.hidden = (this.params[paramName].value != 2 || !this.params.views_limit_exact.allow);
+        this.params.link_domain.hidden       = (!inArray(this.params.link_type.value, [5, 7]) || this.params[paramName].value == 4);
+        this.params.stats_url.hidden         = (this.params[paramName].value != 3 || !this.params.stats_url.allow);
+        this.params.views_limit_flag.hidden  = (this.params.cost_type.value != 1 || this.params.format_type.value == 3 && this.params.views_limit_exact.allow);
+        this.params.views_limit_exact.hidden = (this.params.cost_type.value != 1 || this.params.format_type.value != 3 || !this.params.views_limit_exact.allow);
 
         this.params.photo.value_p            = '';
         this.params.photo_link.value_p       = '';
-        this.params.title.disabled           = (this.params[paramName].value == 3);
-        if (this.params.cost_type.value == 3) {
+        this.params.title.disabled           = (this.params[paramName].value == 4);
+        if (this.params.format_type.value == 4) {
           this.setTitle('');
         }
 
-        if (this.params[paramName].value == 3 || paramValueOld == 3) {
-          var vkLinkType = ((this.params.link_type.value == 5 && this.params.link_url_vk.link_type_value) ? this.params.link_url_vk.link_type_value : this.params.link_type.value);
+        var isChangedTextImage          = (this.params[paramName].value == 1 || paramValueOld == 1);
+        var isChangedPromotionCommunity = (this.params[paramName].value == 4 || paramValueOld == 4);
+
+        if (isChangedTextImage || isChangedPromotionCommunity) {
+          this.updateUiParamData('link_type');
+        }
+
+        if (isChangedPromotionCommunity) {
           this.params.link_domain.value         = '';
           this.params.link_domain.link_url      = '';
           this.params.link_domain.delayed_error = '';
           this.params.link_domain.disabled      = true;
-          this.params.link_type.data            = ((this.params[paramName].value == 3) ? this.params.link_type.data_promotion_community : this.params.link_type.data_normal);
-          this.updateUiParamData('link_type');
+        }
+
+        if (isChangedPromotionCommunity) {
+          var vkLinkType = ((this.params.link_type.value == 5 && this.params.link_url_vk.link_type_value) ? this.params.link_url_vk.link_type_value : this.params.link_type.value);
           if (inArray(vkLinkType, [1, 2, 6, 4])) {
             this.updateNeeded.need_promotion_community = true;
           } else {
             this.setLinkType(0);
           }
+        } else if (isChangedTextImage && this.params.link_type.value == 7) {
+          this.setLinkType(0);
         }
 
         this.updateUiParam('title');
         this.updateUiParam('link_domain');
         this.updateUiParam('cost_per_click');
         this.updateUiParam('views_places');
-        this.updateUiParamVisibility('cost_type');
+        this.updateUiParam('views_limit_flag');
+        this.updateUiParamVisibility('format_type');
         this.updateUiParamVisibility('description');
         this.updateUiParamVisibility('link_domain');
         this.updateUiParamVisibility('stats_url');
@@ -2339,6 +2396,18 @@ AdsViewEditor.prototype.onParamUpdate = function(paramName, paramValue, forceDat
 
         isUpdateNeeded = true;
         break;
+      case 'cost_type':
+        this.params.views_limit_flag.hidden  = (this.params.cost_type.value != 1 || this.params.format_type.value == 3 && this.params.views_limit_exact.allow);
+        this.params.views_limit_exact.hidden = (this.params.cost_type.value != 1 || this.params.format_type.value != 3 || !this.params.views_limit_exact.allow);
+
+        this.updateUiParam('cost_per_click');
+        this.updateUiParam('views_places');
+        this.updateUiParam('views_limit_flag');
+        this.updateUiParamVisibility('views_limit_flag');
+        this.updateUiParamVisibility('views_limit_exact');
+
+        isUpdateNeeded = true;
+        break;
       case 'link_type':
         var link_id_value_old = this.params.link_id.value
 
@@ -2347,7 +2416,7 @@ AdsViewEditor.prototype.onParamUpdate = function(paramName, paramValue, forceDat
         this.params.link_id.data = [];
         this.params.link_id.hidden     = !inArray(this.params[paramName].value, [1, 2, 3, 4, 6]);
         this.params.link_url.hidden    = !inArray(this.params[paramName].value, [5, 7]);
-        this.params.link_domain.hidden = (!inArray(this.params[paramName].value, [5, 7]) || this.params.cost_type.value == 3);
+        this.params.link_domain.hidden = (!inArray(this.params[paramName].value, [5, 7]) || this.params.format_type.value == 4);
         if (this.params[paramName].value == 7) {
           this.params.link_id.value       = this.params.link_id.video_value;
           this.params.link_owner_id.value = this.params.link_owner_id.video_value;
@@ -2355,7 +2424,7 @@ AdsViewEditor.prototype.onParamUpdate = function(paramName, paramValue, forceDat
 
         this.params.photo.value_p      = '';
         this.params.photo_link.value_p = '';
-        if (this.params.cost_type.value == 3) {
+        if (this.params.format_type.value == 4) {
           this.params.link_domain.value         = '';
           this.params.link_domain.link_url      = '';
           this.params.link_domain.delayed_error = '';
@@ -2403,7 +2472,7 @@ AdsViewEditor.prototype.onParamUpdate = function(paramName, paramValue, forceDat
       case 'link_id':
         this.params.photo.value_p      = '';
         this.params.photo_link.value_p = '';
-        if (this.params.cost_type.value == 3) {
+        if (this.params.format_type.value == 4) {
           this.params.link_domain.value         = '';
           this.params.link_domain.link_url      = '';
           this.params.link_domain.delayed_error = '';
@@ -2461,10 +2530,10 @@ AdsViewEditor.prototype.onParamUpdate = function(paramName, paramValue, forceDat
         remainElem.innerHTML = remainLength;
         this.params[paramName].edited = true;
         if (paramName == 'title') {
-          if (this.params[paramName].update_value_max || this.params.cost_type.value != 3) {
+          if (this.params[paramName].update_value_max || this.params.format_type.value != 4) {
             this.params[paramName].value_max = this.params[paramName].value;
           }
-          this.params[paramName].reduce_hidden = !(this.params.cost_type.value == 3 && this.params[paramName].value_max.match(/\S\s+\S/));
+          this.params[paramName].reduce_hidden = !(this.params.format_type.value == 4 && this.params[paramName].value_max.match(/\S\s+\S/));
           this.updateUiParamVisibility(paramName);
         }
         this.updatePreview(paramName);
@@ -2498,83 +2567,48 @@ AdsViewEditor.prototype.onParamUpdate = function(paramName, paramValue, forceDat
         var isAppAdminLink = (this.params.link_type.value == 4 && this.params.link_id.app_admin_links_ids[this.params.link_id.value]);
         var isApp = (isAppCampaign && isAppAdminLink);
 
-        var suffix1           = ((this.params.cost_type.value == 2) ? '_cpm_exclusive' : ((this.params.cost_type.value == 0) ? '_cpc' : '_cpm'));
-        var suffix2           = (isApp ? '_app' : '');
-        var suffixesAll       = suffix1 + suffix2;
+        var suffixesAll = '';
+        suffixesAll    += ((this.params.cost_type.value == 0) ? '_click' : '_views');
+        suffixesAll    += ((this.params.format_type.value == 3) ? '_exclusive' : '');
+        suffixesAll    += (isApp ? '_app' : '');
+
         var costPerClickValue = 'value' + suffixesAll;
 
-        var values = {
-          value_cpc:               null,
-          value_cpm:               null,
-          value_cpm_exclusive:     null,
-          value_cpc_app:           null,
-          value_cpm_app:           null,
-          value_cpm_exclusive_app: null
+        var suffixes = {
+          '_click':               ['_views',               1 / cur.unionsLimits.cost_per_views_coeff],
+          '_click_exclusive':     ['_click',               3],
+          '_click_app':           ['_click_exclusive',     1 / 3 / 2],
+          '_click_exclusive_app': ['_click_app',           3],
+          '_views_exclusive_app': ['_click_exclusive_app', cur.unionsLimits.cost_per_views_coeff],
+          '_views_app':           ['_views_exclusive_app', 1 / 3],
+          '_views_exclusive':     ['_views_app',           3 * 2],
+          '_views':               ['_views_exclusive',     1 / 3]
         };
 
-        values[costPerClickValue] = this.params.cost_per_click.value;
+        var values = {};
+
+        values[costPerClickValue] = Number(this.params.cost_per_click.value);
 
         do {
           var valuesCountComplete = 0;
           var valuesCountTotal = 0;
 
-          for (var valueName in values) {
-            if (values[valueName] === null) {
-              switch (valueName) {
-                case 'value_cpc':
-                  if (values.value_cpm !== null) {
-                    values[valueName] = values.value_cpm / cur.unionsLimits.cost_per_views_coeff;
-                  } else if (values.value_cpc_app !== null) {
-                    values[valueName] = values.value_cpc_app * 2;
-                  }
-                  break;
-                case 'value_cpm':
-                  if (values.value_cpm_exclusive !== null) {
-                    values[valueName] = values.value_cpm_exclusive / 3;
-                  } else if (values.value_cpm_app !== null) {
-                    values[valueName] = values.value_cpm_app * 2;
-                  }
-                  break;
-                case 'value_cpm_exclusive':
-                  if (values.value_cpc !== null) {
-                    values[valueName] = values.value_cpc * cur.unionsLimits.cost_per_views_coeff * 3;
-                  } else if (values.value_cpm_exclusive_app !== null) {
-                    values[valueName] = values.value_cpm_exclusive_app * 2;
-                  }
-                  break;
-                case 'value_cpc_app':
-                  if (values.value_cpm_app !== null) {
-                    values[valueName] = values.value_cpm_app / cur.unionsLimits.cost_per_views_coeff;
-                  } else if (values.value_cpc !== null) {
-                    values[valueName] = values.value_cpc / 2;
-                  }
-                  break;
-                case 'value_cpm_app':
-                  if (values.value_cpm_exclusive_app !== null) {
-                    values[valueName] = values.value_cpm_exclusive_app / 3;
-                  } else if (values.value_cpm !== null) {
-                    values[valueName] = values.value_cpm / 2;
-                  }
-                  break;
-                case 'value_cpm_exclusive_app':
-                  if (values.value_cpc_app !== null) {
-                    values[valueName] = values.value_cpc_app * cur.unionsLimits.cost_per_views_coeff * 3;
-                  } else if (values.value_cpm_exclusive !== null) {
-                    values[valueName] = values.value_cpm_exclusive / 2;
-                  }
-                  break;
-              }
-              if (values[valueName] !== null) {
-                values[valueName] = (new Number(values[valueName])).toFixed(2).replace('.00', '');
-              }
+          for (var suffixTo in suffixes) {
+            var suffixInfo    = suffixes[suffixTo];
+            var suffixFrom    = suffixInfo[0];
+            var valueNameTo   = 'value' + suffixTo;
+            var valueNameFrom = 'value' + suffixFrom;
+            if (!(valueNameTo in values) && (valueNameFrom in values)) {
+              values[valueNameTo] = values[valueNameFrom] * suffixInfo[1];
             }
-            valuesCountComplete += (values[valueName] !== null);
+
+            valuesCountComplete += (valueNameTo in values);
             valuesCountTotal++;
           }
         } while (valuesCountComplete != valuesCountTotal);
 
         for (var valueName in values) {
-          this.params.cost_per_click[valueName] = values[valueName];
+          this.params.cost_per_click[valueName] = Number(values[valueName]).toFixed(2).replace('.00', '');
         }
 
         this.updateUiParam('cost_per_click');
@@ -2789,14 +2823,11 @@ AdsViewEditor.prototype.getParams = function() {
 }
 
 AdsViewEditor.prototype.getPhotoSize = function() {
-  if (this.params.cost_type.value == 3) {
-    return 'p';
-  } else if (this.params.cost_type.value == 2) {
-    return 'b';
-  } else if (this.params.cost_type.value == 0 && this.params.link_type.value != 7) {
-    return 's';
-  } else {
-    return 'm';
+  switch (this.params.format_type.value) {
+    case 1: return 's';
+    case 2: return 'm';
+    case 3: return 'b';
+    case 4: return 'p';
   }
 }
 
@@ -2835,9 +2866,9 @@ AdsViewEditor.prototype.updatePhotoLink = function() {
   var vkLinkType = ((this.params.link_type.value == 5 && this.params.link_url_vk.link_type_value) ? this.params.link_url_vk.link_type_value : this.params.link_type.value);
 
   var ajaxParams = {};
-  ajaxParams.photo     = this.params.photo[valueBySize];
-  ajaxParams.cost_type = this.params.cost_type.value;
-  ajaxParams.link_type = vkLinkType;
+  ajaxParams.photo       = this.params.photo[valueBySize];
+  ajaxParams.format_type = this.params.format_type.value;
+  ajaxParams.link_type   = vkLinkType;
 
   ajax.post('/adsedit?act=get_photo_link', ajaxParams, {onDone: onDone.bind(this), onFail: onFail.bind(this)})
 
@@ -2864,6 +2895,11 @@ AdsViewEditor.prototype.setVideoData = function(linkId, linkOwnerId, videoHash, 
   }
   this.updatePreview('link');
   this.updatePreview('play');
+}
+
+AdsViewEditor.prototype.setFormatType = function(formatType) {
+  this.onParamUpdate('format_type', formatType, false, true);
+  Radiobutton.select(this.options.targetIdPrefix + 'format_type', this.params.format_type.value);
 }
 
 AdsViewEditor.prototype.setCostType = function(costType) {
@@ -2971,7 +3007,7 @@ AdsViewEditor.prototype.setUpdateData = function(data, result) {
 
   if (isObject(result) && 'promotion_photo' in result) {
     var vkLinkType = ((this.params.link_type.value == 5 && this.params.link_url_vk.link_type_value) ? this.params.link_url_vk.link_type_value : this.params.link_type.value);
-    if (this.params.cost_type.value == 3 && data.link_type == this.params.link_type.value && data.link_id == this.params.link_id.value && data.link_url == this.params.link_url.value && inArray(vkLinkType, [1, 2, 6, 4])) {
+    if (this.params.format_type.value == 4 && data.link_type == this.params.link_type.value && data.link_id == this.params.link_id.value && data.link_url == this.params.link_url.value && inArray(vkLinkType, [1, 2, 6, 4])) {
       this.setPhotoData('p', result['promotion_photo']);
       this.setTitle(AdsEdit.unescapeValueInit(result['promotion_title']));
       this.params.link_domain.value    = result['promotion_link_domain'];

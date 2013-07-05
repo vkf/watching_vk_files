@@ -1340,9 +1340,10 @@ Ads.createInlineEdit = function(editElem, progressElem, unionType, unionId, valu
         value = value.replace(',', '.');
 
         var valueFloat      = parseFloat(value);
-        var suffix1         = (additionalParams.is_exclusive_ad ? '_views_exclusive' : (additionalParams.is_cost_per_click ? '_click' : '_views'));
-        var suffix2         = (additionalParams.is_app_admin ? '_app' : '');
-        var suffixesAll     = suffix1 + suffix2;
+        var suffixesAll     = '';
+        suffixesAll        += (additionalParams.is_cost_per_click ? '_click' : '_views');
+        suffixesAll        += (additionalParams.is_exclusive_ad ? '_exclusive' : '');
+        suffixesAll        += (additionalParams.is_app_admin ? '_app' : '');
         var minValue        = cur.unionsLimits['cost_per' + suffixesAll + '_min'];
         var maxValue        = cur.unionsLimits['cost_per' + suffixesAll + '_max'];
         var minErrorLangKey = (additionalParams.is_cost_per_click ? 'ads_error_cost_per_click_min_value' : 'ads_error_cost_per_views_min_value');

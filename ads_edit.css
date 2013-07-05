@@ -24,7 +24,7 @@
   width: 540px;
 }
 .ads_edit_panel_preview {
-  padding-right: 60px;
+  padding-right: 50px;
 }
 .ads_edit_table {
   border: 0px;
@@ -114,6 +114,9 @@
 }
 
 .ads_edit_value_cost_type_wrap {
+  height: 54px;
+}
+.ads_edit_value_format_type_wrap {
   min-height: 54px;
 }
 
@@ -151,7 +154,7 @@
 /* Edit ad - common */
 /* ---------------- */
 
-#ads_edit_ad_row_main_header td {
+.ads_edit_ad_row_header_radiobutton td {
   padding-bottom: 4px;
 }
 #ads_edit_ad_row_targeting_header td,
@@ -219,6 +222,17 @@
   padding-top: 15px;
 }
 
+#ads_edit_audience_title,
+#ads_edit_audience_title_text {
+  position: relative;
+}
+#ads_edit_audience_progress {
+  display: none;
+  position: absolute;
+  top: 4px;
+  right: 0;
+}
+
 /* -------------- */
 /* Edit ad - view */
 /* -------------- */
@@ -240,8 +254,11 @@
   resize: none;
 }
 
+#ads_param_link_domain_progress_wrap {
+  width: 1px;
+}
 #ads_param_link_domain_progress {
-  padding: 6px 0 0 5px;
+  padding: 11px 0 0 5px;
 }
 
 #ads_edit_ad_row_additional .ads_edit_value_checkbox_wrap {
@@ -273,10 +290,6 @@
   color: #777777;
   font-size: 0.9em;
   padding-top: 8px;
-}
-
-#ads_param_views_limit_flag_wrap {
-  padding-top: 2px;
 }
 
 .ads_edit_value_campaign_type_wrap {

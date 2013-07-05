@@ -72,6 +72,13 @@ div.gedit_public_labeled {
   line-height: 140%;
   margin: 10px 0 0;
 }
+
+.group_to_public_comment {
+  padding: 10px 10px 12px;
+  line-height: 120%;
+  margin: 0 0 8px;
+}
+
 .group_rss_label {
   width: 100px;
 }

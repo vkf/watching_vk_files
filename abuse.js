@@ -140,6 +140,15 @@ Abuse = {
     }
     return false;
   },
+  toKorneev: function (oid, hash) {
+    ajax.post('abuse.php', {act: 'a_to_korneev', oid: oid, hash: hash}, {
+      onDone: function (text) {
+        val('ab_abuserow_solveform' + oid, text);
+      }
+    });
+    val('ab_abuserow_solveform' + oid, '<div class="progress ab_admin_solve_progress"></div>');
+    return false;
+  },
   reasonsBox: function (oid, type, solved) {
     return showBox('abuse.php', {act: 'a_reasons_box', oid: oid, type: type || 0, solved: solved || 0}, {
       params: {bodyStyle: 'height: 300px; padding: 0;'}

@@ -975,6 +975,30 @@ var GroupsList = {
     })) { return; }
 
     showTabbedBox('places.php', {act: 'a_get_place_box', id: place}, {stat: ['places.css', 'map.css', 'maps.js', 'ui_controls.css', 'ui_controls.js']});
+  },
+
+  feedbanGroup: function(el, gid, hash) {
+    var oid = -gid;
+    ajax.post('al_fans.php', {act: 'feedtgl', oid: oid, hash: hash}, {
+      onDone: function(val, str) {
+        el.innerHTML = str;
+        if (!cur.scrollList.lists || !cur.scrollList.lists.groups) {
+          return;
+        }
+        var lst = cur.scrollList.lists.groups;
+        if (lst && lst.length) {
+          for (var i = 0, l = lst.length; i < l; ++i) {
+            if (lst[i][2] == gid) {
+              cur.scrollList.lists.groups[i][12] = val;
+              break;
+            }
+          }
+        }
+      },
+      showProgress: function() {
+        el.innerHTML = '<span class="progress_inline"></span>';
+      }
+    });
   }
 }
 

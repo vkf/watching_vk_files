@@ -183,6 +183,7 @@ var FansBox = {
   },
   genIdolRow: function(row, name) {
     var oid = row[0], evs = row[6] ? ' onmouseover="FansBox.bigphOver(this, ' + oid + ')"' : '', href = '/' + (row[4] ? row[4] : (oid > 0 ? 'id' + oid : 'public' + (-oid))), photo = row[3], size = getLang('public_N_followers', row[5], true), non = ' style="display: none"', status = row[7].length ? row[7] : getLang(oid > 0 ? 'profile_own_profile' : 'groups_type_public'), btns = vk.id && vk.id != oid;
+    var feed_act = row[8] ? '<a onclick="FansBox.feedToggle(this, ' + oid + ')">'+getLang('public_feedunblock')+'</a>' : '';
     return ['\
 <div class="fans_idol_row inl_bl">\
   <div class="fans_idolph_wrap fl_l"', evs, '>\
@@ -196,6 +197,7 @@ var FansBox = {
     <div id="fans_idol_sub', oid, '" class="button_blue fans_idol_sub"', ((row[1] || !btns) ? non : ''), '>\
       <button onclick="FansBox.subscribe(this, ', oid, ')">', getLang('public_subscribe'), '</button>\
     </div>\
+    <div id="fans_idol_feedact', oid, '" class="fans_idol_space"', (row[1] && btns ? '' : non), '>', feed_act,'</div>\
     <div id="fans_idol_unsub', oid, '" class="fans_idol_unsub"', (row[1] && btns ? '' : non), '>\
       <a onclick="FansBox.unsubscribe(this, ', oid, ')">', getLang('public_unsubscribe'), '</a>\
     </div>\
@@ -254,11 +256,13 @@ var FansBox = {
       }
     }
   },
+
   subscribe: function(el, oid) {
     ajax.post('al_feed.php', {act: 'subscr', oid: oid, hash: cur.fnbxHash}, {
       onDone: function() {
         hide('fans_idol_sub' + oid);
         show('fans_idol_unsub' + oid);
+        show('fans_idol_feedact' + oid);
         if (cur.fnbxOwnerId == vk.id) {
           FansBox.recache(1);
         }
@@ -286,6 +290,7 @@ var FansBox = {
       onDone: function() {
         show('fans_idol_sub' + oid);
         hide('fans_idol_unsub' + oid);
+        hide('fans_idol_feedact' + oid);
         if (cur.fnbxOwnerId == vk.id) {
           FansBox.recache(-1);
         }
@@ -298,6 +303,28 @@ var FansBox = {
       hideProgress: function() {
         show(el);
         re(domNS(el));
+      }
+    })
+  },
+  feedToggle: function(el, oid) {
+    ajax.post(cur.fnbxPage, {act: 'feedtgl', oid: oid, hash: cur.fnbxHash, from: 'box'}, {
+      onDone: function(val, str) {
+        el.innerHTML = str;
+        if (cur.fnbxOwnerId == vk.id) {
+          FansBox.recache(-1);
+        }
+        var lst = cur.fnbxIdolsList[cur.fnbxOwnerId];
+        if (lst && lst.length) {
+          for (var i = 0, l = lst.length; i < l; ++i) {
+            if (lst[i][0] == oid) {
+              cur.fnbxIdolsList[cur.fnbxOwnerId][i][0] = val;
+              break;
+            }
+          }
+        }
+      },
+      showProgress: function() {
+        el.innerHTML = '<span class="progress_inline"></span>';
       }
     })
   },

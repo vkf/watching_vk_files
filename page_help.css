@@ -97,18 +97,23 @@ div.tb_prg {
 /*  min-height: 34px;*/
 }
 .fans_idol_size {
-  padding-top: 5px;
+  padding-top: 4px;
   color: #777;
 }
 .fans_idol_plhl {
 /*  color: #777;*/
 }
 .fans_idol_sub {
-  margin-top: 10px;
+  margin-top: 12px;
 }
 .fans_idol_unsub {
   color: #777;
-  margin-top: 14px;
+  margin-top: 0px;
+}
+.fans_idol_space {
+  padding-top: 0px;
+  height: 14px;
+  padding-bottom: 2px;
 }
 .fans_more_link {
   display: block;

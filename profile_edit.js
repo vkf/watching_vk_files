@@ -1067,7 +1067,7 @@ var ProfileEditor = {
       win.focus();
     } catch(e) { }
     window.socialCallback = function(data) {
-      ge('export_service_4').innerHTML = '<img src="/images/upload.gif" />';
+      ge('export_service_4').innerHTML = '<div class="progress_inline"></div>';
       ProfileEditor.fetchServiceName(4);
     }
     return;
@@ -1107,6 +1107,7 @@ var ProfileEditor = {
       case 1: title = 'settings_status_export'; msg = 'settings_status_confirm'; break;
       case 2: title = 'settings_notes_export'; msg = 'settings_livejournal_confirm'; break;
       case 3: title = 'settings_status_export'; msg = 'settings_facebook_confirm'; break;
+      case 4: title = 'settings_status_import_photo'; msg = 'settings_instagram_confirm'; break;
     }
     var msg = '<center>'+getLang(msg)+'</center>';
     var clrBox = showFastBox(getLang(title), msg, getLang('global_continue'), function() {

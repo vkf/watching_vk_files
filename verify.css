@@ -9,17 +9,23 @@
 }
 #verify_search {
   margin: 0;
-  padding: 5px 4px 4px 20px;
-  width: 402px;
+  padding: 7px 8px 7px 20px;
+  width: 399px;
   height: 14px;
   line-height: 1.27em;
-  background: #FFF url(/images/magglass.png) no-repeat 5px 6px;
+  background: #FFF url(/images/magglass.png) no-repeat 5px 8px;
+  margin-right: 8px;
 }
 #verify_submit {
-  padding-left: 8px;
-  padding-right: 8px;
+  padding: 6px 8px 7px 8px;
   width: 168px;
   text-align: center;
+}
+.verify_audio_top #verify_search {
+  width: 271px;
+}
+.verify_genre_cont {
+  margin-right: 8px;
 }
 #verify_list_wrap {
   padding: 0 10px;

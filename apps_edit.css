@@ -69,11 +69,11 @@ td.apps_edit_wide {
 .apps_edit_table .label {
   color: #666666;
   width: 165px;
-  padding-top: 8px;
+  padding-top: 9px;
 }
 
 .apps_edit_table .apps_edit_t {
-  padding-top: 8px;
+  padding-top: 9px;
 }
 .apps_edit_table .apps_edit_i {
   padding: 8px 26px 0px 26px;
@@ -91,12 +91,13 @@ td.apps_edit_wide {
 
 
 .apps_edit_table .text {
-  width: 250px;
+  width: 238px;
 }
 .apps_edit_table textarea {
   height: 60px;
   float: left;
   margin-right: 6px;
+  padding: 7px 9px 8px;
 }
 
 .app_edit_admins {
@@ -784,7 +785,7 @@ td.apps_edit_info_narrow {
 td.apps_edit_label {
   color: #666;
   width: 165px;
-  padding-top: 8px;
+  padding-top: 9px;
 }
 #apps_edit_upload_small {
   padding: 10px 0px;
@@ -1422,7 +1423,7 @@ input.apps_edit_func_name {
   border-color: #C0CAD5;
 }
 input.apps_edit_input {
-  padding: 5px 3px 6px;
+  padding: 7px 9px 8px;
   margin-top: -2px;
 }
 .apps_edit_dd {

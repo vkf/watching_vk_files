@@ -243,10 +243,10 @@
 }
 
 .pedit_box_row .pedit_label {
-  width: 100px;
+  width: 125px;
 }
 .pedit_box_row .pedit_labeled {
-  padding: 5px 0px;
+  padding: 4px 0px;
 }
 .pedit_row .pedit_labeled_l {
   padding: 4px 0px;
@@ -424,4 +424,16 @@
 }
 .pedit_twitter_msg {
   min-height: 42px;
+}
+.pedit_label_sel {
+  padding-top: 10px;
+}
+.pedit_box_row .pedit_labeled_radio {
+  padding: 2px 0px 7px;
+}
+.pedit_box_radio {
+  padding: 6px 0px;
+}
+.pedit_label_radio {
+  padding-top: 6px;
 }

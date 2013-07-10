@@ -1021,7 +1021,7 @@ var ProfileEditor = {
   },
 
   setUpTwitter: function() {
-    showBox('al_profileEdit.php', {act: 'twitter_settings_box'});
+    showBox('al_profileEdit.php', {act: 'twitter_settings_box'}, {dark: 1, params: {width: 460}});
   },
 
   setUpFacebook: function(app_id, redir, authorized) {
@@ -1047,7 +1047,12 @@ var ProfileEditor = {
         onDone: function(result) {
           if (result.msg) {
             clearInterval(cur['nameService'+service]);
-            ge('export_service_'+service).innerHTML = result.msg;
+            ge('export_service_'+service).innerHTML = (result.msg_sett) ? result.msg_sett : result.msg;
+            var boxStr = ge('export_box_service_'+service);
+            if (boxStr) {
+              boxStr.innerHTML = result.msg;
+              cur.showIntegrationSaveBtns();
+            }
           }
         }
       });
@@ -1067,8 +1072,9 @@ var ProfileEditor = {
       win.focus();
     } catch(e) { }
     window.socialCallback = function(data) {
-      ge('export_service_4').innerHTML = '<div class="progress_inline"></div>';
-      ProfileEditor.fetchServiceName(4);
+      showBox('al_profileEdit.php', {act: 'instagram_settings_box'}, {dark: true, params: {width: 460}});
+      //ge('export_service_4').innerHTML = '<div class="progress_inline"></div>';
+      //ProfileEditor.fetchServiceName(4);
     }
     return;
   },
@@ -1116,6 +1122,10 @@ var ProfileEditor = {
         clrBox.hide();
         ge('export_service_'+service).innerHTML = result.msg;
         setTimeout(scrollToTop, 300);
+        var settBox = curBox();
+        if (settBox) {
+          settBox.hide();
+        }
       }});
       clrBox.showProgress();
     }, getLang('global_cancel'));

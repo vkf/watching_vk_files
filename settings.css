@@ -707,8 +707,11 @@ table.history .cur_session {
 .settings_history_thumb_terminal {
   background-position: 1px -101px !important;
 }
-.settings_history_thumb_offers {
+.settings_history_thumb_gifts {
   background-position: 1px -135px !important;
+}
+.settings_history_thumb_offers {
+  background-position: 1px -167px !important;
 }
 .settings_history_title {
   width: 300px;

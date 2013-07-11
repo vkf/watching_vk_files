@@ -416,6 +416,10 @@ img.im_log_author_chat_thumb {
   width: 290px;
   padding-top: 0;
 }
+.im_log_body div.im_fwd_log_wrapped .im_msg_media_doc .post_media {
+  width: auto;
+  padding-top: 8px;
+}
 .im_log_body div.im_fwd_log_wrapped .media_desc {
   padding-top: 3px;
 }

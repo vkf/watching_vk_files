@@ -6083,6 +6083,7 @@ var IM = {
     if (cont.tagName == 'TEXTAREA') return val(cont);
     var el = cont.firstChild;
     var v = '';
+    var contTag = new RegExp('^(DIV|P|LI|OL|TR|TD)$');
     while (el) {
       switch (el.nodeType) {
         case 3:
@@ -6091,7 +6092,7 @@ var IM = {
           break;
         case 1:
           var str = IM.editableVal(el);
-          if ((el.tagName == 'DIV' || el.tagName == 'P') && str) {
+          if (el.tagName.match(contTag) && str) {
             if (str.substr(-1) != '\n') {
               str += '\n';
             }
@@ -6100,7 +6101,7 @@ var IM = {
             while(prev && prev.nodeType == 3 && trim(prev.nodeValue) == '') {
               prev = prev.previousSibling;
             }
-            if (prev && prev.tagName != 'DIV' && prev.tagName != 'P' && prev.tagName != 'BR') {
+            if (prev && !prev.tagName.match(contTag)) {
               str = '\n' + str;
             }
 

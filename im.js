@@ -6083,7 +6083,7 @@ var IM = {
     if (cont.tagName == 'TEXTAREA') return val(cont);
     var el = cont.firstChild;
     var v = '';
-    var contTag = new RegExp('^(DIV|P|LI|OL|TR|TD)$');
+    var contTag = new RegExp('^(DIV|P|LI|OL|TR|TD|BLOCKQUOTE)$');
     while (el) {
       switch (el.nodeType) {
         case 3:
@@ -6092,7 +6092,7 @@ var IM = {
           break;
         case 1:
           var str = IM.editableVal(el);
-          if (el.tagName.match(contTag) && str) {
+          if (el.tagName && el.tagName.match(contTag) && str) {
             if (str.substr(-1) != '\n') {
               str += '\n';
             }
@@ -6101,7 +6101,7 @@ var IM = {
             while(prev && prev.nodeType == 3 && trim(prev.nodeValue) == '') {
               prev = prev.previousSibling;
             }
-            if (prev && !prev.tagName.match(contTag)) {
+            if (prev && !(prev.tagName && prev.tagName.match(contTag))) {
               str = '\n' + str;
             }
 

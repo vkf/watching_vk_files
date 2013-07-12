@@ -5299,6 +5299,8 @@ function initAddMedia(lnk, previewId, mediaTypes, opts) {
       }
       if (result) {
         addMedia.chooseMedia(data[0], data[1], data[2], url, true);
+      } else if (opts.onCheckURLDone) {
+        opts.onCheckURLDone(result, data);
       }
     },
     checkURL: function(url) {

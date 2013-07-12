@@ -690,6 +690,7 @@ var IM = {
   onUploadDone: function () {
     unlockButton(ge('im_send'));
     if (cur.sendOnUploadDone) {
+      delete cur.sendOnUploadDone;
       IM.send();
     }
   },
@@ -2515,7 +2516,7 @@ var IM = {
 
     cur.imPeerMedias = {};
     cur.imSortedMedias = {};
-    cur.imMedia = initAddMedia('im_add_media_link', 'im_media_preview', [['photo', getLang('profile_wall_photo')], ['video', getLang('profile_wall_video')], ['audio', getLang('profile_wall_audio')], ['doc', getLang('profile_wall_doc')], ['map', getLang('profile_wall_map')], ['gift', getLang('profile_wall_gift')]], {mail: 1});
+    cur.imMedia = initAddMedia('im_add_media_link', 'im_media_preview', [['photo', getLang('profile_wall_photo')], ['video', getLang('profile_wall_video')], ['audio', getLang('profile_wall_audio')], ['doc', getLang('profile_wall_doc')], ['map', getLang('profile_wall_map')], ['gift', getLang('profile_wall_gift')]], {mail: 1, onCheckURLDone: IM.onUploadDone});
     val('im_media_preview', '');
 
     cur.imMedia.onChange = IM.onMediaChange;

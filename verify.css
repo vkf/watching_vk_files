@@ -73,3 +73,10 @@ img.verify_photo {
   text-align: center;
   color: #777;
 }
+.verify_edit_new {
+  margin-top: 10px;
+}
+.verify_label_new {
+  color: #777777;
+  font-weight: normal;
+}

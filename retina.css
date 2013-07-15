@@ -213,8 +213,8 @@
 .is_2x .search_verified,
 .is_2x .wall_post_source_icon,
 .is_2x .page_fronly {
-  background-image: url(/images/profile_icons_2x.png?9);
-  background-size: 13px 174px;
+  background-image: url(/images/profile_icons_2x.png?10);
+  background-size: 13px 241px;
 }
 .is_2x #pv_actions .left,
 .is_2x #pv_actions .right {
@@ -832,4 +832,8 @@
 }
 .is_2x .apps_sticker_ua {
   background-image: url(/images/icons/new_app_ua_2x.png);
+}
+.is_2x .pv_filter_font_icon {
+  background-image: url('/images/icons/switch_fonts_2x.png');
+  background-size: 17px 25px;
 }

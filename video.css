@@ -94,7 +94,7 @@
   display: block;
   float: left;
   margin-top: 1px;
-  background: url(/images/profile_icons.gif?4) left -10px no-repeat;
+  background: url(/images/profile_icons.gif?10) left -10px no-repeat;
 }
 .video_add_new:hover {
   background-color: #DAE1E8;

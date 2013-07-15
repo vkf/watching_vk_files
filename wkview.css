@@ -725,13 +725,24 @@ div#wl_post_body_wrap .page_media_thumbed_link {
   border-left: 3px solid #C3D1E0;
   padding: 0 9px;
 }
-div#wl_post_body_wrap .published_by_quote {
+div#wl_post_body_wrap .published_by_quote,
+div#wl_post_body_wrap .published_sec_quote {
   margin: 15px 0 3px;
   border-left-width: 3px;
-  padding-left: 12px;
+  padding-left: 11px;
+}
+div#wl_post_body_wrap .published_by_quote .published_sec_quote {
+  margin: 11px 0 0px -7px;
+  padding-left: 4px;
 }
 div#wl_post_body_wrap .published_by_quote .published_by_wrap {
   margin-top: 0;
+}
+div#wl_post_body_wrap .published_sec_quote {
+  margin: 11px 0 3px;
+}
+div#wl_post_body_wrap .published_sec_quote .published_by_wrap {
+  margin: 4px 0px;
 }
 div#wl_post_body_wrap div.post_media:last-child {
   margin-bottom: 1px;

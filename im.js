@@ -904,6 +904,9 @@ var IM = {
 
         if (ge('im_msg_media' + msg_id)) {
           val('im_msg_media' + msg_id, response.media || '');
+          if (!response.media) {
+            debugLog('MEDIA FAIL', msg_id, new_msg_id, response, params);
+          }
           IM.scrollOn();
         }
 
@@ -2934,6 +2937,9 @@ var IM = {
   },
 
   initTabEvents: function(tabEl) {
+    if (!tabEl) {
+      return;
+    }
     if (!tabEl.className) {
       var mid = tabEl;
       tabEl = cur.tabs[mid].elem;

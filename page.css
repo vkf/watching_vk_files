@@ -814,7 +814,7 @@ div.wall_module .ext_video div {
   font-weight: bold;
 }
 .wall_module div.published_by_date {
-  padding-top: 5px;
+  padding-top: 4px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -831,7 +831,7 @@ div.wall_module .ext_video div {
   display: inline-block;
   *display: block;
   zoom: 1;
-  background: url(/images/profile_icons.gif?7) no-repeat;
+  background: url(/images/profile_icons.gif?11) no-repeat;
   width: 11px;
   height: 11px;
 }
@@ -850,7 +850,23 @@ div.wall_module .ext_video div {
 .wall_post_source_mobile {
   background-position: 0px -121px;
 }
-.wall_module .published_by_quote {
+.published_a_quote:hover .wall_post_source_default {
+  background-position: 0px -209px;
+}
+.published_a_quote:hover .wall_post_source_iphone {
+  background-position: 0px -186px;
+}
+.published_a_quote:hover .wall_post_source_android {
+  background-position: 0px -174px;
+}
+.published_a_quote:hover .wall_post_source_windows {
+  background-position: 0px -220px;
+}
+.published_a_quote:hover .wall_post_source_mobile {
+  background-position: 0px -198px;
+}
+.wall_module .published_by_quote,
+.wall_module .published_sec_quote {
   margin: 5px 0;
   border-left: 2px solid #C3D1E0;
   overflow: hidden;
@@ -858,6 +874,23 @@ div.wall_module .ext_video div {
 }
 .published_by_quote .published_by_wrap {
   margin-top: 0;
+}
+.wall_module .published_sec_quote {
+  margin: 3px 0;
+}
+.published_sec_quote .published_by_wrap {
+  margin: 2px 0px;
+}
+.wall_module .published_by_quote .published_sec_quote {
+  margin: 3px 0px 0px -5px;
+  padding-left: 3px;
+}
+.published_a_quote:hover {
+  cursor: pointer;
+  background: #E9EDF1;
+}
+.wall_module .published_a_quote:hover .published_by_date {
+  color: #8795a5;
 }
 .wall_signed {
   margin-top: 5px;
@@ -5039,9 +5072,20 @@ b.wall_mob_onl {
   filter: alpha(opacity=40);
 }
 #like_share_warn {
-  padding: 10px 0px 0px;
   color: #777;
   display: none;
+}
+#like_share_after_text {
+  padding-top: 10px;
+}
+#like_share_add_media {
+  padding: 16px 9px 0px;
+}
+#like_share_media_preview {
+  line-height: normal;
+}
+div.like_share_target_label {
+  padding-top: 16px;
 }
 
 /* Composer */
@@ -5113,7 +5157,7 @@ div.create_poll_cb,
 }
 .page_fronly {
   margin-left: 4px;
-  background: url(/images/profile_icons.gif?7) no-repeat;
+  background: url(/images/profile_icons.gif?10) no-repeat;
   background-position: 0px -163px;
   width: 8px;
   height: 11px;
@@ -5366,6 +5410,12 @@ div.medadd_aud_ph {
 .wide_wall_module .reply_media_preview .medadd_aud .title_wrap {
   width: 265px;
 }
+#like_share_media_preview .medadd_aud {
+  width: 420px;
+}
+#like_share_media_preview .medadd_aud .title_wrap {
+  width: 350px;
+}
 
 button.wall_block_app_btn {
   max-width: 290px;
@@ -5417,7 +5467,7 @@ button.wall_block_app_btn {
 
 /* Verified accounts */
 .page_verified {
-  background: url(/images/profile_icons.gif?7) no-repeat 0 -73px;
+  background: url(/images/profile_icons.gif?10) no-repeat 0 -73px;
   width: 13px;
   height: 11px;
   display:-moz-inline-stack;

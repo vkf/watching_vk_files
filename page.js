@@ -2319,6 +2319,47 @@ var Wall = {
       Wall.postFull('wall' + matches[1] + '_' + matches[3], false, opts);
     }
   },
+  copyHistory: function(ev, el, post, offset) {
+    ev = ev || window.event;
+    var target = ev.target || ev.srcElement,
+        i = 8,
+        foundGood = false,
+        classRE = /published_a_quote/;
+    do {
+      if (!target ||
+          (foundGood = target.className.match(classRE)) ||
+          target.onclick ||
+          target.onmousedown ||
+          inArray(target.tagName, ['A', 'IMG'])
+      ) {
+        break;
+      }
+    } while (i-- && (target = target.parentNode));
+    if (!foundGood) return;
+    var sel = trim((
+      window.getSelection && window.getSelection() ||
+      document.getSelection && document.getSelection() ||
+      document.selection && document.selection.createRange().text || ''
+    ).toString());
+    if (sel) return;
+
+    ajax.post('al_wall.php', {act: 'copy_history', post: post, offset: offset}, {onDone: function(rows) {
+      if (!domPN(el)) return;
+
+      hide(el);
+      if (!rows) return;
+
+      var after = hasClass(domPN(el), 'published_by_quote') ? domPN(el) : el;
+      domPN(after).insertBefore(cf(rows), domNS(after));
+      if (isAncestor(after, 'im_rows')) {
+        IM.updateScroll(true);
+      } else if (isAncestor(after, 'wl_post')) {
+        WkView.wallUpdateReplies();
+      }
+    }});
+
+    return cancelEvent(ev);
+  },
   postFull: function (post, event, opts) {
     if (post.match(/^wall-?\d+_\d+$/) && !(opts || {}).nolist) {
       switch (cur.wallType) {
@@ -4901,10 +4942,12 @@ function initAddMedia(lnk, previewId, mediaTypes, opts) {
         }
         medias.push([type, media, mediaEl, url]);
       } else {
-        val(previewEl, '<div class="fl_l">' + preview + '</div><div class="x fl_l" onmouseover="showTooltip(this, {text: \'' + getLang('dont_attach') + '\', shift: [0, 3, 3]})" onclick="cur.addMedia[' + lnkId + '].unchooseMedia()"></div>');
+//        val(previewEl, '<div class="fl_l">' + preview + '</div><div class="x fl_l" onmouseover="showTooltip(this, {text: \'' + getLang('dont_attach') + '\', shift: [0, 3, 3]})" onclick="cur.addMedia[' + lnkId + '].unchooseMedia()"></div>');
+        val(previewEl, '<div class="' + (toPics === false ? 'page_docs_preview' : 'page_pics_preview') + '"><div class="page_preview_' + type + '_wrap"' + (opts.nocl ? ' style="cursor: default"' : '') + attrs + '>' + preview + '<div nosorthandle="1" class="page_media_x_wrap inl_bl" '+ (browser.msie && browser.version < 9 ? 'title' : 'tootltip') + '="'+getLang('dont_attach')+'" onmouseover="if (browser.msie && browser.version < 9) return; showTooltip(this, {text: this.getAttribute(\'tootltip\'), shift: [14, 3, 3], black: 1})" onclick="cur.addMedia['+addMedia.lnkId+'].unchooseMedia(); return cancelEvent(event);"><div class="page_media_x" nosorthandle="1"></div></div>' + postview + '</div></div>');
         show(previewEl);
         addMedia.chosenMedia = [type, media];
         addMedia.chosenMediaData = data;
+        if (opts.toggleLnk) hide(lnk);
       }
 
       if (type == 'share') {
@@ -5042,7 +5085,7 @@ function initAddMedia(lnk, previewId, mediaTypes, opts) {
       } else {
         var share, x;
         if (addMedia.chosenMedia) {
-          if ((x = previewEl.firstChild.nextSibling) && x.tt && x.tt.el) {
+          if ((x = geByClass1('page_media_x_wrap', previewEl, 'div')) && x.tt && x.tt.el) {
             x.tt.destroy();
           }
           addMedia.chosenMedia = false;
@@ -5050,6 +5093,7 @@ function initAddMedia(lnk, previewId, mediaTypes, opts) {
           val(previewEl, '');
           hide(previewEl);
         }
+        if (opts.toggleLnk) show(lnk);
         if (share = addMedia.shareData) {
           if (share.url) {
             addMedia.urlsCancelled.push(share.url);
@@ -5073,31 +5117,36 @@ function initAddMedia(lnk, previewId, mediaTypes, opts) {
       if (addMedia.onChange) addMedia.onChange(false);
     },
     getMedias: function() {
-      var edited = window.ThumbsEdit ? ThumbsEdit.getMedias('thumbs_edit' + lnkId) : [], already = {};
-      var chosen = addMedia.chosenMedias || [], result = [], check = function(id, ck, cv) {
-        if (cv[0] + cv[1] == id) {
-          result.push(cv);
-          already[id] = true;
-          return false;
-        }
-      };
-      each(edited, function(k, v) {
-        each(chosen, check.pbind(v[0] + v[1]));
-      });
-      each(dpicsEl.childNodes, function(k, v) {
-        var m = (v.id || '').match(/^pam\d+_([a-z]+)(-?\d+_\d+)/);
-        if (m) each(chosen, check.pbind(m[1] + m[2]));
-      });
-      each(docsEl.childNodes, function(k, v) {
-        var m = (v.id || '').match(/^pam\d+_([a-z]+)(-?\d+_\d+)/);
-        if (m) each(chosen, check.pbind(m[1] + m[2]));
-      });
-      each(chosen, function(k, v) {
-        if (v && isArray(v) && v.length && !already[v[0] + v[1]]) {
-          result.push(v);
-        }
-      });
-      return result;
+      if (multi) {
+        var edited = window.ThumbsEdit ? ThumbsEdit.getMedias('thumbs_edit' + lnkId) : [], already = {};
+        var chosen = addMedia.chosenMedias || [], result = [], check = function(id, ck, cv) {
+          if (cv[0] + cv[1] == id) {
+            result.push(cv);
+            already[id] = true;
+            return false;
+          }
+        };
+        each(edited, function(k, v) {
+          each(chosen, check.pbind(v[0] + v[1]));
+        });
+        each(dpicsEl.childNodes, function(k, v) {
+          var m = (v.id || '').match(/^pam\d+_([a-z]+)(-?\d+_\d+)/);
+          if (m) each(chosen, check.pbind(m[1] + m[2]));
+        });
+        each(docsEl.childNodes, function(k, v) {
+          var m = (v.id || '').match(/^pam\d+_([a-z]+)(-?\d+_\d+)/);
+          if (m) each(chosen, check.pbind(m[1] + m[2]));
+        });
+        each(chosen, function(k, v) {
+          if (v && isArray(v) && v.length && !already[v[0] + v[1]]) {
+            result.push(v);
+          }
+        });
+        return result;
+      } else {
+        var chosen = addMedia.chosenMedia;
+        return chosen ? [chosen[0] + chosen[1]] : [];
+      }
     },
     showMediaProgress: function(type, i, info) {
       if (addMedia.onProgress && addMedia.onProgress(type, i, info) === false) {
@@ -5521,10 +5570,10 @@ function initAddMedia(lnk, previewId, mediaTypes, opts) {
     },
 
     destroy: function() {
-      if (docsEl.sorter) {
+      if ((docsEl || {}).sorter) {
         docsEl.sorter.destroy();
       }
-      if (dpicsEl.qsorter) {
+      if ((dpicsEl || {}).qsorter) {
         dpicsEl.qsorter.destroy();
       }
     },

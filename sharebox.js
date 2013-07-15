@@ -30,7 +30,9 @@ var ShareBox = {
       sbSend: function() {
         if (buttonLocked('like_share_send')) return;
 
-        var v = radioBtns['like_share'].val, to = 0, msg = trim(val(cur.sbField));
+        var v = radioBtns['like_share'].val, to = 0,
+        composer = cur.sbField && data(cur.sbField, 'composer'),
+        params = composer ? Composer.getSendParams(composer) : {message: trim(val(cur.sbField))};
         switch (v) {
         case 1:
           var dd = cur.wdd && cur.wdd['like_club_dd'];
@@ -39,36 +41,34 @@ var ShareBox = {
             to = intval(i.replace(/_$/, ''));
           }
         case 0:
-          var params = {
+          ajax.post('like.php', Wall.fixPostParams(extend(params, {
             act: 'a_do_publish',
-            message: msg,
             from: 'box',
             to: to,
             hash: cur.sbShareHash,
             object: cur.sbObj,
             list: cur.sbList
-          }
-          ajax.post('like.php', params, ShareBox.options());
+          })), ShareBox.options());
         break;
 
         case 2:
-          var dd = cur.wdd && cur.wdd['like_mail_dd'], params = {
+          var dd = cur.wdd && cur.wdd['like_mail_dd'], params =
+          extend(params, {
             act: 'a_send',
-            message: msg,
             from: 'box',
             to_ids: [],
             chas: cur.sbMailHash,
             ajax: 1,
             title: (isVisible('like_share_title_wrap') && val('like_share_title') || ''),
             media: cur.sbObj + (cur.sbList ? ('/' + cur.sbList) : '')
-          }
+          });
           if (!dd || !dd.selCount) return elfocus('like_mail_inp');
 
           for (var i in dd.selected) {
             params.to_ids.push(i.replace(/_$/, ''));
           }
           params.to_ids = params.to_ids.join(',');
-          ajax.post('al_mail.php', params, ShareBox.options());
+          ajax.post('al_mail.php', Wall.fixPostParams(params), ShareBox.options());
         break;
         }
       },
@@ -83,12 +83,17 @@ var ShareBox = {
     autosizeSetup(cur.sbField, {minHeight: 80})
     setTimeout(elfocus.pbind((opts.rbVal == 2) ? 'like_mail_inp' : (opts.rbVal ? 'like_club_inp' : cur.sbField)), 0);
 
-
     Wall.initComposer(cur.sbField, {
       lang: {
         introText: getLang('profile_mention_start_typing'),
         noResult: getLang('profile_mention_not_found')
-      }
+      },
+      media: isVisible('like_share_add_media') ? {
+        lnk: domFC(ge('like_share_add_media')),
+        preview: ge('like_share_media_preview'),
+        types: opts.shTypes,
+        options: {limit: 1, disabledTypes: ['album', 'share', 'link', 'page'], toggleLnk: true, nocl: 1}
+      } : undefined
     });
 
     var tmp = cur.postTo;

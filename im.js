@@ -423,6 +423,11 @@ var IM = {
     if (el) val(el, cur.tabs[peer_id].data.members_grid_small);
   },
   loadMedia: function (msg_id, peer_id) {
+    var msgMediaEl = ge('im_msg_media' + msg_id);
+    if (!msgMediaEl) {
+      return;
+    }
+
     ajax.post('al_im.php', {act: 'a_get_media', id: msg_id}, {
       onDone: function (content, msgInfo, opts) {
         if (msgInfo) {
@@ -433,9 +438,9 @@ var IM = {
           IM.receivePeerData(peer_id, opts.peer);
         }
 
-        var cont = ge('im_msg_media' + msg_id), el;
-        if (cont) {
-          val(cont, content);
+        if (msgMediaEl) {
+          val(msgMediaEl, content);
+          msgMediaEl.id = '';
           if (opts) {
             if (opts.gift) {
               var msgObj = ge('mess' + msg_id);
@@ -444,16 +449,15 @@ var IM = {
               textObj.parentNode.appendChild(textObj);
             }
           }
-        }
-        if (cur.peer == peer_id) {
-          IM.scrollAppended(0);
+          if (cur.peer == peer_id) {
+            IM.scrollAppended(0);
+          }
         }
       },
       onFail: function (a) {
         debugLog('load media fail', msg_id, peer_id);
         topError('IM media fail: ' + a + '; ' + peer_id + '_' + msg_id, {dt: -1});
-        var cont = ge('im_msg_media' + msg_id);
-        hide(cont);
+        re(msgMediaEl);
       }
     });
   },
@@ -474,7 +478,11 @@ var IM = {
     if (!msg_id) return;
     if (!ge('mess' + msg_id)) IM.addMsg(peer, -1, msg_id, 2, 1, '', '', res[2], {source_act: res[5] ? 'chat_photo_update' : 'chat_photo_removed', from: cur.id, attach1_type: 'photo', _no_media_load: 1});
 
-    val('im_msg_media' + msg_id, res[5]);
+    var msgMediaEl = ge('im_msg_media' + msg_id);
+    if (msgMediaEl) {
+      val(msgMediaEl, res[5]);
+      msgMediaEl.id = '';
+    }
     val('im_msg_info' + msg_id, res[6]);
     val('im_dialogs_msginfo' + msg_id, res[6]);
     IM.scroll();
@@ -902,8 +910,10 @@ var IM = {
         addEvent(msg_row, 'mouseout', IM.logMessState.pbind(0, new_msg_id));
         msg_row.onclick = function (e) {if (!IM.checkLogClick(this, e || window.event)) IM.checkLogMsg(new_msg_id)};
 
-        if (ge('im_msg_media' + msg_id)) {
-          val('im_msg_media' + msg_id, response.media || '');
+        var msgMediaEl = ge('im_msg_media' + msg_id);
+        if (msgMediaEl) {
+          val(msgMediaEl, response.media || '');
+          ge(msgMediaEl).id = '';
           if (!response.media) {
             debugLog('MEDIA FAIL', msg_id, new_msg_id, response, params);
           }

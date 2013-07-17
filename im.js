@@ -423,10 +423,6 @@ var IM = {
     if (el) val(el, cur.tabs[peer_id].data.members_grid_small);
   },
   loadMedia: function (msg_id, peer_id) {
-    var msgMediaEl = ge('im_msg_media' + msg_id);
-    if (!msgMediaEl) {
-      return;
-    }
 
     ajax.post('al_im.php', {act: 'a_get_media', id: msg_id}, {
       onDone: function (content, msgInfo, opts) {
@@ -438,6 +434,7 @@ var IM = {
           IM.receivePeerData(peer_id, opts.peer);
         }
 
+        var msgMediaEl = ge('im_msg_media' + msg_id);
         if (msgMediaEl) {
           val(msgMediaEl, content);
           msgMediaEl.id = '';
@@ -457,7 +454,7 @@ var IM = {
       onFail: function (a) {
         debugLog('load media fail', msg_id, peer_id);
         topError('IM media fail: ' + a + '; ' + peer_id + '_' + msg_id, {dt: -1});
-        re(msgMediaEl);
+        re('im_msg_media' + msg_id);
       }
     });
   },

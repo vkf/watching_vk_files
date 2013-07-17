@@ -5,7 +5,7 @@ init: function(opts) {
   placeholderSetup(cur.searchEl, {back: true});
 
   cur.nav.push(function(changed, old, n) {
-    if (old[0] == 'dev' && !old.act) {
+    if ((old[0] == 'dev' || old[0] == 'dev/') && !old.act) {
       return true;
     }
     if (n[0].substr(0, 4) == 'dev/' || (n[0] == 'dev' && n.act) && cur.page) {
@@ -331,9 +331,10 @@ wrapObject: function(obj, rootNode) {
       break;
     case 'string':
       var str = clean(obj);
-      if (obj.match(/^http:\/\/.*/)) {
+      if (obj.match(/^https?:\/\/.*/)) {
         str = '<a href="'+str+'" target="_blank">'+str+'</a>';
       }
+      str = str.replace(/\n/g, '<br />');
       html += '<span class="dev_result_str">\''+str+'\'</span>';
       break;
     case 'number':

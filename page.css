@@ -3461,7 +3461,9 @@ h2.abx_header {
 .abx_blacklist_cb_wrap {
   padding-top: 10px;
 }
-
+.abx_hint {
+  padding-top: 10px;
+}
 
 
 

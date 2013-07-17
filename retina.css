@@ -136,7 +136,8 @@
 .is_2x .wall_module .reply_delete_button,
 .is_2x .fave_delete_link,
 .is_2x #intr_hide,
-.is_2x .wall_module .post_delete_button {
+.is_2x .wall_module .post_delete_button,
+.is_2x .top_info_wrap .hide_button {
   background-image: url(/images/pics/statusx_op_2x.gif);
   background-size: 11px 11px;
 }
@@ -832,6 +833,16 @@
 }
 .is_2x .apps_sticker_ua {
   background-image: url(/images/icons/new_app_ua_2x.png);
+}
+.is_2x .audio_new_sticker {
+  background-image: url(/images/icons/new_audio_en_2x.png);
+  background-size: 58px 58px;
+}
+.is_2x .audio_sticker_ru {
+  background-image: url(/images/icons/new_audio_ru_2x.png);
+}
+.is_2x .audio_sticker_ua {
+  background-image: url(/images/icons/new_audio_ua_2x.png);
 }
 .is_2x .pv_filter_font_icon {
   background-image: url('/images/icons/switch_fonts_2x.png');

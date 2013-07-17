@@ -807,6 +807,7 @@ textarea.dev_poll_code {
 .dev_form_no_params {
   text-align: center;
   color: #607387;
+  margin-bottom: 10px;
 }
 #dev_page_cont textarea.dev_editor_textarea,
 #dev_page_cont .dev_editor_cont {

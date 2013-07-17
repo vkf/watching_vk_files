@@ -67,8 +67,9 @@
   opacity: 1;
   filter: alpha(opacity=100);
 }
+#custom_bar.top_info_wrap .hide_button,
 #olympics_bar.top_info_wrap .hide_button {
-  margin-top: 15px;
+  margin-top: 14px;
 }
 .confirm_mail .info div, .top_info_bar .info div {
   padding-top: 5px;
@@ -490,7 +491,7 @@ ul.vk_com_only_good {
 #save_fv_bar,
 #chrome_bar,
 #olympics_bar,
-#wp_bar {
+#custom_bar {
   height: 48px;
   position: relative;
   overflow: visible;
@@ -503,8 +504,7 @@ ul.vk_com_only_good {
   *display: block;
 }
 #save_fv_bar_content,
-#chrome_bar_content,
-#wp_bar_content {
+#chrome_bar_content {
   color: #5E7488;
   font-size: 12px;
   font-weight: bold;
@@ -513,6 +513,7 @@ ul.vk_com_only_good {
   text-align: center;
   margin-left: 40px;
 }
+#custom_bar_content,
 #olympics_bar_content {
   color: #69839f;
   font-size: 12px;
@@ -522,22 +523,19 @@ ul.vk_com_only_good {
   text-align: center;
   margin-left: 40px;
 }
-#wp_bar_content {
-  height: 31px;
-  padding-top: 17px;
-}
 #save_fv_bar_bg,
 #chrome_bar_bg,
 #olympics_bar_bg,
-#wp_bar_bg {
+#custom_bar_bg {
   background: url(/images/chrome_bar.gif) repeat-x left top;
   margin-top: -48px;
   height: 52px;
 }
-.chrome_bar_a,
-.wp_bar_a {
+.chrome_bar_a{
   color: #3E698F;
 }
+,
+.custom_bar_a,
 .olympics_bar_a {
   color: #45688e;
 }

@@ -1890,3 +1890,21 @@
   color: #777777;
   padding-top: 6px;
 }
+.audio_edited {
+  color: #777777;
+}
+.audio_new_sticker {
+  background: url('/images/icons/new_audio_en.png') 0px 0px no-repeat;
+  width: 60px;
+  height: 60px;
+  position: absolute;
+  margin-left: -1px;
+  margin-top: -1px;
+  z-index: 10;
+}
+.audio_sticker_ru {
+  background-image: url('/images/icons/new_audio_ru.png');
+}
+.audio_sticker_ua {
+  background-image: url('/images/icons/new_audio_ua.png');
+}

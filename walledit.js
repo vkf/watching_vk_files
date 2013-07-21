@@ -47,14 +47,14 @@ var WallEdit = {
 
     var checkev = browser.opera_mobile ? 'blur' : 'keyup';
     node.parentNode.insertBefore(ce('div', {id: 'wpe_cont', innerHTML: '\
-<div class="clear_fix"><textarea id="wpe_text" class="fl_l" on' + checkev + '="' + (!opts.copy ? 'wall.checkPostLen(\'wpe_text\', \'wpe_warn\', this.value)' : 'wall.likeShareCheckLen(\'wpe_text\', \'wpe_warn\')') + '" onkeypress="onCtrlEnter(event, WallEdit.savePost)">' + text + '</textarea></div>\
+<div class="clear_fix"><textarea id="wpe_text" class="fl_l" on' + checkev + '="wall.checkPostLen(\'wpe_text\', \'wpe_warn\', this.value)" onkeypress="onCtrlEnter(event, WallEdit.savePost)">' + text + '</textarea></div>\
 <div id="wpe_warn"></div>\
 <div id="wpe_media_preview" class="clear_fix media_preview"></div>\
 <div id="wpe_media_preview" class="clear_fix media_preview"></div>\
 ' + (opts.signed ? ('<div id="wpe_signed" class="checkbox' + (opts.signed > 0 ? ' on' : '') + '" onclick="checkbox(this)"><div></div>' + getLang('wall_suggest_subscribe') + '</div>') : '') + '\
 ' + (opts.add ? '<div class="wpe_auth">' + opts.add + '</div>' : '') + '\
 <div class="wpe_buttons">' +
-  ((!opts.copy) ? '<div id="wpe_add_media" class="fl_r"><span class="add_media_lnk">' + getLang('global_add_media') + '</span></div>' : '') +
+  ((!opts.noatt) ? '<div id="wpe_add_media" class="fl_r"><span class="add_media_lnk">' + getLang('global_add_media') + '</span></div>' : '') +
   '<div class="button_blue fl_l">\
     <button onclick="WallEdit.savePost()">' + getLang('global_save') + '</button>\
   </div>\
@@ -67,7 +67,7 @@ var WallEdit = {
     autosizeSetup('wpe_text', {minHeight: 50});
     var mentionsLang = {introText: getLang('profile_mention_start_typing'), noResult: getLang('profile_mention_not_found')};
 
-    if (opts.copy) {
+    if (opts.noatt) {
       setTimeout(function () {
         var previewEl = ge('wpe_media_preview');
         show(node.previousSibling, previewEl);
@@ -90,6 +90,12 @@ var WallEdit = {
             mediaTypes.push(this);
           }
         });
+      } else if (opts.copy) {
+        each (types, function () {
+          if (inArray(this[0], ['photo', 'video', 'audio', 'doc'])) {
+            mediaTypes.push(this);
+          }
+        });
       } else {
         mediaTypes = types;
       }
@@ -100,10 +106,10 @@ var WallEdit = {
           types: mediaTypes,
           options: {
             toId: post.split('_')[0],
-            limit: opts.reply ? 2 : 10,
-            toggleLnk: opts.reply,
-            editable: !opts.reply,
-            sortable: !opts.reply
+            limit: opts.copy ? 1 : (opts.reply ? 2 : 10),
+            toggleLnk: opts.reply || opts.copy,
+            editable: !opts.reply && !opts.copy,
+            sortable: !opts.reply && !opts.copy
           }
         };
         if (opts.reply == 'photo_comment' || opts.reply == 'video_comment') {

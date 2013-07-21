@@ -150,6 +150,7 @@
 }
 .wall_fixed .wall_module .wall_album_photos .page_post_sized_thumbs {
   margin: 0;
+  padding: 0;
 }
 .wall_fixed .wall_fixed_more_arrow {
   display: inline-block;

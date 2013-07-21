@@ -821,7 +821,10 @@ div.wall_module .ext_video div {
   width: 290px;
 }
 .wall_module .published_comment {
-  padding: 4px 0 6px;
+  padding: 4px 0 1px;
+}
+.wall_module .published_comment .wall_post_text {
+  padding-bottom: 3px;
 }
 .wall_module .published_by_date, .wall_module .wall_post_source {
   color: #777;
@@ -3740,6 +3743,7 @@ img.page_preview_video, img.page_preview_graffiti {
   padding-bottom: 10px;
 }
 .wpe_auth {
+  margin-top: 10px;
   padding-bottom: 10px;
   line-height: 160%;
   color: #777;
@@ -4178,7 +4182,8 @@ img.page_preview_video, img.page_preview_graffiti {
 
 
 .page_post_sized_thumbs {
-  margin: 9px 0 4px;
+  margin: 9px 0 0px;
+  padding-bottom: 4px;
 }
 .page_post_sized_full_thumb {
   margin: 20px 0 10px;

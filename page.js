@@ -5084,14 +5084,14 @@ function initAddMedia(lnk, previewId, mediaTypes, opts) {
         toggle(progressEl, !!domFC(progressEl));
       } else {
         var share, x;
+        if ((x = geByClass1('page_media_x_wrap', previewEl, 'div')) && x.tt && x.tt.el) {
+          x.tt.destroy();
+        }
+        val(previewEl, '');
+        hide(previewEl);
         if (addMedia.chosenMedia) {
-          if ((x = geByClass1('page_media_x_wrap', previewEl, 'div')) && x.tt && x.tt.el) {
-            x.tt.destroy();
-          }
           addMedia.chosenMedia = false;
           addMedia.chosenMediaData = false;
-          val(previewEl, '');
-          hide(previewEl);
         }
         if (opts.toggleLnk) show(lnk);
         if (share = addMedia.shareData) {
@@ -5174,7 +5174,9 @@ function initAddMedia(lnk, previewId, mediaTypes, opts) {
           if (opts.toggleLnk) toggle(lnk, addMedia.attachCount() < limit);
         } else {
           val(previewEl, progress);
+          show(previewEl);
           addMedia.chosenMedia = 'progress';
+          if (opts.toggleLnk) hide(lnk);
         }
         prg = ge('upload' + ind + '_progress');
         prg.full = false;//intval(getStyle(prg.parentNode, 'width'));
@@ -5328,7 +5330,7 @@ function initAddMedia(lnk, previewId, mediaTypes, opts) {
           continue;
         }
         var valid = true;
-        if (matches[4].match(/(^|\.|\/\/)vkontakte\.ru|vk\.com/)) {
+        if (matches[4].match(/(^|\.|\/\/)(vkontakte\.ru|vk\.com)/)) {
           valid = query.match(/(#photo|^\/(photo|video|album|page|audio|doc)|z=(album|photo|video)|w=(page))(-?\d+_)?\d+|\.(jpg|png|gif)$|^http:\/\/instagram\.com\/p\/.+/) ? true : false;
         }
         if (valid) {
@@ -5341,7 +5343,11 @@ function initAddMedia(lnk, previewId, mediaTypes, opts) {
       var url = '';
       if (addMedia.urlAttachmentLoading) {
         re(addMedia.urlAttachmentLoading[2]);
-        toggle(progressEl, progressEl.childNodes > 0);
+        if (multi) {
+          toggle(progressEl, progressEl.childNodes > 0);
+        } else {
+          toggle(previewEl, previewEl.childNodes > 0);
+        }
         url = addMedia.urlAttachmentLoading[1];
         addMedia.urlAttachmentLoading = false;
         setStyle(bodyNode, {cursor: 'default'});

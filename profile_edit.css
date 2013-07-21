@@ -429,7 +429,7 @@
   padding-top: 10px;
 }
 .pedit_box_row .pedit_labeled_radio {
-  padding: 2px 0px 7px;
+  padding: 2px 0px 5px;
 }
 .pedit_box_radio {
   padding: 6px 0px;
@@ -437,3 +437,9 @@
 .pedit_label_radio {
   padding-top: 6px;
 }
+.pedit_box_row .pedit_instagram_info {
+  width: 282px;
+  color: #777777;
+  padding-top: 8px;
+  padding-bottom: 0px;
+  line-height: 160%;

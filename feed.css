@@ -1506,6 +1506,7 @@ a.feed_article_thumb {
 }
 .feed_found_photos .page_post_sized_thumbs {
   margin: 6px 0 0;
+  padding-bottom: 0px;
 }
 .feed_row:last-child .feed_found_photos .page_post_sized_thumbs {
   margin-bottom: 10px;

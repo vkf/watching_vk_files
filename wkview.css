@@ -680,10 +680,12 @@ div#wl_post_body_wrap .audio .title_wrap {
   width: 485px;
 }
 div#wl_post_body_wrap .page_post_sized_thumbs {
-  margin: 9px auto 4px;
+  margin: 9px auto 0px;
+  padding-bottom: 4px;
 }
 div#wl_post_body_wrap .wall_album_wrap .page_post_sized_thumbs {
   margin: 0;
+  padding: 0;
 }
 div#wl_post_body_wrap #wpe_text {
   width: 599px;

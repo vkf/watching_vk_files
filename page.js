@@ -4644,6 +4644,9 @@ function initAddMedia(lnk, previewId, mediaTypes, opts) {
         progressEl = domNS(ppdocsEl);
     removeClass(previewEl, 'media_preview');
     addClass(previewEl, 'multi_media_preview');
+  } else {
+    addClass(previewEl, 'med_no_attach');
+    show(previewEl);
   }
 
   addMedia = {
@@ -4942,9 +4945,8 @@ function initAddMedia(lnk, previewId, mediaTypes, opts) {
         }
         medias.push([type, media, mediaEl, url]);
       } else {
-//        val(previewEl, '<div class="fl_l">' + preview + '</div><div class="x fl_l" onmouseover="showTooltip(this, {text: \'' + getLang('dont_attach') + '\', shift: [0, 3, 3]})" onclick="cur.addMedia[' + lnkId + '].unchooseMedia()"></div>');
         val(previewEl, '<div class="' + (toPics === false ? 'page_docs_preview' : 'page_pics_preview') + '"><div class="page_preview_' + type + '_wrap"' + (opts.nocl ? ' style="cursor: default"' : '') + attrs + '>' + preview + '<div nosorthandle="1" class="page_media_x_wrap inl_bl" '+ (browser.msie && browser.version < 9 ? 'title' : 'tootltip') + '="'+getLang('dont_attach')+'" onmouseover="if (browser.msie && browser.version < 9) return; showTooltip(this, {text: this.getAttribute(\'tootltip\'), shift: [14, 3, 3], black: 1})" onclick="cur.addMedia['+addMedia.lnkId+'].unchooseMedia(); return cancelEvent(event);"><div class="page_media_x" nosorthandle="1"></div></div>' + postview + '</div></div>');
-        show(previewEl);
+        removeClass(previewEl, 'med_no_attach');
         addMedia.chosenMedia = [type, media];
         addMedia.chosenMediaData = data;
         if (opts.toggleLnk) hide(lnk);
@@ -5088,7 +5090,7 @@ function initAddMedia(lnk, previewId, mediaTypes, opts) {
           x.tt.destroy();
         }
         val(previewEl, '');
-        hide(previewEl);
+        addClass(previewEl, 'med_no_attach');
         if (addMedia.chosenMedia) {
           addMedia.chosenMedia = false;
           addMedia.chosenMediaData = false;
@@ -5174,7 +5176,7 @@ function initAddMedia(lnk, previewId, mediaTypes, opts) {
           if (opts.toggleLnk) toggle(lnk, addMedia.attachCount() < limit);
         } else {
           val(previewEl, progress);
-          show(previewEl);
+          removeClass(previewEl, 'med_no_attach');
           addMedia.chosenMedia = 'progress';
           if (opts.toggleLnk) hide(lnk);
         }
@@ -5200,7 +5202,6 @@ function initAddMedia(lnk, previewId, mediaTypes, opts) {
           setStyle(prg, {width: percent + '%'});
         }
       }
-      // show(previewEl);
     },
 
     attachCount: function() {
@@ -5346,7 +5347,7 @@ function initAddMedia(lnk, previewId, mediaTypes, opts) {
         if (multi) {
           toggle(progressEl, progressEl.childNodes > 0);
         } else {
-          toggle(previewEl, previewEl.childNodes > 0);
+          toggleClass(previewEl, 'med_no_attach', !previewEl.childNodes);
         }
         url = addMedia.urlAttachmentLoading[1];
         addMedia.urlAttachmentLoading = false;

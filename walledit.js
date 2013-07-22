@@ -50,7 +50,6 @@ var WallEdit = {
 <div class="clear_fix"><textarea id="wpe_text" class="fl_l" on' + checkev + '="wall.checkPostLen(\'wpe_text\', \'wpe_warn\', this.value)" onkeypress="onCtrlEnter(event, WallEdit.savePost)">' + text + '</textarea></div>\
 <div id="wpe_warn"></div>\
 <div id="wpe_media_preview" class="clear_fix media_preview"></div>\
-<div id="wpe_media_preview" class="clear_fix media_preview"></div>\
 ' + (opts.signed ? ('<div id="wpe_signed" class="checkbox' + (opts.signed > 0 ? ' on' : '') + '" onclick="checkbox(this)"><div></div>' + getLang('wall_suggest_subscribe') + '</div>') : '') + '\
 ' + (opts.add ? '<div class="wpe_auth">' + opts.add + '</div>' : '') + '\
 <div class="wpe_buttons">' +
@@ -69,9 +68,7 @@ var WallEdit = {
 
     if (opts.noatt) {
       setTimeout(function () {
-        var previewEl = ge('wpe_media_preview');
-        show(node.previousSibling, previewEl);
-        replaceClass(previewEl, 'media_preview', 'multi_media_preview');
+        show(node.previousSibling);
         hide(node, acts, likeWrap);
         cur.wallEditComposer = Composer.init(ge('wpe_text'), {lang: mentionsLang});
         elfocus('wpe_text');

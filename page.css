@@ -1960,6 +1960,9 @@ div.media_preview {
   margin-bottom: 8px;
   display: none;
 }
+div.med_no_attach {
+  margin-bottom: 0px;
+}
 .media_preview .audio,
 .media_preview .doc {
   padding-top: 4px;

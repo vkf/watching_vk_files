@@ -821,7 +821,7 @@ div.wall_module .ext_video div {
   width: 290px;
 }
 .wall_module .published_comment {
-  padding: 4px 0 1px;
+  padding: 0px 0 1px;
 }
 .wall_module .published_comment .wall_post_text {
   padding-bottom: 3px;
@@ -853,7 +853,7 @@ div.wall_module .ext_video div {
 .wall_post_source_mobile {
   background-position: 0px -121px;
 }
-.published_a_quote:hover .wall_post_source_default {
+/*.published_a_quote:hover .wall_post_source_default {
   background-position: 0px -209px;
 }
 .published_a_quote:hover .wall_post_source_iphone {
@@ -867,7 +867,7 @@ div.wall_module .ext_video div {
 }
 .published_a_quote:hover .wall_post_source_mobile {
   background-position: 0px -198px;
-}
+}*/
 .wall_module .published_by_quote,
 .wall_module .published_sec_quote {
   margin: 5px 0;
@@ -879,22 +879,25 @@ div.wall_module .ext_video div {
   margin-top: 0;
 }
 .wall_module .published_sec_quote {
-  margin: 3px 0;
+  margin: 5px 0 3px;
 }
 .published_sec_quote .published_by_wrap {
-  margin: 2px 0px;
+  margin: 0px;
 }
 .wall_module .published_by_quote .published_sec_quote {
-  margin: 3px 0px 0px -5px;
+  margin: 5px 0px 0px -5px;
   padding-left: 3px;
 }
-.published_a_quote:hover {
+.published_a_quote {
   cursor: pointer;
-  background: #E9EDF1;
+/*  background: #E9EDF1;*/
 }
-.wall_module .published_a_quote:hover .published_by_date {
-  color: #8795a5;
+.published_a_quote .published_by_wrap {
+  margin-bottom: 1px;
 }
+/*.wall_module .published_a_quote:hover .published_by_date {
+ color: #8795a5;
+}*/
 .wall_signed {
   margin-top: 5px;
   padding: 0px;
@@ -979,6 +982,7 @@ div.wall_module .ext_video div {
 }
 .wall_post_more,
 .wall_reply_more,
+.wall_copy_more,
 .wall_module .reply_show_whole {
   position: relative;
   top: 2px;
@@ -993,7 +997,8 @@ div.wall_module .ext_video div {
 .wall_reply_text:hover .wall_reply_more,
 .page_description:hover .wall_post_more,
 .wall_post_more:hover,
-.wall_reply_more:hover {
+.wall_reply_more:hover,
+.published_a_quote:hover .wall_copy_more {
   color: #45688E;
   text-decoration: none;
 }

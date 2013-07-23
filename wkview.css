@@ -1138,8 +1138,12 @@ a:hover .wk_likes_bl_wrap {
 #wk_likes_rows .published_by_wrap {
   margin-bottom: 2px;
 }
-
-
+#wk_likes_rows .published_sec_quote .published_by_wrap {
+  margin-bottom: 0px;
+}
+#wk_likes_rows .published_a_quote .published_by_wrap {
+/*  margin-bottom: 1px;*/
+}
 
 /* History */
 .wk_history_content #wk_content {

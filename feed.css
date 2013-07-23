@@ -1011,8 +1011,12 @@ img.feedback_group_photo {
 }
 .wall_module .feedback_row_answer .dld,
 .wall_module .feedback_reply_row .dld {
+  line-height: 140%;
   color: #879BB0;
   padding: 1px 49px 3px;
+}
+.wall_module .feedback_reply_row_share {
+  color: #45688E;
 }
 .wall_module .feedback_row_answer .dld .dld {
   padding: 0;

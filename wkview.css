@@ -662,6 +662,9 @@ div#wl_post_body_wrap .page_media_caption {
   font-size: 1.45em;
   line-height: 150%;
 }
+div#wl_post_body_wrap .published_a_quote .wall_post_text {
+  font-size: 14px;
+}
 
 div#wl_post_body_wrap .wall_text,
 div#wl_post_body_wrap .wall_post_text,

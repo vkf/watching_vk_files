@@ -650,6 +650,10 @@ div.pad_msg_text div.im_fwd_log_wrap {
 .pad_nwsa_dld {
   color: #879BB0;
   padding: 1px 49px 3px;
+  line-height: 140%;
+}
+.pads_nwsa_dlda {
+  color: #45688E;
 }
 .pad_msg_field,
 .pad_nws_field {

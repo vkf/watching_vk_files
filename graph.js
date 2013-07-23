@@ -1458,7 +1458,7 @@ Graph.prototype = {
         this.minAbsValue = Math.min(this.minAbsValue, Math.abs(line.d[i].y));
         this.maxTime = Math.max(this.maxTime, line.d[i].x);
         this.minTime = Math.min(this.minTime, line.d[i].x);
-        if (i > 0 && Math.abs(line.d[i].x - line.d[i - 1].x) > 1) {
+        if (i > 0 && i < 10 && Math.abs(line.d[i].x - line.d[i - 1].x) > 1) {
           this.MAXSCALE = Math.min(this.MAXSCALE, 2.5 * Math.abs(line.d[i].x - line.d[i - 1].x));
           this.XSTEP = (this.XSTEP + Math.abs(line.d[i].x - line.d[i - 1].x)) / 2;
         }

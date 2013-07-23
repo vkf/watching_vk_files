@@ -614,3 +614,30 @@ border-bottom: 1px solid #DAE1E8;
 .docs_choose_switch .divide {
   color: #C7D7E9;
 }
+.docs_delete_row {
+  margin-top: -4px;
+  background: url("/images/pics/statusx_op.gif") no-repeat scroll 3px 3px;
+  opacity: 0;
+  filter: alpha(opacity=0);
+  cursor: pointer;
+  height: 17px;
+  width: 17px;
+}
+.docs_edit_row {
+  margin-top: -4px;
+  background: url("/images/pics/statusedit.gif") no-repeat scroll 3px 3px;
+  opacity: 0;
+  filter: alpha(opacity=0);
+  cursor: pointer;
+  height: 17px;
+  width: 17px;
+}
+.docs_add_row {
+  margin-top: -2px;
+  background: url("/images/icons/audio_icons.png") no-repeat scroll -79px -51px;
+  opacity: 0;
+  filter: alpha(opacity=0);
+  cursor: pointer;
+  height: 12px;
+  width: 12px;
+}

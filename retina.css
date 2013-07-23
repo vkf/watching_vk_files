@@ -89,7 +89,8 @@
 .is_2x .page_gif_add_icon,
 .is_2x .current_audio .label,
 .is_2x .current_audio_cnt .label,
-.is_2x .video_row_icon_add .video_row_icon {
+.is_2x .video_row_icon_add .video_row_icon,
+.is_2x .docs_add_row {
   background-image: url(/images/icons/audio_icons_2x.png?4);
   background-size: 257px 63px;
 }
@@ -137,7 +138,8 @@
 .is_2x .fave_delete_link,
 .is_2x #intr_hide,
 .is_2x .wall_module .post_delete_button,
-.is_2x .top_info_wrap .hide_button {
+.is_2x .top_info_wrap .hide_button,
+.is_2x .docs_delete_row {
   background-image: url(/images/pics/statusx_op_2x.gif);
   background-size: 11px 11px;
 }
@@ -722,7 +724,8 @@
   background-size: 40px 160px;
 }
 .is_2x .wall_module .reply_edit_button,
-.is_2x .wall_module .post_edit_button {
+.is_2x .wall_module .post_edit_button,
+.is_2x .docs_edit_row {
   background-image: url(/images/pics/statusedit_2x.gif);
   background-size: 11px 11px;
 }

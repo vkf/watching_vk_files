@@ -184,11 +184,7 @@ drawList: function(list, first, cont) {
   for (var i in list) {
     var item = list[i];
 
-    cont.appendChild(ce('div', {
-      id: 'docs_file_'+item[4]+'_'+item[0],
-      className: 'docs_item' + first,
-      innerHTML: Docs.getDocHTML(item)
-    }))
+    cont.appendChild(se('<div id="docs_file_'+item[4]+'_'+item[0]+'" class="docs_item'+first+'" onmouseover="Docs.rowOver('+item[4]+', '+item[0]+');" onmouseout="Docs.rowOut('+item[4]+', '+item[0]+');">'+Docs.getDocHTML(item)+'</div>'))
     first = '';
   }
 },
@@ -229,6 +225,13 @@ getDocHTML: function(item) {
       var extStr = ext;
     }
     ext = '<a class="docs_item_icon" href="'+url+'" ext="'+ext+'" onclick="return Docs.downloadItem('+oid+', '+id+', event);">'+extStr+'</a>';
+  }
+  var mid = intval(item[7]);
+
+  if (oid == vk.id || mid == vk.id || (oid == cur.oid && oid < 0 && cur.groupAdmin)) {
+    ext = '<div class="docs_delete_row fl_r" id="docs_delete_row'+oid+'_'+id+'" onmouseover="Docs.rowActive('+oid+', '+id+', 1)" onmouseout="Docs.rowInactive('+oid+', '+id+', 1)" onclick="Docs.deleteItem('+oid+', '+id+', cur.hash); return false" style="opacity: 0;"></div><div class="docs_edit_row fl_r" id="docs_edit_row'+oid+'_'+id+'" onmouseover="Docs.rowActive('+oid+', '+id+', 2)" onmouseout="Docs.rowInactive('+oid+', '+id+', 2)" onclick="Docs.editItem('+oid+', '+id+'); return false" style="opacity: 0;"></div>'+ext;
+  } else {
+    ext = '<div class="docs_add_row fl_r" id="docs_add_row'+oid+'_'+id+'" onmouseover="Docs.rowActive('+oid+', '+id+', 3)" onmouseout="Docs.rowInactive('+oid+', '+id+', 3)" onclick="Docs.addItem('+oid+', '+id+', cur.hash); return false" style="opacity: 0;"></div>'+ext;
   }
   return cur.itemTpl(oid, id, ext, title, dateStr, url, tags, intval(item[7])).join('');
 },
@@ -516,6 +519,10 @@ showFileTT: function(obj, oid, did) {
 
 deleteItem: function(oid, did, hash) {
   var doc = ge('docs_file_'+oid+'_'+did);
+  var delRow = ge('docs_delete_row' + oid+'_'+did);
+  if (delRow) {
+    setStyle(delRow, {opacity: 0.5});
+  }
   cur['doc_restore_'+did] = doc.innerHTML;
   doc.innerHTML = '<div class="docs_deleted"><img src="/images/upload.gif" /></div>';
   ajax.post('docs.php', {act: 'a_delete', hash: hash, did: did, oid: oid}, {
@@ -660,6 +667,60 @@ rmoveSearchTag: function (obj) {
 addSearchTag: function(obj) {
   cur.searchDD.addTag(obj.innerHTML);
   scrollToTop(100);
+},
+
+_animObjX: function(el, opacity, set_active) {
+  if (!el) return;
+  if (set_active !== undefined) {
+    el.active = set_active;
+  } else if (el.active) {
+    return;
+  }
+  animate(el, {opacity: opacity}, 200);
+},
+
+rowActive: function(oid, did, type) {
+  var docId = oid+'_'+did;
+  var shift = [10, 0, 8];
+  if (type == 1) {
+    var docObj = ge('docs_delete_row' + docId);
+    var ttText = cur.lang['docs_remove_tt'];
+  } else if (type == 2) {
+    var docObj = ge('docs_edit_row' + docId);
+    var ttText = cur.lang['docs_edit_tt'];
+  } else {
+    var docObj = ge('docs_add_row' + docId);
+    var ttText = cur.lang['docs_add_tt'];
+    shift = [12, 2, 8];
+  }
+  Docs._animObjX(docObj, 1, 1);
+  if (ttText) {
+    showTooltip(docObj, {text: ttText, showdt: 500, black: 1, shift: shift});
+  }
+},
+rowInactive: function(oid, did, type) {
+  var docId = oid+'_'+did;
+  if (type == 1) {
+    var docObj = ge('docs_delete_row' + docId);
+  } else if (type == 2) {
+    var docObj = ge('docs_edit_row' + docId);
+  } else {
+    var docObj = ge('docs_add_row' + docId);
+  }
+  Docs._animObjX(docObj, 0.5, 0);
+},
+
+rowOver: function(oid, did) {
+  var docId = oid+'_'+did;
+  Docs._animObjX(ge('docs_delete_row' + docId), 0.5);
+  Docs._animObjX(ge('docs_edit_row' + docId), 0.5);
+  Docs._animObjX(ge('docs_add_row' + docId), 0.5);
+},
+rowOut: function(oid, did) {
+  var docId = oid+'_'+did;
+  Docs._animObjX(ge('docs_delete_row' + docId), 0);
+  Docs._animObjX(ge('docs_edit_row' + docId), 0);
+  Docs._animObjX(ge('docs_add_row' + docId), 0);
 },
 
 _eof: 1};try{stManager.done('docs.js');}catch(e){}

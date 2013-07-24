@@ -68,7 +68,8 @@ var WallEdit = {
 
     if (opts.noatt) {
       setTimeout(function () {
-        show(node.previousSibling);
+        addClass('wpe_media_preview', 'med_no_attach');
+        show(node.previousSibling, 'wpe_media_preview');
         hide(node, acts, likeWrap);
         cur.wallEditComposer = Composer.init(ge('wpe_text'), {lang: mentionsLang});
         elfocus('wpe_text');
@@ -80,19 +81,21 @@ var WallEdit = {
       show(node.previousSibling);
       hide(node, acts, likeWrap);
 
-      var mediaTypes = [], mediaOpts;
+      var mediaTypes = [], mediaOpts, dis = [];
       if (opts.reply) {
         each (types, function () {
           if (inArray(this[0], ['photo', 'video', 'audio', 'doc', 'link'])) {
             mediaTypes.push(this);
           }
         });
+        dis = ['album'];
       } else if (opts.copy) {
         each (types, function () {
           if (inArray(this[0], ['photo', 'video', 'audio', 'doc'])) {
             mediaTypes.push(this);
           }
         });
+        dis = ['album', 'share', 'link', 'page'];
       } else {
         mediaTypes = types;
       }
@@ -103,6 +106,7 @@ var WallEdit = {
           types: mediaTypes,
           options: {
             toId: post.split('_')[0],
+            disabledTypes: dis,
             limit: opts.copy ? 1 : (opts.reply ? 2 : 10),
             toggleLnk: opts.reply || opts.copy,
             editable: !opts.reply && !opts.copy,

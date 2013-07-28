@@ -128,7 +128,7 @@ var photos = {
     var photo_id = photo.id.replace(needle, '');
     var before_id = (before && before.id || '').replace(needle, '');
     var after_id = (after && after.id || '').replace(needle, '');
-    ajax.post('al_photos.php', {act: 'reorder_photos', photo: photo_id, before: before_id, after: after_id, rev: nav.objLoc.rev});
+    ajax.post('al_photos.php', {act: 'reorder_photos', photo: photo_id, before: before_id, after: after_id, rev: nav.objLoc.rev, hash: cur.reorderHash});
   },
   privacy: function(key) {
     if (key == 'photos_move') {

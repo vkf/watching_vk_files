@@ -55,7 +55,8 @@
 .is_2x #groups_list_search,
 .is_2x .tdd_search .tdd_control,
 .is_2x #search_query,
-.is_2x .tdd_search .tdd_control {
+.is_2x .tdd_search .tdd_control,
+.is_2x .choose_search_cont input {
   background-image: url(/images/magglass_2x.png);
   background-size: 11px 11px;
 }

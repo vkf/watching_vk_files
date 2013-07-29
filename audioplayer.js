@@ -1025,7 +1025,7 @@ var audioPlayer = {
           }
         }
         if (obj.duration) {
-          obj.duration.innerHTML = songInfo[4];
+          obj.duration.innerHTML = _a.timeLeft ? songInfo[4] : '0:00';
         }
         if (obj.add) {
           var aid = currentAudioId(), cur_aids = aid && aid.split('_') || [], raw_id = aid && cur_aids[0] + '_' + cur_aids[1] || null;

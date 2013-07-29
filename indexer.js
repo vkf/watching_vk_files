@@ -11,8 +11,8 @@ function vkIndexer(list, prepareFunc, callback) {
   setTimeout(this.indexIteration.bind(this), 10);
 }
 
-vkIndexer.prototype.delimiter = new RegExp('[\\s\\-\\.,\\"\\\'\\«\\(\\)\\[\\]\\{\\}\\\\]+', 'g');
-vkIndexer.prototype.trimmer = new RegExp('^[\\s\\-\\.,\\"\\\'\\«\\(\\)\\[\\]\\{\\}\\\\]+|[\\s\\-,\\"\\\'\\«\\(\\)\\[\\]\\{\\}\\\\]+$', 'g');
+vkIndexer.prototype.delimiter = new RegExp('[\\s\\-\\.,\\"\\\'\\«\\(\\)\\[\\]\\{\\}\\+\\\\]+', 'g');
+vkIndexer.prototype.trimmer = new RegExp('^[\\s\\-\\.,\\"\\\'\\«\\(\\)\\[\\]\\{\\}\\+\\\\]+|[\\s\\-,\\"\\\'\\«\\(\\)\\[\\]\\{\\}\\\\]+$', 'g');
 
 vkIndexer.prototype.toTranslit = {1072:"a",1073:"b",1074:"v",1075:"g",1076:"d",1077:"e",1078:"zh",
 1079:"z",1080:"i",1081:"y",1082:"k",1083:"l",1084:"m",1085:"n",1086:"o",1087:"p",1088:"r",

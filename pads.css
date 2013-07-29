@@ -764,6 +764,9 @@ div.pad_msg_text div.im_fwd_log_wrap {
   background: #FFF url(/images/magglass.png) no-repeat 5px 6px;
   outline: none;
 }
+#pad_audio_search input.pad_search:active {
+  pointer-events: none;
+}
 .font_medium #pad_audio_search input.pad_search {
   width: 310px;
 }

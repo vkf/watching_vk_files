@@ -1640,6 +1640,12 @@ var Audio = {
   loadFeed: function(update) {
     if (cur.isFeedLoading) return;
     cur.isFeedLoading = true;
+    if (cur.audiosList['all'] && cur.allAudiosIndex != 'all') {
+      cur.allAudiosIndex = 'all';
+      this.indexAll();
+      var curEl = geByClass1('current', ge('audio_friends_list'));
+      if (curEl) removeClass(curEl, 'current');
+    }
     if (update) {
       delete cur.feedFrom;
       delete cur.feedOffset;

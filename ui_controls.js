@@ -1133,8 +1133,10 @@ createChildClass('Selector', UiControl, {
   showDefaultList: function() {
     var reversed = hasClass(this.resultList, 'reverse');
     var rev = this.needsReverse();
-    if (reversed != rev && this.currenDataItems) {
-      this.setSelectContent(this.currenDataText || '', this.currenDataItems);
+    if (reversed != rev) {
+      if (this.currenDataItems) {
+        this.setSelectContent(this.currenDataText || '', this.currenDataItems);
+      }
       toggleClass(this.resultList, 'reverse', rev);
       toggleClass(this.resultListShadow, 'reverse', rev);
       reversed = rev;
@@ -1180,7 +1182,7 @@ createChildClass('Selector', UiControl, {
       listH = minListH ? minListH : (this.currenDataItems ? this.currenDataItems.length * getSize(this.container)[1] : maxListH);
     }
     if (listH > maxListH) listH = maxListH;
-    return (contY + contH + listH - scrollY > wh && contY - listH - scrollY > 0);
+    return (contY + contH + listH - scrollY > wh && contY - listH - scrollY > 0 && contY - listH > 40);
   },
   setSelectContent: function(text, items, query) {
     items = isArray(items) && items.length ? items : [];

@@ -95,6 +95,11 @@ var html5video = {
       actsEl.appendChild(se('<div id="logo_btn" class="logo ' + (vars.is_vk ? 'vk ' : '') +  'fl_l" onmouseover="html5video.logoOver(this, event)" onmouseout="html5video.logoOut(this, event)" onclick="html5video.logoClick()"></div>'), ge('quality_btn'));
       html5video.actionsW += 35;
     }
+    html5video.noQualityBtn = !vars.vtag;
+    if (html5video.noQualityBtn) {
+      hide('quality_btn');
+      html5video.actionsW -= 31;
+    }
     html5video.maxActionsW = html5video.actionsW;
 
     setStyle(actsEl, {minWidth: html5video.actionsW});
@@ -201,6 +206,9 @@ var html5video = {
     var vars = html5video.vars, host;
     if (vars.cacheData[res]) {
       return vars.cacheData[res];
+    }
+    if (!vars.vtag && vars['extra_data']) {
+      return vars['extra_data'];
     }
     if (typeof(vars.host) == 'string' && vars.host.substr(0, 4) == 'http') {
       host = vars.host;
@@ -424,6 +432,9 @@ var html5video = {
       'rotate_btn': 34,
       'add_btn': 33
     };
+    if (html5video.noQualityBtn) {
+      btns = btns.slice(1);
+    }
     var actsEl = ge('video_actions');
     for (var i in btns) {
       show(btns[i]);

@@ -2292,7 +2292,6 @@ var Wall = {
   postClick: function (post, event, opts) {
     var matches = (post || '').match(/^(-?\d+)_(wall)?(\d+)$/),
         el = ge('post' + post);
-    if (!matches) return;
     if (opts && opts.skipCheck) {
       var clickEl = true;
     } else {
@@ -2304,9 +2303,12 @@ var Wall = {
       var moreLink = geByClass1('wall_post_more', clickEl, 'a');
       if (moreLink && isVisible(moreLink)) {
         moreLink.onclick();
+        if (!matches) removeClass(el, 'wall_post_over');
         return;
       }
     }
+
+    if (!matches) return;
 
     if (hasClass(el, 'suggest') || geByClass1('post_publish', el)) return;
     var url = 'wall' + matches[1] + '_' + matches[3];
@@ -2432,7 +2434,7 @@ var Wall = {
   postOver: function(post) {
     var el = ge('post' + post);
     if (!el || hasClass(el, 'one')) return;
-    if (post.match(/^(-?\d+)_(wall)?(\d+)$/)) {
+    if (post.match(/^(-?\d+)_(wall)?(\d+)$/) || isVisible(geByClass1('wall_post_more', el, 'a'))) {
       addClass(el, 'wall_post_over');
     }
     if (!vk.id) return;
@@ -2442,9 +2444,8 @@ var Wall = {
   postOut: function(post) {
     var el = ge('post' + post);
     if (!el || hasClass(el, 'one')) return;
-    if (post.match(/^(-?\d+)_(wall)?(\d+)$/)) {
-      removeClass(el, 'wall_post_over');
-    }
+
+    removeClass(el, 'wall_post_over');
     if (!vk.id) return;
 
     if (!el || hasClass(el, 'one')) return;

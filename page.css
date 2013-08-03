@@ -2162,7 +2162,7 @@ div.med_no_attach {
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
   border-radius: 3px;
-  display: block;
+  display: inline-block;
 }
 .page_media_map_point {
   position: absolute;

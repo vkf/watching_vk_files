@@ -84,7 +84,7 @@ var SmsOffice = {
       }
       ge('wrapper_'+cont_id).style.height = 'auto';
       ge('wrapper_'+cont_id).style.margin = '10px 0';
-      stManager.add('graph.js',function(){
+      stManager.add(['graph.js', 'graph.css'], function(){
         if (!window.checkGraphLoaded) {
           window.checkGraphLoaded = function(callbackId) {
             if (window.Graph) {

@@ -8,14 +8,14 @@ var l = {
 };
 
 var dateFormat = getLang('datepicker_dateFormat');
-if (dateFormat == 'dateFormat') dateFormat = '{day} {month} {year}';
+if (dateFormat === 'dateFormat') dateFormat = '{day} {month} {year}';
 var monthFormat = getLang('datepicker_monthFormat');
-if (monthFormat == 'monthFormat') monthFormat = '{month} {year}';
+if (monthFormat === 'monthFormat') monthFormat = '{month} {year}';
 
 var larr = getLang('larr');
-if (larr == 'larr') larr = '&larr;';
+if (larr === 'larr') larr = '&larr;';
 var rarr = getLang('rarr');
-if (rarr == 'rarr') rarr = '&rarr;';
+if (rarr === 'rarr') rarr = '&rarr;';
 
 var modes = ['d', 'w', 'm'];
 
@@ -68,10 +68,13 @@ window.Calendar = function(params) {
   }
 
   var day = params.day || { d: -1, m: -1, y: -1 };
-  if (!day.d) {
+  if (!day.m) {
     day = parseDay(day);
   }
-  var _t = this, addRows = params.addRows || '', addRowsM = params.addRowsM || addRows;
+
+  var _t = this;
+  var addRows = params.addRows || '';
+  var addRowsM = params.addRowsM || addRows;
 
   this.setDay = function(d, m, y) {
     day = m ? { d: d, m: m, y: y } : parseDay(d);
@@ -106,21 +109,33 @@ window.Calendar = function(params) {
     var dontDoLine = false;
     var leftStyle = '';
     var todayDate = !disabled ? new Date() : new Date(3000, 1, 1);
-    todayDate = new Date(todayDate.getFullYear(), todayDate.getMonth(), todayDate.getDate());
+    todayDate = new Date(todayDate.getFullYear(), todayDate.getMonth(), (mode === 'm') ? 1 : todayDate.getDate());
 
     var d_y = oD.getFullYear();
     dim[1] = (((d_y % 100 != 0) && (d_y % 4 == 0)) || (d_y % 400 == 0)) ? 29 : 28;
-    var t = [], t2 = [];
+    var t = [];
+    var t2 = [];
+
+    var tbl = '<table class="%cls%" cols="%cols%" cellpadding="0" border="0" cellspacing="0"><tbody>%rows%</tbody></table>';
+    var headerNormal;
+    var headerDisabled;
+
     switch (mode) {
     case 'm':
       var selDay = (y == day.y) ? day.m : 0;
       nextYear = y + 1;
       lastYear = y - 1;
-      t.push('<table class="cal_table" cols="7" cellpadding="0" border="0" cellspacing="0"><tbody><tr>');
-      t.push('<td class="month_arr"><a class="month_arrow" onclick="return cals.getMonth('+guid+',1,'+lastYear+');">' + larr + '</a></td>');
-      t.push('<td colspan="5" align="center" class="month">' + y + '</td>');
-      t.push('<td class="month_arr"><a class="month_arrow" onclick="return cals.getMonth('+guid+',1,'+nextYear+');">' + rarr + '</a></td></tr><tr>');
-      t.push('</tr></tbody></table><table class="cal_table" cols="2" cellpadding="0" border="0" cellspacing="0"><tbody><tr>');
+
+      headerNormal = ''
+        + '<tr>'
+        + '<td class="month_arr"><a class="arr left" onclick="return cals.getMonth('+guid+',1,'+lastYear+');"></a></td>'
+        + '<td align="center" class="month">' + y + '</td>'
+        + '<td class="month_arr"><a class="arr right" onclick="return cals.getMonth('+guid+',1,'+nextYear+');"></a></td>'
+        + '</tr>';
+
+      t.push('<tr><td colspan="2">');
+      t.push(rs(tbl, {cls: 'cal_table_head', cols: '3', rows: headerNormal}));
+      t.push('</td></tr><tr>');
       for (var i = 1; i <= 12; i++) {
         leftStyle = "";
         if (i % 2 == 1) {
@@ -129,20 +144,27 @@ window.Calendar = function(params) {
         }
         clDay = (i == selDay) ? 'day sel' : 'day';
         curDate = new Date(y, i - 1, 1);
-        if (i != selDay && curDate < todayDate) clDay += " past_day";
-        else if (curDate.getTime() == todayDate.getTime()) clDay += " today";
+        if (!params.pastActive && curDate < todayDate || params.pastActive && curDate > todayDate) {
+          clDay += ' past_day';
+        }
+        if (curDate.getTime() == todayDate.getTime()) {
+          clDay += ' today';
+        }
         t.push('<td class="' + clDay + leftStyle + '" style="width:50%" id="day' + i + '_' + rnd + '" onclick="return cals.getDay('+guid+', 1, '+i+', '+y+');" onmouseover="addClass(this, \'hover\')"  onmouseout="removeClass(this, \'hover\')">' + mn[i - 1] + '</td>');
       }
+      t.push('</tr>');
 
-      t.push('</tr></tbody></table>');
+      t2.push(rs(tbl, {cls: 'cal_table', cols: '2', rows: t.join('')}));
+
       if (!noheight) place.style.height = place.offsetHeight + "px";
 
-      place.innerHTML = t.join('');
+      val(place, t2.join(''));
+
       break;
 
     default:
       var selDay = (y == day.y && m == day.m) ? day.d : 0;
-      var tbl = '<table class="%cls%" cols="%cols%" cellpadding="0" border="0" cellspacing="0"><tbody>%rows%</tbody></table>';
+
       if (m == 12) {
         nextMonth = 1;
         nextYear = y + 1;
@@ -150,7 +172,6 @@ window.Calendar = function(params) {
         nextMonth = m + 1;
         nextYear = y;
       }
-
       if (m == 1) {
         lastMonth = 12;
         lastYear = y - 1;
@@ -158,12 +179,27 @@ window.Calendar = function(params) {
         lastMonth = m - 1;
         lastYear = y;
       }
+
       var monthYear = monthFormat.replace('{month}', mn[m - 1]).replace('{year}', y);
       var calClass = 'cal_table' + (disabled ? ' disabled' : '') + (monthsel ? ' unshown' : '');
-      var hoverEl = mode == 'w' ? 'this.parentNode' : 'this';
+      var hoverEl = (mode === 'w') ? 'this.parentNode' : 'this';
+
+      var headerNormal = ''
+        + '<tr>'
+        + '<td class="month_arr"><a class="arr left" onclick="return cals.getMonth('+guid+','+lastMonth+','+lastYear+');"></a></td>'
+        + '<td align="center" class="month"><a class="cal_month_sel" onclick="return cals.getMonth('+guid+','+m+','+y+',1);">' + monthYear + '</a></td>'
+        + '<td class="month_arr"><a class="arr right" onclick="return cals.getMonth('+guid+','+nextMonth+','+nextYear+');"></a></td>'
+        + '</tr>';
+      var headerDisabled = ''
+        + '<tr>'
+        + '<td class="month_arr"><span class="arr left"></span></td>'
+        + '<td align="center" class="month">' + monthYear + '</td>'
+        + '<td class="month_arr"><span class="arr right"></span></td>'
+        + '</tr>';
+
       t.push('<tr><td colspan="7">');
-      t.push(rs(tbl, {cls: 'cal_table_head', cols: '3', rows: disabled ? '<tr><td class="month_arr"><span class="arr left"></span></td><td align="center" class="month">' + monthYear + '</td><td class="month_arr"><span class="arr right"></span></td></tr><tr></tr>' : '<td class="month_arr"><a class="arr left" onclick="return cals.getMonth('+guid+','+lastMonth+','+lastYear+');"></a></td><td align="center" class="month"><a class="cal_month_sel" onclick="return cals.getMonth('+guid+','+m+','+y+',1);">' + monthYear + '</a></td><td class="month_arr"><a class="arr right" onclick="return cals.getMonth('+guid+','+nextMonth+','+nextYear+');"></a></td></tr>'}));
-      t.push('</td></tr>');
+      t.push(rs(tbl, {cls: 'cal_table_head', cols: '3', rows: disabled ? headerDisabled : headerNormal}));
+      t.push('</td></tr><tr>');
 
       for (var s = 0; s < 7; s++) {
         t.push('<td class="daysofweek">' + l.days[s] + '</td>');
@@ -178,7 +214,7 @@ window.Calendar = function(params) {
         var curDate = new Date(y, m - 1, i - oD.od + 1);
         var x1 = x;
         var lim = 1;
-        if (mode == 'w') {
+        if (mode === 'w') {
           var x1 = i - oD.od - i % 7 + 2;
           if (i % 7 == 0) x1 -= 7;
           if (selDay) {
@@ -186,14 +222,19 @@ window.Calendar = function(params) {
             if (lim == 8) lim = 1;
           }
         }
-        if (x >= selDay && x < selDay + lim) {
-          clDay = 'day sel' + leftStyle;
-        } else {
-          clDay = 'day' + leftStyle;
-        }
-        if (curDate < todayDate) clDay += ' past_day';
 
-        if (curDate.getTime() == todayDate.getTime()) clDay += ' today';
+        clDay = leftStyle;
+        if (x >= selDay && x < selDay + lim) {
+          clDay += ' day sel';
+        } else {
+          clDay += ' day';
+        }
+        if (!params.pastActive && curDate < todayDate || params.pastActive && curDate > todayDate) {
+          clDay += ' past_day';
+        }
+        if (curDate.getTime() == todayDate.getTime()) {
+          clDay += ' today';
+        }
 
         if (x > 0) {
           dayPos[i] = x1;
@@ -201,8 +242,8 @@ window.Calendar = function(params) {
         } else {
           if (i != 36) {
             if (!dontDoLine) {
-              if (mode == "w") dayPos[i] = x1;
-              date = (i > 7 && !hideNextMonth) ? curDate.getDate() : "&nbsp";
+              if (mode === 'w') dayPos[i] = x1;
+              date = (i > 7 && !hideNextMonth) ? curDate.getDate() : '&nbsp';
               t.push('<td class="day no_month_day' + leftStyle + '">' + date + '</td>');
             }
           } else {
@@ -214,7 +255,9 @@ window.Calendar = function(params) {
         }
       }
       t.push('</tr>' + addRows);
+
       t2.push(rs(tbl, {cls: calClass, cols: '7', rows: t.join('')}));
+
       t = [];
 
       todayDate = new Date(todayDate.getFullYear(), todayDate.getMonth(), 1);
@@ -222,8 +265,21 @@ window.Calendar = function(params) {
       var selDay = (y == day.y) ? day.m : 0;
       var calClass = 'cal_table' + (disabled ? ' disabled' : '') + (monthsel ? '' : ' unshown');
 
+      headerNormal = ''
+        + '<tr>'
+        + '<td class="month_arr"><a class="arr left" onclick="return cals.getMonth('+guid+','+m+','+(y-1)+',1);"></a></td>'
+        + '<td align="center" class="month"><a class="cal_month_sel" onclick="return cals.getMonth('+guid+','+m+','+y+');">' + y + '</a></td>'
+        + '<td class="month_arr"><a class="arr right" onclick="return cals.getMonth('+guid+','+m+','+(y+1)+',1);"></a></td>'
+        + '</tr>';
+      headerDisabled = ''
+        + '<tr>'
+        + '<td class="month_arr"><span class="arr left"></span></td>'
+        + '<td align="center" class="month">' + y + '</td>'
+        + '<td class="month_arr"><span class="arr right"></span></td>'
+        + '</tr>';
+
       t.push('<tr><td colspan="2">');
-      t.push(rs(tbl, {cls: 'cal_table_head', cols: '3', rows: disabled ? '<tr><td class="month_arr"><span class="arr left"></span></td><td align="center" class="month">' + y + '</td><td class="month_arr"><span class="arr right"></span></td></tr><tr></tr>' : '<td class="month_arr"><a class="arr left" onclick="return cals.getMonth('+guid+','+m+','+(y-1)+',1);"></a></td><td align="center" class="month"><a class="cal_month_sel" onclick="return cals.getMonth('+guid+','+m+','+y+');">' + y + '</a></td><td class="month_arr"><a class="arr right" onclick="return cals.getMonth('+guid+','+m+','+(y+1)+',1);"></a></td></tr>'}));
+      t.push(rs(tbl, {cls: 'cal_table_head', cols: '3', rows: disabled ? headerDisabled : headerNormal}));
       t.push('</td></tr><tr>');
       for (var i = 1; i <= 12; i++) {
         leftStyle = '';
@@ -233,19 +289,24 @@ window.Calendar = function(params) {
         }
         clDay = (i == selDay) ? 'day sel' : 'day';
         curDate = new Date(y, i - 1, 1);
-        if (curDate < todayDate) clDay += ' past_day';
-        else if (curDate.getTime() == todayDate.getTime()) clDay += ' today';
+        if (!params.pastActive && curDate < todayDate || params.pastActive && curDate > todayDate) {
+          clDay += ' past_day';
+        }
+        if (curDate.getTime() == todayDate.getTime()) {
+          clDay += ' today';
+        }
         t.push('<td class="' + clDay + leftStyle + '" style="width:50%" id="day' + i + '_' + rnd + '" onclick="return cals.getMonth('+guid+', '+i+', '+y+');" onmouseover="addClass(this, \'hover\')"  onmouseout="removeClass(this, \'hover\')">' + mn[i - 1] + '</td>');
       }
-
       t.push('</tr>' + addRowsM);
 
       t2.push(rs(tbl, {cls: calClass, cols: '2', rows: t.join('')}));
 
       val(place, t2.join(''));
+
       if (browser.opera && !browser.mobile) {
         animate(place, {opacity: 0.99}, 20, animate.pbind(place, {opacity: 1}, 20)); // fuck opera!
       }
+
       break;
     }
   }
@@ -258,37 +319,42 @@ window.Datepicker = function(el, options) {
   el = ge(el);
   if (!el) return;
 
-  var calDiv, calBox, calFrame, dates = {},
-      lockHide = false,
-      _t = this,
-      w, isShown = false,
-      hour = 0,
-      min = 0;
-  var id = el.id,
-      inputId = id + "_date_input",
-      n = el.name || id,
-      p = el.parentNode,
-      calBox = id + '_cal_box',
-      calDiv = id + '_cal_div',
-      calFrame = id + '_cal_frame';
+  var dates = {};
+  var lockHide = false;
+  var _t = this;
+  var w;
+  var isShown = false;
+  var hour = 0;
+  var min = 0;
+  var id = el.id;
+  var inputId = id + "_date_input";
+  var n = el.name || id;
+  var p = el.parentNode;
+  var calBox = id + '_cal_box';
+  var calDiv = id + '_cal_div';
+  var calFrame = id + '_cal_frame';
 
   var defaults = {
-    mode: 'd',
-    resfmt: 'ts', // could be 'plain'
-    onUpdate: function(d, m) {},
-    width: 145
+    mode:       'd',
+    resfmt:     'ts', // could be 'plain'
+    width:      145,
+    addRows:    '',
+    noPast:     false,
+    pastActive: false,
+    onUpdate:   function(d, m) {}
   };
 
   options = extend({}, defaults, options);
 
-  var mode = options.mode;
-  var onUpdate = options.onUpdate;
-  var w = options.width;
-  var fmt = options.resfmt;
-  var addRows = options.addRows || '', addRowsM = options.addRowsM || addRows;
+  var mode       = options.mode;
+  var onUpdate   = options.onUpdate;
+  var w          = options.width;
+  var fmt        = options.resfmt;
+  var addRows    = options.addRows;
+  var addRowsM   = options.addRowsM || addRows;
 
   var onClick = function(e) {
-    if (mode == 'h') return false;
+    if (mode === 'h') return false;
     if (isShown) {
       _t.hide();
     } else {
@@ -305,12 +371,13 @@ window.Datepicker = function(el, options) {
     _ui.sel(_t.guid);
     show(calBox);
     new Calendar({
+      container:     ge(calDiv),
+      day:           dates,
+      mode:          mode,
+      addRows:       addRows,
+      addRowsM:      addRowsM,
       hideNextMonth: true,
-      container: ge(calDiv),
-      day: dates,
-      mode: mode,
-      addRows: addRows,
-      addRowsM: addRowsM,
+      pastActive:    options.pastActive,
       getDay: function(d, m, y) {
         updateDate({
           'd': d,
@@ -332,20 +399,20 @@ window.Datepicker = function(el, options) {
     }
     dates = date;
     var controlElem = geByClass1('datepicker_control', wrap);
-    if (mode == 'h') {
+    if (mode === 'h') {
       addClass(controlElem, 'disabled');
     } else {
       removeClass(controlElem, 'disabled');
-      if (mode == 'm') {
-        ge(inputId).value = l.mn[date.m - 1] || '';
+      if (mode === 'm') {
+        ge(inputId).value = monthFormat.replace('{month}', winToUtf(l.mn[date.m - 1])).replace('{year}', date.y);
       } else {
         ge(inputId).value = dateFormat.replace('{day}', date.d).replace('{month}', winToUtf(l.mnOf[date.m - 1])).replace('{year}', date.y);
       }
     }
     _t.hide();
-    if (fmt == 'plain') {
+    if (fmt === 'plain') {
       ge(id).value = date.d + '.' + date.m + '.' + date.y + (options.time ? (' ' + hour + ':' + min) : '');
-    } else if (fmt == 'ts') {
+    } else if (fmt === 'ts') {
       ge(id).value = Math.floor(new Date(date.y, date.m - 1, date.d, hour, min).getTime() / 1000) - ((new Date()).getTimezoneOffset() + 240) * 60 - intval(vk.dt);
     }
     if (!init) onUpdate(date, mode);
@@ -422,7 +489,7 @@ window.Datepicker = function(el, options) {
   _t.guid = _ui.reg({
     container: wrap,
     onEvent: function(e) {
-      if (e.type == 'mousedown') {
+      if (e.type === 'mousedown') {
         var outside = true,
             t = e.target;
         while (t && t != t.parentNode) {
@@ -501,9 +568,9 @@ window.Timepicker = function(el, options) {
   var onChange = function() {
     var hour = hourDD.val(),
         min = minDD.val();
-    if (fmt == 'plain') {
+    if (fmt === 'plain') {
       ge(id).value = hour + ':' + min;
-    } else if (fmt == 'ts') {
+    } else if (fmt === 'ts') {
       ge(id).value = hour * 3600 + min * 60;
     }
     o.onUpdate(hour, min);

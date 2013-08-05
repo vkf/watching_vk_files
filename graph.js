@@ -406,7 +406,7 @@ function Graph(id, data, params, width, height) {
 
   // create basic DOM tree
   this.graphDiv = ge(id);
-  setStyle(this.graphDiv, {fontFamily: 'tahoma, arial, verdana, sans-serif, Lucida Sans', fontSize: '11px', color: '#36638e', width: this.viewWidth + 'px', clear: 'both', lineHeight: '130%'});
+  setStyle(this.graphDiv, {fontFamily: 'tahoma, arial, verdana, sans-serif, Lucida Sans', fontSize: '11px', color: '#36638e', width: this.viewWidth + 'px', clear: 'both', lineHeight: '130%', textAlign: 'left'});
   this.graphDiv.innerHTML = '<div style="float: left"><canvas style="padding-top: 20px"></canvas></div>\
     <div style="float: left">\
       <div style="height: 20px; float: right;"></div>\

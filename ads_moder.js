@@ -5,35 +5,68 @@ AdsModer.init = function() {
 }
 
 AdsModer.initDelayedImages = function() {
-  var imagesAll = geByTag('img');
-  var imagesIndex = {};
+  var imagesIndex;
   var indexStep = 500;
+  var lastImage;
+  var lastImageY;
 
-  var image;
-  var indexKey;
-  for (var i = 0, len = imagesAll.length; i < len; i++) {
-    image = imagesAll[i];
-    if (!image.hasAttribute('src_')) {
-      continue;
-    }
-    indexKey = intval(getXY(image)[1] / indexStep);
-    if (!(indexKey in imagesIndex)) {
-      imagesIndex[indexKey] = [];
-    }
-    imagesIndex[indexKey].push(image);
-  }
-
+  buildIndex();
   if (isEmpty(imagesIndex)) {
     return;
   }
 
-  function onScroll() {
+  var scrolledNode = (browser.msie6 ? pageNode : window);
+  var handler = checkImages.pbind(false);
+  function deinit() {
+    removeEvent(scrolledNode, 'scroll', handler);
+  }
+  cur.destroy.push(deinit);
+  addEvent(scrolledNode, 'scroll', handler);
+  handler();
+
+  function buildIndex() {
+    if (lastImage && lastImage.hasAttribute('src_') && lastImageY == getXY(lastImage)[1]) {
+      return;
+    }
+
+    var imagesAll = geByTag('img');
+    var image;
+    var indexKey;
+
+    imagesIndex = {};
+
+    if (!imagesAll.length) {
+      return;
+    }
+
+    for (var i = 0, image; image = imagesAll[i]; i++) {
+      if (!image.hasAttribute('src_')) {
+        continue;
+      }
+      indexKey = intval(getXY(image)[1] / indexStep);
+      if (!(indexKey in imagesIndex)) {
+        imagesIndex[indexKey] = [];
+      }
+      imagesIndex[indexKey].push(image);
+      lastImage = image;
+    }
+
+    lastImageY = getXY(lastImage)[1];
+  }
+
+  function checkIndex() {
+    buildIndex();
+    if (isEmpty(imagesIndex)) {
+      deinit();
+    }
+  }
+
+  function checkImages(delayed) {
     var yTop        = scrollGetY()
     var yBottom     = yTop + lastWindowHeight;
     var indexTop    = intval(yTop / indexStep);
     var indexBottom = intval(yBottom / indexStep);
     var image;
-    var isUpdated = false;
     for (var i = indexTop; i <= indexBottom; i++) {
       if (!(i in imagesIndex)) {
         continue;
@@ -42,33 +75,12 @@ AdsModer.initDelayedImages = function() {
         image = imagesIndex[i][j];
         image.src = image.getAttribute('src_');
         image.removeAttribute('src_')
-        isUpdated = true;
       }
       delete imagesIndex[i];
     }
-    if (!isUpdated) {
-      for (var i in imagesIndex) {
-        image = imagesIndex[i].pop();
-        image.src = image.getAttribute('src_');
-        image.removeAttribute('src_');
-        if (!imagesIndex[i].length) {
-          delete imagesIndex[i];
-        }
-        break;
-      }
-    }
-    if (isEmpty(imagesIndex)) {
-      deinit();
-    }
+    checkIndex();
+    setTimeout(checkIndex, 1000);
   }
-
-  var scrolledNode = browser.msie6 ? pageNode : window;
-  function deinit() {
-    removeEvent(scrolledNode, 'scroll', onScroll);
-  }
-  cur.destroy.push(deinit);
-  addEvent(scrolledNode, 'scroll', onScroll);
-  onScroll();
 }
 
 AdsModer.showObjectInfo = function(objectType, objectId) {
@@ -181,7 +193,7 @@ AdsModer.saveNote = function(isDelete) {
 }
 
 AdsModer.openCategoriesEditBox = function(requestKey, linkElem) {
-  var editBox = showFastBox({title: 'Изменение тематики объявления', width: 420}, cur.categoriesEditBoxHtml);
+  var editBox = showFastBox({title: 'Изменение тематики объявления', width: 440}, cur.categoriesEditBoxHtml);
   editBox.removeButtons();
   editBox.addButton(getLang('box_cancel'), false, 'no');
   editBox.addButton('Изменить', applyChanges, 'yes');
@@ -644,4 +656,99 @@ AdsModer.historyToggleFilters = function() {
       toggleClass(elem, 'unshown');
   }
 }
+
+AdsModer.statSummaryInit = function(periodType, fromYear, fromMonth, fromDay, toYear, toMonth, toDay) {
+  var datePickerOptionsFrom = {
+    mode: (periodType === 'month') ? 'm' : 'd',
+    year:  fromYear,
+    month: fromMonth,
+    day:   fromDay,
+    width: 130,
+    pastActive: true,
+    onUpdate: function(date, mode) {
+      fromYear  = date.y;
+      fromMonth = date.m;
+      fromDay   = date.d;
+      updateLink();
+    }
+  };
+  var datePickerOptionsTo = {
+    mode: (periodType === 'month') ? 'm' : 'd',
+    year:  toYear,
+    month: toMonth,
+    day:   toDay,
+    width: 130,
+    pastActive: true,
+    onUpdate: function(date, mode) {
+      toYear  = date.y;
+      toMonth = date.m;
+      toDay   = date.d;
+      updateLink();
+    }
+  };
+  new Datepicker(ge('ads_moder_stat_summary_from'), datePickerOptionsFrom);
+  new Datepicker(ge('ads_moder_stat_summary_to'), datePickerOptionsTo);
+
+  function updateLink() {
+    var fromPeriod = fromYear * 100 + fromMonth;
+    var toPeriod   = toYear   * 100 + toMonth;
+    if (periodType !== 'month') {
+      fromPeriod = fromPeriod * 100 + fromDay;
+      toPeriod   = toPeriod   * 100 + toDay;
+    }
+    var linkElem = ge('ads_moder_stat_summary_range_link');
+    linkElem.href = linkElem.href.replace(/&period=\d+-\d+/, '&period=' + fromPeriod + '-' + toPeriod);
+    linkElem.style.opacity = 1;
+  }
+}
+
+AdsModer.statSummaryShowAllProperties = function() {
+  var propertiesElem = ge('ads_moder_stat_summary_filter_properties');
+  var elems = geByClass('ads_moder_stat_summary_filter_property', propertiesElem);
+  each(elems, show);
+  hide('ads_moder_stat_summary_filter_properties_shower');
+}
+
+AdsModer.statSummaryDistrShowCountLabel = function(id, i, val) {
+  var contXy = getXY(ge(id+'_stats_graph_wrap'));
+  var colXy  = getXY(ge(id+'_distr_col_'+i));
+
+  setStyle(ge(id+'_max_label'), {
+    left: colXy[0] - contXy[0] + 14,
+    top:  colXy[1] - contXy[1] - 11
+  });
+  ge(id+'_max_label').innerHTML = val;
+  show(id+'_max_label');
+  setStyle(ge(id+'_max_label_out'), {
+    width:  ge(id+'_max_label').offsetWidth + 2,
+    height: ge(id+'_max_label').offsetHeight + 2,
+    left:   colXy[0] - contXy[0] + 13,
+    top:    colXy[1] - contXy[1] - 12
+  });
+  show(id+'_max_label_out');
+  setStyle(ge(id+'_max_label_out2'), {
+    width:  ge(id+'_max_label').offsetWidth + 4,
+    height: ge(id+'_max_label').offsetHeight + 4,
+    left:   colXy[0] - contXy[0] + 12,
+    top:    colXy[1] - contXy[1] - 13
+  });
+  show(id+'_max_label_out2');
+}
+
+AdsModer.statSummaryDistrHideCountLabel = function(id) {
+  hide(id+'_max_label');
+  hide(id+'_max_label_out');
+  hide(id+'_max_label_out2');
+}
+
+AdsModer.statSummaryShowVotesBox = function(periodType, period) {
+  var ajaxParams = {};
+  ajaxParams.period_type = periodType;
+  ajaxParams.period      = period;
+
+  var showOptions = {params: {}};
+
+  showBox('/adsmoder?act=stat_summary_votes', ajaxParams, showOptions);
+}
+
 try{stManager.done('ads_moder.js');}catch(e){}

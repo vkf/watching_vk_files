@@ -25,6 +25,33 @@ td.ads_table_overflow_hidden div div {
   width: 700px;
 }
 
+.ads_moder_stat_filter {
+  background-color: #F7F7F7;
+  border-bottom: 1px solid #DAE1E8;
+  padding: 10px 10px 5px 10px;
+}
+.ads_moder_stat_filter_tab_wrap {
+  padding: 0 5px 5px 0;
+  text-align: center;
+}
+.ads_moder_stat_filter_tab_wrap .round_tab.disabled:hover,
+.ads_moder_stat_filter_tab_wrap .round_tab.label:hover {
+  background-color: transparent;
+  cursor: default;
+}
+.ads_moder_stat_filter_tab_wrap .round_tab.label {
+  color: #555555;
+}
+.ads_moder_stat_filter_period_day .round_tab {
+  width: 100px;
+}
+.ads_moder_stat_filter_period_week .round_tab {
+  width: 180px;
+}
+.ads_moder_stat_filter_period_month .round_tab {
+  width: 100px;
+}
+
 /* -- */
 /* Ad */
 /* -- */
@@ -383,7 +410,7 @@ a.ads_premoderation_request_ad_page_link {
 .ads_premoderation_categories_edit_box .label {
   padding-top: 4px;
   color: grey;
-  width: 130px;
+  width: 150px;
   text-align: right;
 }
 .ads_premoderation_categories_edit_box .labeled {
@@ -396,29 +423,6 @@ a.ads_premoderation_request_ad_page_link {
 }
 .ads_premoderation_mass_progress_wrap1 {
   width: 250px;
-}
-
-.ads_premoderation_stat_filter {
-  background-color: #F7F7F7;
-  border-bottom: 1px solid #DAE1E8;
-  padding: 10px 10px 5px 10px;
-}
-.ads_premoderation_stat_filter_tab_wrap {
-  padding: 0 5px 5px 0;
-  text-align: center;
-}
-.ads_premoderation_stat_filter_tab_wrap .round_tab.disabled:hover {
-  background-color: transparent;
-  cursor: default;
-}
-.ads_premoderation_stat_filter_period_day .round_tab {
-  width: 100px;
-}
-.ads_premoderation_stat_filter_period_week .round_tab {
-  width: 180px;
-}
-.ads_premoderation_stat_filter_period_month .round_tab {
-  width: 100px;
 }
 
 .ads_premoderation_stat_moder_name_wrap {
@@ -455,6 +459,59 @@ table.ads_logs_info {
 table.ads_logs_info td,
 table.ads_logs_info th {
   padding: 1px 10px;
+}
+
+/* ------------ */
+/* Stat summary */
+/* ------------ */
+
+.ads_stat_sumary_content {
+  padding: 20px;
+}
+
+.ads_moder_stat_summary_range_wrap {
+  margin-top: -2px;
+}
+@-moz-document url-prefix() {
+.ads_moder_stat_summary_range_wrap {
+  margin-top: -1px;
+}
+}
+.ads_moder_stat_summary_range_part {
+  padding-left: 8px;
+}
+.ads_moder_stat_summary_range_label {
+  padding-top: 5px;
+}
+@-moz-document url-prefix() {
+.ads_moder_stat_summary_range_label {
+  padding-top: 4px;
+}
+}
+#ads_moder_stat_summary_range_link {
+  opacity: 0.5;
+  display: block;
+  padding: 1px;
+}
+#ads_moder_stat_summary_range_link:hover {
+  opacity: 1;
+}
+#ads_moder_stat_summary_range_link img {
+  display: block;
+}
+
+#ads_moder_stat_summary_filter_properties_shower {
+  display: block;
+  padding: 3px 8px 8px 8px;
+}
+
+.ads_stat_summary_graph_link {
+  height: 11px;
+  overflow: visible;
+}
+.ads_stat_summary_graph_image {
+  display: block;
+  margin-top: -1px;
 }
 
 /* ----- */
@@ -494,4 +551,72 @@ table.ads_logs_info th {
 #ads_premoderation_stat .ads_unions_list th.column_period *,
 #ads_premoderation_stat .ads_unions_list td.column_period {
   text-align: left;
+}
+
+/* Distribution chart */
+.ads_moder_chart_table_wrap {
+  position: relative;
+}
+.ads_moder_chart_table {
+  background-color: #F3F5F7;
+  border: 0 none;
+  margin-bottom: 10px;
+  vertical-align: bottom;
+  margin: 0 auto;
+}
+.ads_moder_chart_table td.ads_moder_total_chart_row {
+  background-color: #FFFFFF;
+  color:#45688E;
+  border: 0 none;
+  padding-top: 10px;
+  padding-bottom: 30px;
+  vertical-align: bottom;
+}
+.ads_moder_chart_column {
+  background-color: #B0C1CF;
+  vertical-align: bottom;
+  cursor: pointer;
+}
+.ads_moder_chart_column.even {
+  background-color: #C7D3DD;
+}
+.ads_moder_chart_table td {
+  vertical-align: bottom;
+}
+.ads_moder_chart_table td.ads_moder_chart_under_num {
+  background-color: #EAEEF2;
+  height: 15px;
+  padding-bottom: 3px;
+}
+.ads_moder_chart_table td.ads_moder_chart_under_num.even {
+  background-color: #FFFFFF;
+}
+.ads_moder_chart_date {
+  font-size: 9px;
+  height: 10px;
+  padding-top: 4px;
+  text-align: center;
+}
+.ads_moder_chart_max_label {
+  background-color: #FFFFFF;
+  color: #000000;
+  display: none;
+  font-size: 9px;
+  padding: 2px 4px;
+  position: absolute;
+  z-index: 100;
+}
+.ads_moder_chart_max_label_out {
+  background-color: #2B587A;
+  display: none;
+  opacity: 0.2;
+  position: absolute;
+  z-index: 90;
+}
+.ads_moder_chart_max_label_out2 {
+  background-color: #2B587A;
+  display: none;
+  opacity: 0.1;
+  position: absolute;
+  z-index: 90;
 }

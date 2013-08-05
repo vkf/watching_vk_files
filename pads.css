@@ -580,9 +580,11 @@ b.pad_fr_mob_onl {
   margin-right: -4px;
 }
 .pad_msg_name,
-.pad_msg_text {
+.pad_msg_text,
+.pad_msg_text .wall_module .post_media {
   width: 380px;
 }
+
 .pad_msg_text .wall_reply_text,
 .pad_nws_text .wall_reply_text,
 .pad_msg_text .wall_post_text,

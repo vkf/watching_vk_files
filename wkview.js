@@ -1503,6 +1503,9 @@ likesInit: function () {
 
   if (!cur.wallInited) {
     Wall.initWallOptions(wkcur.wall_opts);
+  } else {
+    wkcur._oldReplyForm = cur.wallTpl.reply_form;
+    cur.wallTpl.reply_form = wkcur.wall_opts.wall_tpl.reply_form;
   }
 
   if (cur.options === undefined) {
@@ -1516,6 +1519,10 @@ likesInit: function () {
     removeEvent(wkLayerWrap, 'scroll', WkView.onScroll);
     removeEvent(window, 'resize', WkView.onResize);
     re(wkcur.lSTL, cur.lSTL);
+    if (wkcur._oldReplyForm) {
+      cur.wallTpl.reply_form = wkcur._oldReplyForm;
+      wkcur._oldReplyForm = false;
+    }
   });
 },
 likesTabInit: function () {

@@ -191,4 +191,262 @@ declineObjection: function(oid) {
   });
 },
 
+indexTitles: function(callback) {
+  var all = cur.blacklist,
+  replacer = function(str, p) {
+    var c = intval(p);
+    return (c >= 33 && c < 48) ? String.fromCharCode(c) : str;
+  };
+
+  cur.titles = cur.titles || {};
+  cur.titlesIndex = new vkIndexer(all, function(obj) {
+    cur.titles[parseInt(obj.id)] = obj;
+    return obj.title_sorted.replace(/\&\#(\d+);?/gi, replacer);
+  }, function() {
+    if (callback) {
+      callback();
+    }
+  });
+},
+
+filterClaimedTitles: function(e, obj, force) {
+  clearTimeout(this.filterTimeout);
+  this.filterTimeout = setTimeout((function() {
+    var str = trim(obj.value);
+    if (str == cur.searchStr && !force) return;
+    toggleClass(cur.clearSearch, 'shown', !!str);
+    if (str && hasClass(cur.addButton.parentNode, 'button_disabled')) {
+      disableButton(cur.addButton, false);
+    } else if (!str && !hasClass(cur.addButton.parentNode, 'button_disabled')) {
+      disableButton(cur.addButton, true);
+    }
+    cur.searchStr = str;
+    this.searchTitles(str);
+
+    scrollToTop();
+  }).bind(this), 10);
+},
+
+clearTitlesSearch: function(el, event) {
+  setStyle(el, {opacity: .6});
+  elfocus(cur.aSearch);
+  val(cur.aSearch, '');
+  removeClass(cur.clearSearch, 'shown');
+  if (!hasClass(cur.addButton.parentNode, 'button_disabled')) {
+    disableButton(cur.addButton, true);
+  }
+  this.filterClaimedTitles(null, cur.aSearch);
+},
+
+scrollCheck: function () {
+  if (browser.mobile || cur.disableAutoMore) return;
+
+  if (!isVisible(cur.showMore) || !cur.curList) return;
+
+  var docEl = document.documentElement;
+  var ch = window.innerHeight || docEl.clientHeight || bodyNode.clientHeight;
+  var st = scrollGetY();
+
+  if (st + ch + 400 > cur.showMore.offsetTop) {
+    Claims.showTitleRows();
+  }
+},
+
+scrollnode: browser.msie6 ? pageNode : window,
+startTitleEvents: function() {
+  addEvent(Claims.scrollnode, 'scroll', Claims.scrollCheck);
+  addEvent(window, 'resize', Claims.scrollCheck);
+  addEvent(cur.aSearch, 'blur', Claims.searchTitleBlur);
+  addEvent(cur.aSearch, 'focus', Claims.searchTitleFocus);
+},
+
+stopTitleEvents: function() {
+  removeEvent(Claims.scrollnode, 'scroll', AudClaimsio.scrollCheck);
+  removeEvent(window, 'resize', Claims.scrollCheck);
+  removeEvent(cur.aSearch, 'blur', Claims.searchTitleBlur);
+  removeEvent(cur.aSearch, 'focus', Claims.searchTitleFocus);
+},
+
+searchTitleFocus: function() {
+  addClass(cur.aContent, 'light');
+},
+
+searchTitleBlur: function() {
+  removeClass(cur.aContent, 'light');
+},
+
+filterDeletedTitles: function(arr) {
+  var len = arr.length;
+  var res = [];
+  for (var i = 0; i < len; i++) {
+    var t = arr[i];
+    if (cur.titles && cur.titles[t.id] && !cur.titles[t.id].deleted) {
+      res.push(t);
+    }
+  }
+  return res;
+},
+
+searchTitles: function(str) {
+  cur.shownTitles = 0;
+  if (str) {
+    var htmlentities = function(s){
+      var el = document.createElement('div');
+      el.innerText = el.textContent = s;
+      s = el.innerHTML;
+      delete el;
+      return s.split('"').join('&quot;');
+    }
+    var htmlencode = function(str){
+      return str.toLowerCase().replace(/\u2013|\u2014/g, '-');
+      var aStr = str.toLowerCase().replace(/\u2013|\u2014/g, '-').split(''), i = aStr.length, aRet = [];
+      while (i--) {
+        var iC = aStr[i].charCodeAt();
+        if ((iC > 127 && iC < 994)) {
+          aRet.push('&#'+iC+';');
+        } else if (iC == 36) {
+          aRet.push('&#0'+iC+';');
+        } else {
+          aRet.push(htmlentities(aStr[i]));
+        }
+      }
+      return aRet.reverse().join('');
+    }
+    var res = cur.titlesIndex.search(htmlencode(str));
+    cur.curList = 'search_' + str;
+    cur.titlesList[cur.curList] = res.sort(function(a,b) {return a._order - b._order});
+
+    if (str) {
+      str += ' '+(parseLatin(str) || '');
+      str = trim(escapeRE(str.replace(/\)/g, '')).split('&').join('&amp;'));
+      cur.selection = {
+        re: new RegExp('('+str.replace(cur.titlesIndex.delimiter, '|').replace(/(^\||\|$|\?)/g, '')+')', 'gi'),
+        val: '<span>$1</span>'
+      };
+    }
+  } else {
+    cur.curList = 'all';
+    cur.selection = false;
+  }
+
+  cur.sectionCount = (cur.titlesList[cur.curList]) ? cur.titlesList[cur.curList].length : 0;
+  this.filterTimeout = setTimeout((function() {
+    this.showTitleRows();
+  }).bind(this), 10);
+},
+
+showTitleRows: function(start, end) {
+  var list = cur.titlesList[cur.curList] || [];
+  if (start == undefined) {
+    start = cur.shownTitles;
+  }
+  if (end == undefined) {
+    end = cur.shownTitles + cur.titlesPerPage;
+  }
+  if (window.tooltips && cur.tooltips) {
+    for (var i = 0; i < cur.tooltips.length; ++i) {
+      if (cur.tooltips[i].el) {
+        if (cur.tooltips[i].el.ttimer) {
+          clearTimeout(cur.tooltips[i].el.ttimer);
+        }
+      }
+      cur.tooltips[i].hide({fasthide: true});
+    }
+  }
+  if (!cur.searchStr) {
+    list = Claims.filterDeletedTitles(list);
+  }
+  if (!list || !list.length) {
+    var msg = (cur.blacklist.length) ? getLang('claim_no_audios_found').split('{query}').join('<b>'+cur.searchStr.replace(/([<>&#]*)/g, '')+'</b>'): getLang('claim_no_blacklist_audios');
+      cur.aContent.innerHTML = '<div id="not_found" class="claim_msg">'+msg+'</div>';
+    hide(cur.showMore);
+  } else {
+    if (!cur.shownTitles) cur.aContent.innerHTML = '';
+    var titles = list.slice(start, end);
+    if (!titles.length) {
+      if (cur.shownTitles >= cur.sectionCount) {
+        hide(cur.showMore);
+      }
+      return;
+    }
+    var html = [];
+    for (i in titles) {
+      var row = clone(titles[i]);
+      if (cur.selection) {
+        row.title = row.title.replace(cur.selection.re, cur.selection.val).replace(/&#(\d*)<span>(\d+)<\/span>(\d*);/g, "&#$1$2$3;");
+      }
+      html.push(cur.titleTpl(row));
+      cur.shownTitles += 1;
+    }
+    var au = ce('div', {innerHTML: html.join('')});
+    while (au.firstChild) {
+      var el = au.firstChild;
+      cur.aContent.appendChild(el);
+    }
+    toggle(cur.showMore, (cur.shownTitles < cur.sectionCount));
+  }
+},
+
+deleteClaimedTitle: function(title_id) {
+  var obj = cur.titles[title_id], title = obj.title || '';
+  var box = showFastBox({title: getLang('claim_delete_blacklist_title'), dark: 1, width: 450}, rs(cur.sureDelete, {title: '<b>' + title + '</b>'}), getLang('global_delete'), function(btn) {
+    ajax.post('/claims', {act: 'a_delete_blacklist', title_id: title_id, hash: cur.hash}, {
+      showProgress: lockButton.pbind(btn),
+      hideProgress: unlockButton.pbind(btn),
+      onDone: function() {
+        cur.titlesIndex.remove(obj);
+        cur.titles[title_id].deleted = true;
+        cur.sectionCount--;
+        if (cur.shownTitles) cur.shownTitles--;
+        slideUp('row'+title_id, 200, re.pbind('row'+title_id));
+        box.hide();
+      },
+      onFail: function(err) {
+        ge('claim_error').innerHTML = err;
+        show('claim_error');
+        return true;
+      }
+    });
+  }, getLang('global_cancel'));
+},
+
+saveClaimedTitle: function(btn){
+  var box = curBox();
+      title = trim(val('claim_add_title')),
+      claim_id = val('claim_add_claim');
+  ajax.post('/claims', {act: 'a_add_blacklist', str: title, claim_id: claim_id, hash: cur.hash}, {
+    showProgress: lockButton.pbind(btn),
+    hideProgress: unlockButton.pbind(btn),
+    onDone: function(obj) {
+      var all_list = cur.blacklist;
+      if (all_list && all_list.length) {
+        obj._order = all_list[0]._order - 1;
+        cur.titlesList['all'].splice(0, 0, obj);
+      } else {
+        obj._order = 0;
+        cur.titlesList['all'] = [obj];
+      }
+      cur.titles[obj[1]] = obj;
+      cur.titlesIndex.add(obj);
+      Claims.filterClaimedTitles(null, cur.aSearch, true);
+      box.hide();
+    },
+    onFail: function(err) {
+      ge('claim_error').innerHTML = err;
+      show('claim_error');
+      return true;
+    }
+  });
+},
+
+newClaimedTitle: function() {
+  var str = trim(cur.aSearch.value), claim_id = '';
+  if (!str) {
+    notaBene(cur.aSearch);
+    return;
+  }
+  showFastBox({title: getLang('claim_add_blacklist_title'), dark: 1, width: 450}, rs(cur.addForm, {title: str, claim_id: claim_id}), getLang('global_add'), Claims.saveClaimedTitle, getLang('global_cancel'));
+  elfocus('claim_add_title');
+},
+
 _eof: 1};try{stManager.done('claims.js');}catch(e){}

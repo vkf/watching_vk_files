@@ -626,6 +626,7 @@ Ads.createStaticDatePicker = function(elem, bindingId, classid, defaultDate) {
     month: defaultDate.month,
     year: defaultDate.year,
     width: 124,
+    pastActive: true,
     onUpdate: function(d, m) {
       if (m == 'h') {
         cur.exportParamsData[classid].day = defaultDate.day;
@@ -2519,8 +2520,8 @@ Ads.changeDemographySource = function(name) {
   if (name == 'clicks') {
     cur.lastDemographySourceOffset = 0;
     if (cur.isDemographySvg) {
-      each(geByClass('ads_demography_bars_clicks'), function(i, el) { el.style.visibility = 'visible'; });
-      each(geByClass('ads_demography_bars_views'),  function(i, el) { el.style.visibility = 'hidden'; });
+      each(geByClass('ads_demography_bars_clicks'), function(i, el) { el.style.visibility = 'visible'; el.style.position = 'relative'; });
+      each(geByClass('ads_demography_bars_views'),  function(i, el) { el.style.visibility = 'hidden';  el.style.position = 'absolute'; });
     } else {
       each(geByClass('ads_demography_bars_clicks'), show);
       each(geByClass('ads_demography_bars_views'),  hide);
@@ -2531,8 +2532,8 @@ Ads.changeDemographySource = function(name) {
   } else {
     cur.lastDemographySourceOffset = 1;
     if (cur.isDemographySvg) {
-      each(geByClass('ads_demography_bars_views'),  function(i, el) { el.style.visibility = 'visible'; });
-      each(geByClass('ads_demography_bars_clicks'), function(i, el) { el.style.visibility = 'hidden'; });
+      each(geByClass('ads_demography_bars_views'),  function(i, el) { el.style.visibility = 'visible'; el.style.position = 'relative'; });
+      each(geByClass('ads_demography_bars_clicks'), function(i, el) { el.style.visibility = 'hidden';  el.style.position = 'absolute'; });
     } else {
       each(geByClass('ads_demography_bars_views'),  show);
       each(geByClass('ads_demography_bars_clicks'), hide);

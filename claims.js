@@ -449,4 +449,39 @@ newClaimedTitle: function() {
   elfocus('claim_add_title');
 },
 
+addTitleDuration: function(title_id, title) {
+  cur.currentTitleId = title_id;
+  showBox('audio', {act: 'a_choose_audio_box', q: title, blacklist: 1}, {cache: 1, dark: 1});
+},
+
+chooseTitleDuration: function(link, duration) {
+  ajax.post('/claims', {act: 'a_add_blacklist_duration', title_id: cur.currentTitleId, duration: duration, hash: cur.hash},  {
+    onDone: function() {
+      var parEl = geByClass1('claim_title_duration', ge('row' + cur.currentTitleId));
+      if (parEl) {
+        var addEl = geByClass1('add', parEl);
+        if (addEl) {
+          parEl.insertBefore(se('<div class="claim_title_dur">' + cur.formatTime(duration) + '</div>'), addEl)
+        }
+      }
+    }
+  });
+  link.parentNode.innerHTML = '<div class="claim_choose_added">' + getLang('claim_choose_added') + '</div>';
+},
+
+deleteTitleDuration: function(title_id, duration_id, el) {
+  var box = showFastBox({title: getLang('claim_delete_blacklist_duration_title'), dark: 1, width: 450}, getLang('claim_sure_delete_blacklist_duration'), getLang('global_delete'), function(btn) {
+    ajax.post('/claims', {act: 'a_delete_blacklist_duration', title_id: title_id, duration_id: duration_id, hash: cur.hash}, {
+      showProgress: lockButton.pbind(btn),
+      hideProgress: unlockButton.pbind(btn),
+      onDone: function() {
+        delete ((cur.titles[title_id] || {}).duration || {})[duration_id];
+        re(el);
+        box.hide();
+      },
+      onFail: box.hide
+    });
+  }, getLang('global_cancel'));
+},
+
 _eof: 1};try{stManager.done('claims.js');}catch(e){}

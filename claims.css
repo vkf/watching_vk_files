@@ -410,12 +410,11 @@
   -moz-border-radius: 2px;
   border-radius: 2px;
   display: inline-block;
-  cursor: default;
+  cursor: pointer;
 }
 .claim_title_dur.add {
   width: 24px;
   text-align: center;
-  cursor: pointer;
 }
 .claim_title_row .claim_title_remove_wrap {
   margin: 3px;
@@ -493,4 +492,13 @@
 #claim_error {
   margin: 6px 6px 18px;
   display: none;
+}
+.claim_choose_added {
+  display: block;
+  height: 28px;
+  line-height: 28px;
+  margin: 0px;
+  padding: 0px 6px;
+  color: #777;
+  max-width: 118px;
 }

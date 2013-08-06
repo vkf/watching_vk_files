@@ -3472,7 +3472,7 @@ var Wall = {
         layerpost = layer ? true : false,
         fixed = layer;
 
-    if (fullWall && (nav.objLoc.q || nav.objLoc.search)) return;
+    if (fullWall && (nav.objLoc.q || nav.objLoc.search || nav.objLoc.day)) return;
 
     each(data.events, function () {
       var ev = this.split('<!>'),

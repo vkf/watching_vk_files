@@ -118,7 +118,7 @@ var photos = {
     var album_id = album.id.replace('album', '');
     var before_id = (before && before.id || '').replace('album', '');
     var after_id = (after && after.id || '').replace('album', '');
-    ajax.post('al_photos.php', {act: 'reorder_albums', album: album_id, before: before_id, after: after_id});
+    ajax.post('al_photos.php', {act: 'reorder_albums', album: album_id, before: before_id, after: after_id, hash: cur.reorderHash});
   },
   reorderPhotos: function(photo, before, after) {
     if (hasClass(photo, 'sort_taken')) {

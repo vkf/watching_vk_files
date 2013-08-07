@@ -86,16 +86,13 @@ wikiClick: function(obj, ev) {
         params['global'] = path[0];
         break;
       default:
-        switch(path[0].substr(0, 4)) {
-          case 'page':
-            var query = path[0].substr(4).split('_');
-            params['oid'] = query[0];
-            params['id'] = query[1];
-            break;
-          case 'note':
-            var query = path[0].substr(4).split('_');
-            params['w'] = path[0];
-            break;
+        if (path[0].match(/^page-?\d+_\d+$/)) {
+          var query = path[0].substr(4).split('_');
+          params['oid'] = query[0];
+          params['id'] = query[1];
+        } else if (path[0].match(/^note\d+_\d+$/)) {
+          var query = path[0].substr(4).split('_');
+          params['w'] = path[0];
         }
         break;
     }

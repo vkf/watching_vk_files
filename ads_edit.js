@@ -2572,17 +2572,21 @@ AdsViewEditor.prototype.onParamUpdate = function(paramName, paramValue, forceDat
         suffixesAll    += ((this.params.format_type.value == 3) ? '_exclusive' : '');
         suffixesAll    += (isApp ? '_app' : '');
 
+        var multViews     = cur.unionsLimits.cost_per_views_coeff;
+        var multExclusive = 2;
+        var multApp       = 1 / 2;
+
         var costPerClickValue = 'value' + suffixesAll;
 
         var suffixes = {
-          '_click':               ['_views',               1 / cur.unionsLimits.cost_per_views_coeff],
-          '_click_exclusive':     ['_click',               3],
-          '_click_app':           ['_click_exclusive',     1 / 3 / 2],
-          '_click_exclusive_app': ['_click_app',           3],
-          '_views_exclusive_app': ['_click_exclusive_app', cur.unionsLimits.cost_per_views_coeff],
-          '_views_app':           ['_views_exclusive_app', 1 / 3],
-          '_views_exclusive':     ['_views_app',           3 * 2],
-          '_views':               ['_views_exclusive',     1 / 3]
+          '_click':               ['_views',               1 / multViews],
+          '_click_exclusive':     ['_click',               1 * multExclusive],
+          '_click_app':           ['_click_exclusive',     1 / multExclusive * multApp],
+          '_click_exclusive_app': ['_click_app',           1 * multExclusive],
+          '_views_exclusive_app': ['_click_exclusive_app', 1 * multViews],
+          '_views_app':           ['_views_exclusive_app', 1 / multExclusive],
+          '_views_exclusive':     ['_views_app',           1 * multExclusive / multApp],
+          '_views':               ['_views_exclusive',     1 / multExclusive]
         };
 
         var values = {};

@@ -137,7 +137,7 @@ AdsEdit.initHelpTooltip = function(targetElem, handler, ttContainer, curLocal) {
   curLocal.destroy.push(function(){ removeEvent(tootltipTextElem, 'mouseover mouseout', handler); });
 }
 
-AdsEdit.showHelpCriterionTooltip = function(helpTooltipName, targetElem, ttHandler, ttContainer, helpText, shiftTop, curLocal) {
+AdsEdit.showHelpCriterionTooltip = function(helpTooltipName, targetElem, ttHandler, ttContainer, helpText, shiftLeft, shiftTop, curLocal) {
   if (cur.lastHelpTooltipName && cur.lastHelpTooltipName != helpTooltipName) {
     var lastTooltip = cur.getLastTooltip();
     if (lastTooltip) {
@@ -147,6 +147,9 @@ AdsEdit.showHelpCriterionTooltip = function(helpTooltipName, targetElem, ttHandl
   cur.getLastTooltip = function(){ return targetElem.tt; };
   cur.lastHelpTooltipName = helpTooltipName;
 
+  if (shiftLeft === undefined || shiftLeft === false || shiftLeft === null) {
+    shiftLeft = -350;
+  }
   if (shiftTop === undefined || shiftTop === false || shiftTop === null) {
     shiftTop = -58;
   }
@@ -155,7 +158,7 @@ AdsEdit.showHelpCriterionTooltip = function(helpTooltipName, targetElem, ttHandl
     text: '<div class="ads_edit_tt_pointer ads_edit_tt_pointer_' + helpTooltipName + '"></div><div class="ads_edit_tt_text">' + helpText + '</div>',
     className: 'ads_edit_tt',
     slideX: 15,
-    shift: [-350, 0, shiftTop],
+    shift: [shiftLeft, 0, shiftTop],
     nohide: true,
     forcetodown: true,
     onCreate: function() { AdsEdit.initHelpTooltip(targetElem, ttHandler, ttContainer, curLocal); }
@@ -1254,10 +1257,11 @@ AdsViewEditor.prototype.initHelpParam = function(paramName) {
   var targetElem;
   var handler;
   var context = {focus: false, over: 0, out: 2};
+  var shiftLeft;
   var shiftTop;
 
   switch (paramName) {
-    case 'format_type':      shiftTop = -55; break;
+    case 'format_type':      shiftTop = -55; shiftLeft = -210; break;
     case 'category1_id':     shiftTop = -44; break;
     case 'views_limit_flag': shiftTop = -32; break;
   }
@@ -1265,14 +1269,14 @@ AdsViewEditor.prototype.initHelpParam = function(paramName) {
   switch (paramName) {
     case 'format_type':
       targetElem = ge('ads_param_format_type_exclusive_wrap');
-      var showTooltip = function() { AdsEdit.showHelpCriterionTooltip(paramName, targetElem, handler, this.params[paramName], helpText, shiftTop, this.cur); }.bind(this);
+      var showTooltip = function() { AdsEdit.showHelpCriterionTooltip(paramName, targetElem, handler, this.params[paramName], helpText, shiftLeft, shiftTop, this.cur); }.bind(this);
       var hideTooltip = function() { AdsEdit.hideHelpTooltip(this.params[paramName].tt); }.bind(this);
       handler = function(event){ AdsEdit.onHelpTooltipEvent(event, paramName, context, showTooltip, hideTooltip); }.bind(this);
       AdsEdit.initHelpTooltipTarget(targetElem, handler, this.cur);
       break;
     case 'category1_id':
       targetElem = ge(this.options.targetIdPrefix + 'category1_id').parentNode;
-      var showTooltip = function() { AdsEdit.showHelpCriterionTooltip(paramName, targetElem, handler, this.params[paramName], helpText, shiftTop, this.cur); }.bind(this);
+      var showTooltip = function() { AdsEdit.showHelpCriterionTooltip(paramName, targetElem, handler, this.params[paramName], helpText, shiftLeft, shiftTop, this.cur); }.bind(this);
       var hideTooltip = function() { AdsEdit.hideHelpTooltip(this.params[paramName].tt); }.bind(this);
       handler = function(event){ AdsEdit.onHelpTooltipEvent(event, paramName, context, showTooltip, hideTooltip); }.bind(this);
       AdsEdit.initHelpTooltipTarget(targetElem, handler, this.cur);
@@ -1280,7 +1284,7 @@ AdsViewEditor.prototype.initHelpParam = function(paramName) {
     case 'views_places':
     case 'views_limit_flag':
       targetElem = ge(this.options.targetIdPrefix + paramName).parentNode;
-      var showTooltip = function() { AdsEdit.showHelpCriterionTooltip(paramName, targetElem, handler, this.params[paramName], helpText, shiftTop, this.cur); }.bind(this);
+      var showTooltip = function() { AdsEdit.showHelpCriterionTooltip(paramName, targetElem, handler, this.params[paramName], helpText, shiftLeft, shiftTop, this.cur); }.bind(this);
       var hideTooltip = function() { AdsEdit.hideHelpTooltip(this.params[paramName].tt); }.bind(this);
       handler = function(event){ AdsEdit.onHelpTooltipEvent(event, paramName, context, showTooltip, hideTooltip); }.bind(this);
       AdsEdit.initHelpTooltipTarget(targetElem, handler, this.cur);
@@ -3186,7 +3190,7 @@ AdsTargetingEditor.prototype.initHelpCriterion = function(criterionName) {
     case 'pays_money':
     case 'tags':
       targetElem = ge(this.options.targetIdPrefix + criterionName).parentNode;
-      var showTooltip = function() { AdsEdit.showHelpCriterionTooltip(criterionName, targetElem, handler, this.criteria[criterionName], helpText, shiftTop, this.cur); }.bind(this);
+      var showTooltip = function() { AdsEdit.showHelpCriterionTooltip(criterionName, targetElem, handler, this.criteria[criterionName], helpText, false, shiftTop, this.cur); }.bind(this);
       var hideTooltip = function() { AdsEdit.hideHelpTooltip(this.criteria[criterionName].tt); }.bind(this);
       handler = function(event){ AdsEdit.onHelpTooltipEvent(event, criterionName, context, showTooltip, hideTooltip); }.bind(this);
       AdsEdit.initHelpTooltipTarget(targetElem, handler, this.cur);

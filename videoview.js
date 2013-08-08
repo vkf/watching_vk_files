@@ -1701,18 +1701,9 @@ showVideo: function(title, html, js, desc, info, controlsLine, opt) {
 },
 
 setTitle: function(len) {
-  var title  = mvcur.mvData.title || '';
-  if (len) {
-    len = Math.floor(len / 7.5);
-  }
-  len = len || 80;
-  if (title.length > len) {
-    title = title.substr(0, len);
-    title = title.replace(/<|>/g, '');
-    title = trim(title.replace(/&[^;]*$/, ''));
-    title += '...';
-  }
-  ge('mv_min_title').innerHTML = title;
+  len = len || 590;
+  ge('mv_min_title').innerHTML = mvcur.mvData.title || '';
+  setStyle(ge('mv_min_title'), {maxWidth: Math.max(0, len - 60)});
 },
 
 getContSize: function() {
@@ -2200,7 +2191,7 @@ unminimize: function(noLoc, beforeHide, noQueue) {
 
 sendVideo: function() {
   Videoview.hidePlayer();
-  var box = showBox('like.php', {act: 'publish_box', object: 'video' + mvcur.videoRaw, to: 'mail'}, {stat: ['page.js', 'page.css', 'wide_dd.js', 'wide_dd.css', 'sharebox.js']});
+  var box = showBox('like.php', {act: 'publish_box', object: 'video' + mvcur.videoRaw, list: mvcur.listId, to: 'mail'}, {stat: ['page.js', 'page.css', 'wide_dd.js', 'wide_dd.css', 'sharebox.js']});
   box.setOptions({onHideAttempt: function() {
     Videoview.showPlayer();
     return true;

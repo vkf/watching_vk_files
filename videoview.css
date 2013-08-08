@@ -152,6 +152,10 @@ body.mobfixed #mv_layer_wrap {
   padding: 12px 19px;
   *padding: 10px 19px;
   color: #777777;
+  max-width: 590px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .is_rtl1 #mv_min_layer {
   width: 500px;

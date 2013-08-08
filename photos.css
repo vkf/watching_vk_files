@@ -807,6 +807,24 @@ a.photos_tt_edit:hover {
   font-weight: bold;
   padding: 17px 20px 18px;
 }
+.photos_choose_header_title {
+  font-size: 1.09em;
+  color: #FFF;
+  font-weight: bold;
+}
+.photos_title_search {
+  font-weight: normal;
+  padding-left: 12px;
+  color: #C7D7E9;
+  -webkit-transition: color 100ms linear;
+  -moz-transition: color 100ms linear;
+  -o-transition: color 100ms linear;
+  transition: color 100ms linear;
+}
+.photos_title_search:hover {
+  color: #FFF;
+  text-decoration: none;
+}
 .photos_choose_upload_area_wrap {
   display: none;
 }
@@ -1143,4 +1161,35 @@ a.photos_tt_edit:hover {
 }
 .photo_edit_img {
   max-width: 130px;
+}
+.choose_search_cont #photos_attach_search {
+  padding: 12px 19px;
+  width: 552px;
+  background: #F7F7F7;
+}
+#choose_photos_query {
+  width: 510px;
+}
+.photos_choose_progress {
+  position: absolute;
+  margin: 6px 0px 0px 514px;
+}
+.loading .photos_choose_progress {
+  display: block;
+}
+.photos_choose_reset {
+  margin: 1px 0px 0px 419px;
+  display: none;
+  cursor: pointer;
+  background: transparent url(/images/icons/input_clear.gif) 6px 6px no-repeat;
+  padding: 2px;
+  width: 19px;
+  height: 19px;
+  opacity: 0.6;
+  filter: alpha(opacity=60);
+  position: absolute;
+  z-index: 95;
+}
+#photos_attach_search .photos_choose_reset {
+  margin-left: 530px;
 }

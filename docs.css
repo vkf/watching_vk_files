@@ -653,8 +653,6 @@ border-bottom: 1px solid #DAE1E8;
 #choose_docs_query {
   width: 566px;
 }
-#docs_attach_search_cont {
-}
 .docs_title_search {
   font-weight: normal;
   padding-left: 12px;
@@ -667,15 +665,6 @@ border-bottom: 1px solid #DAE1E8;
 .docs_title_search:hover {
   color: #FFF;
   text-decoration: none;
-}
-#choose_query_reset {
-  margin-left: 585px;
-}
-#choose_query_reset.shown {
-  display: block;
-}
-.loading #choose_query_reset.shown {
-  display: none;
 }
 .docs_choose_progress {
   position: absolute;

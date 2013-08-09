@@ -1832,3 +1832,10 @@ a.tickets_question_row_tt:hover {
 .tickets_stats_value {
   font-weight: bold;
 }
+.tickets_block_playback_wrap {
+  padding-top: 10px;
+}
+#tickets_block_playback_saved {
+  color: #777;
+  opacity: 0;
+}

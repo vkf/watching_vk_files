@@ -1325,7 +1325,7 @@ createChildClass('Selector', UiControl, {
       addClass(this.container, 'disabled');
 
       var s = getSize(this.container);
-      if (this.options.disabledText) this.input.value = this.options.disabledText;
+      if (this.options.disabledText) this.input.value = '';
       this.container.appendChild(
         ce('div', {
           className: 'hide_mask'
@@ -1349,6 +1349,7 @@ createChildClass('Selector', UiControl, {
       this.container.removeChild(geByClass('hide_mask', this.container)[0]);
       //this.updateInput(); // Is it correct?
     }
+    this.updatePlaceholder();
   },
   _clear: function() {
     this.showImage();

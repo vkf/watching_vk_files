@@ -2,7 +2,7 @@ Tasks = {
 address: "tasks",
 
 switchTab: function(el, evt) {
-  if (evt.button) return true;
+  if (evt.button || evt.ctrlKey || browser.mac && evt.metaKey) return true;
   show('tasks_loading');
   if (hasClass(el.parentNode, 'task_tab')) {
     each(geByClass('task_tab_active', ge('tasks_tabs')), function(i, v) {

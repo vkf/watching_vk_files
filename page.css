@@ -5494,9 +5494,6 @@ button.wall_block_app_btn {
   margin: 0 3px 0 6px;
 }
 
-#choose_query_reset {
-  margin-left: 585px;
-}
 #choose_query_reset.shown {
   display: block;
 }

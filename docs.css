@@ -673,3 +673,6 @@ border-bottom: 1px solid #DAE1E8;
 .loading .docs_choose_progress {
   display: block;
 }
+#docs_attach_search .docs_reset {
+  margin-left: 585px;
+}

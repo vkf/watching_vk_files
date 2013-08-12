@@ -420,10 +420,19 @@
 #pv_tags {
   padding: 0px 0px 20px;
   color: #777;
+  max-width: 394px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 #pv_tags span {
   color: #000;
   cursor: default;
+}
+.pv_tag_span {
+  max-width: 375px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: inline-block;
 }
 #pv_tags .delete,
 #pv_del_reply_to {

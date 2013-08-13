@@ -27,6 +27,7 @@ var ShareBox = {
       sbMailHash: opts.imHash,
       sbObj: opts.shObj,
       sbList: opts.shList || '',
+      sbShareOwn: opts.shOwn,
       sbSend: function() {
         if (buttonLocked('like_share_send')) return;
 
@@ -95,6 +96,12 @@ var ShareBox = {
         options: {limit: 1, disabledTypes: ['album', 'share', 'link', 'page'], toggleLnk: true, nocl: 1}
       } : undefined
     });
+    if (!opts.shOwn) {
+      var composer = cur.sbField && data(cur.sbField, 'composer');
+      if (composer && composer.addMedia) {
+        hide(geByClass1('add_media_type_' + composer.addMedia.lnkId + '_postpone', composer.addMedia.menu.menuNode, 'a'));
+      }
+    }
 
     var tmp = cur.postTo;
     cur.postTo = false;
@@ -114,7 +121,7 @@ var ShareBox = {
 
     if (!window._mbFriends) { // is used in writebox.js too!
       ajax.post('hints.php', {act: 'a_json_friends', from: 'imwrite', str: ''}, {onDone: function(arr) {
-        window._mbFriends = arr;
+        window._sbFriends = arr;
         var dd = (cur.wdd && cur.wdd['like_mail_dd']);
         if (dd) {
           WideDropdown.items('like_mail_dd', arr);
@@ -197,6 +204,31 @@ var ShareBox = {
     var v = radioBtns['like_share'].val;
     if (cur.lang.title_for_all) {
       val('dark_box_topic', cur.lang[(v < 2) ? 'title_for_all' : 'title_for_mail']);
+    }
+    var composer = cur.sbField && data(cur.sbField, 'composer');
+    if (composer && composer.addMedia) {
+      if (v == 1 || v == 0 && cur.sbShareOwn) {
+        show(geByClass1('add_media_type_' + composer.addMedia.lnkId + '_postpone', composer.addMedia.menu.menuNode, 'a'));
+        if (cur.sbPostponeDate && composer.addMedia.chosenMedia[0] == 'postpone' && composer.addMedia.chosenMediaData) {
+          composer.addMedia.chosenMediaData.date = cur.sbPostponeDate;
+          composer.addMedia.chooseMedia('postpone', composer.addMedia.chosenMedia[1], composer.addMedia.chosenMediaData);
+          hide(domFC(ge('like_share_add_media')));
+          cur.sbPostponeDate = false;
+        }
+        if (composer.addMedia.postponePreview) {
+          show(domPN(composer.addMedia.postponePreview));
+        }
+      } else {
+        hide(geByClass1('add_media_type_' + composer.addMedia.lnkId + '_postpone', composer.addMedia.menu.menuNode, 'a'));
+        if (composer.addMedia.chosenMedia && composer.addMedia.chosenMedia[0] == 'postpone') {
+          cur.sbPostponeDate = val('postpone_date' + composer.addMedia.lnkId)
+          val('like_share_media_preview', '');
+          show(domFC(ge('like_share_add_media')));
+        }
+        if (composer.addMedia.postponePreview) {
+          hide(domPN(composer.addMedia.postponePreview));
+        }
+      }
     }
     switch (v) {
       case 0:

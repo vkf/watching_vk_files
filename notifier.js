@@ -720,7 +720,9 @@ Notifier = {
     }.bind(this), 1000 + intval(rand(-100, 100)));
 
     if (curNotifier.fc !== undefined) {
-      FastChat.init(curNotifier.fc);
+      stManager.add(['emoji.js'], function() {
+        FastChat.init(curNotifier.fc);
+      });
     }
   },
   lcStop: function () {
@@ -1515,7 +1517,7 @@ extend(RBox.prototype, {
         selectEvent = browser.msie ? 'selectstart' : 'mousedown';
 
     if (!focused) {
-      t.focus();
+      t.focus(e);
     }
 
     if (t.toBottom) {
@@ -1583,7 +1585,7 @@ extend(RBox.prototype, {
   },
   _resize_mdown: function (e) {
     if (checkEvent(e)) return;
-    this.focus();
+    this.focus(e);
 
     var t = this, handler = e.target,
         wndInner = getWndInner(),
@@ -1728,8 +1730,10 @@ extend(RBox.prototype, {
   _cont_mdown: function (e) {
     var stop = (curRBox.active != this.id);
     if (stop) {
-      this.focus();
-      return cancelEvent(e);
+      this.focus(e);
+      if (!hasClass(e.target, 'fc_editable')) {
+        return cancelEvent(e);
+      }
     }
   },
 
@@ -1820,11 +1824,11 @@ extend(RBox.prototype, {
       curRBox.boxes[curRBox.focused[0]].focus();
     }
   },
-  focus: function () {
+  focus: function (e) {
     var t = this, cb = (curRBox.active != t.id) || true;
     t._focus();
     if (cb && isFunction(t.options.onFocus)) {
-      t.options.onFocus();
+      t.options.onFocus(e);
     }
     return cb;
   },
@@ -1989,7 +1993,7 @@ FastChat = {
       }
       setTimeout(function() {
         if (navVersion <= stVersions['nav']) {
-          stManager.add(['notifier.js', 'notifier.css'], function () {
+          stManager.add(['notifier.js', 'notifier.css', 'emoji.js'], function () {
             FastChat.init(config);
           })
           return;
@@ -2370,7 +2374,7 @@ FastChat = {
           });
           if (!ge('fc_msg' + ev[3])) {
             stManager.add(['im.js'], function() {
-              ev[5] = IM.emojiToHTML(ev[5], true);
+              ev[5] = Emoji.emojiToHTML(ev[5], true);
               FastChat.addMsg(FastChat.prepareMsgData(ev.slice(2)));
             });
             tab.msgs[ev[3]] = [ev[4] & 2 ? 1 : 0, ev[4] & 1];
@@ -3451,15 +3455,27 @@ FastChat = {
       return prefix + '<a href="away.php?utf=1&to=' + encodeURIComponent(protocol + replaceEntities(url)) + '" target="_blank" onclick="return goAway(\''+ clean(protocol + url) + '\', {}, event);">' + full + '</a>';
     });
 
+    message = Emoji.emojiToHTML(message, 1);
+
     return message;
+  },
+  getEditCont: function(emojiId) {
+    //return '<textarea class="fc_tab_txt text"></textarea>';
+    stManager.add(['emoji.js']);
+    return '<div class="emoji_cont">'+Emoji.tplSmile(emojiId, getLang('mail_emoji_hint'), ' fc_emoji')+'<div class="fc_editable" tabindex="0" contenteditable="true"></div></div>';
+  },
+  getVal: function(obj) {
+    //return obj.value;
+    return Emoji ? Emoji.editableVal(obj) : '';
   },
   addTab: function (peer, data, options) {
     if (curFastChat.tabs[peer] !== undefined) {
       return;
     }
+    var editCont = FastChat.getEditCont(Emoji.last);
     options = options || {};
     curFastChat.tabs[peer] = {};
-    var wrap = se(rs(curFastChat.tpl.tab, {id: peer, name: data.name, myphoto: Notifier.fixPhoto(curFastChat.me.photo, true), classname: data.online ? (data.online != 1 ? ' fc_tab_mobile' : ' fc_tab_online') : ''})),
+    var wrap = se(rs(FastChat.tplTab, {id: peer, name: data.name, myphoto: Notifier.fixPhoto(curFastChat.me.photo, true), classname: data.online ? (data.online != 1 ? ' fc_tab_mobile' : ' fc_tab_online') : '', cont: editCont})),
        tab = curFastChat.tabs[peer] = {
       name: data.name,
       fname: data.fname,
@@ -3477,7 +3493,9 @@ FastChat = {
       sentmsgs: [],
       box: false,
       wrap: wrap,
-      txt: geByClass1('fc_tab_txt', wrap, 'textarea'),
+      //txt: geByClass1('fc_tab_txt', wrap, 'textarea'),
+      editable: 1,
+      txt: geByClass1('fc_editable', wrap),
       logWrap: geByClass1('fc_tab_log', wrap),
       log: geByClass1('fc_tab_log_msgs', wrap),
       notify: geByClass1('fc_tab_notify_wrap', wrap),
@@ -3496,16 +3514,22 @@ FastChat = {
       minH: 150,
       minW: 220,
       nofocus: true,
-      onFocus: function () {
+      onFocus: function (e) {
         if (tab.auto) {
           FastChat.stateChange({op: 'added', peer: peer});
           delete tab.auto;
         }
 
         FastChat.restoreDraft(peer);
-        elfocus(tab.txt);
+        if (tab.editable) {
+          Emoji.editableFocus(tab.txt, false, true);
+        } else {
+          elfocus(tab.txt);
+        }
         if (tab.wrap.clientWidth) setStyle(tab.title, {maxWidth: tab.wrap.clientWidth - 71});
-        setStyle(tab.txt.autosize.helper, {width: getStyle(tab.txt, 'width', false)});
+        if (!tab.editable) {
+          setStyle(tab.txt.autosize.helper, {width: getStyle(tab.txt, 'width', false)});
+        }
         tab.scroll && tab.scroll.update(false, true);
         setTimeout(elfocus.pbind(tab.txt), 10);
       },
@@ -3669,23 +3693,46 @@ FastChat = {
         options.startHeight !== undefined)) {
       tab.box._wnd_resize(wndInner[0], wndInner[1], true);
     }
+    var enterWorks = true;
 
     var lastTxtH = 30;
-    autosizeSetup(tab.txt, {minHeight: 30, maxHeight: 42});
-    tab.txt.autosize.options.onResize = function (h) {
-      if (tab.box.minimized) {
-        return;
-      }
-      var txtH = h == 42 ? 42 : 30;
-      if (txtH != h) {
-        setStyle(tab.txt, 'height', txtH);
-      }
-      if (txtH != lastTxtH) {
-        setStyle(tab.logWrap, 'height', tab.logWrap.clientHeight - txtH + lastTxtH); // bottom padding
-        lastTxtH = txtH;
-        tab.scroll && tab.scroll.update(false, true);
-      }
-    };
+    if (tab.editable) {
+      cur.t = tab;
+      tab.emojiId = Emoji.init(tab.txt, {
+        controlsCont: geByClass1('fc_tab_txt_wrap', wrap),
+        ttDiff: -87,
+        ttShift: 84,
+        noRce: true,
+        onSend: FastChat.send.pbind(peer),
+        checkEditable: FastChat.checkEditable,
+        onShow: function() {
+          cssAnim(tab.scroll.scrollbar, {opacity: 0}, {duration: 400});
+          enterWorks = false;
+        },
+        onHide: function() {
+          cssAnim(tab.scroll.scrollbar, {opacity: 1}, {duration: 400});
+          setTimeout(function() {
+            enterWorks = true;
+          }, 0);
+        }
+      });
+    } else {
+      autosizeSetup(tab.txt, {minHeight: 30, maxHeight: 42});
+      tab.txt.autosize.options.onResize = function (h) {
+        if (tab.box.minimized) {
+          return;
+        }
+        var txtH = h == 42 ? 42 : 30;
+        if (txtH != h) {
+          setStyle(tab.txt, 'height', txtH);
+        }
+        if (txtH != lastTxtH) {
+          setStyle(tab.logWrap, 'height', tab.logWrap.clientHeight - txtH + lastTxtH); // bottom padding
+          lastTxtH = txtH;
+          tab.scroll && tab.scroll.update(false, true);
+        }
+      };
+    }
     addEvent(tab.txt, 'keydown focus mousedown keyup', function (e) {
       if (e.type == 'mousedown') {
         if (curRBox.active == tab.box.id) {
@@ -3694,7 +3741,9 @@ FastChat = {
         return;
       }
       if (e.type == 'keydown' && !(e.shiftKey || e.metaKey || e.ctrlKey) && (e.keyCode == KEY.RETURN || e.keyCode == 10)) {
-        FastChat.send(peer);
+        if (enterWorks) {
+          FastChat.send(peer);
+        }
         return cancelEvent(e);
       }
       if (e.type == 'keydown' && e.ctrlKey && e.keyCode == KEY.RETURN) {
@@ -3704,7 +3753,7 @@ FastChat = {
           this.value = val.slice(0, start) + "\n" + val.slice(this.selectionEnd);
           this.selectionStart = this.selectionEnd = start + 1;
         } else if (document.selection && document.selection.createRange) {
-          this.focus();
+          this.focus(e);
           var range = document.selection.createRange();
           range.text = "\r\n";
           range.collapse(false);
@@ -3714,17 +3763,21 @@ FastChat = {
           }
           range.select();
         }
-        tab.txt.autosize.update();
+        if (tab.editable) {
+          FastChat.checkEditable(tab.emojiId, tab.txt);
+        } else {
+          tab.txt.autosize.update();
           setTimeout(function () {
             tab.txt.autosize.update();
           }, 0);
+        }
         return false;
       }
       if (e.type == 'focus') {
         curFastChat.peer = peer;
       } else if (e.type == 'keyup') {
         var lastVal = tab.lastVal || '',
-            curVal = this.value;
+            curVal = FastChat.getVal(this);
         if (curVal.length != lastVal.length ||
             curVal != lastVal) {
           if (curVal) {
@@ -3734,9 +3787,15 @@ FastChat = {
         }
         clearTimeout(tab.saveDraftTO);
         tab.saveDraftTO = setTimeout(FastChat.saveDraft.pbind(peer), curVal.length ? 300 : 0);
+        FastChat.checkEditable(tab.emojiId, tab.txt);
       }
       FastChat.readLastMsgs(peer);
     });
+    FastChat.restoreDraft(peer);
+  },
+
+  checkEditable: function(optId, obj) {
+    Emoji.checkEditable(optId, obj, {height: 40});
   },
 
   fixResized: function (tab, w, stopped) {
@@ -3746,7 +3805,9 @@ FastChat = {
       setStyle(tab.title, {maxWidth: w - 71});
     }
     if (stopped) {
-      setStyle(tab.txt.autosize.helper, {width: getStyle(tab.txt, 'width', false)});
+      if (!tab.editable) {
+        setStyle(tab.txt.autosize.helper, {width: getStyle(tab.txt, 'width', false)});
+      }
       tab.scroll && tab.scroll.update(false, true);
     }
   },
@@ -3782,9 +3843,17 @@ FastChat = {
 
   send: function (peer) {
     var t = this, tab = curFastChat.tabs[peer];
-    var msg = trim(val(tab.txt));
+    if (tab.editable) {
+      var msg = Emoji.editableVal(tab.txt);
+    } else {
+      var msg = trim(val(tab.txt));
+    }
     if (!msg || tab.sending) {
-      elfocus(tab.txt);
+      if (tab.editable) {
+        Emoji.editableFocus(tab.txt, false, true);
+      } else {
+        elfocus(tab.txt);
+      }
       return;
     }
     var msgId = --tab.sent,
@@ -3796,6 +3865,7 @@ FastChat = {
       from: 'fc'
     };
     tab.sending = true;
+    Emoji.ttHide(tab.emojiId);
     ajax.post('al_im.php', params, {
       onDone: function(response) {
         clearTimeout(tab.saveDraftTO);
@@ -3823,7 +3893,11 @@ FastChat = {
 
         elfocus(tab.txt);
         val(tab.txt, msg);
-        tab.txt.autosize.update();
+        if (tab.editable) {
+          FastChat.checkEditable(tab.emojiId, tab.txt);
+        } else {
+          tab.txt.autosize.update();
+        }
 
         var row = ge('fc_msg' + msgId);
         if (!row) return;
@@ -3851,7 +3925,11 @@ FastChat = {
 
     val(tab.txt, '');
     delete curFastChat.myTypingEvents[peer];
-    tab.txt.autosize.update(false, true);
+    if (tab.editable) {
+      FastChat.checkEditable(tab.emojiId, tab.txt);
+    } else {
+      tab.txt.autosize.update(false, true);
+    }
     elfocus(tab.txt);
     FastChat.scroll(peer);
   },
@@ -3879,6 +3957,7 @@ FastChat = {
       return false;
     }
     val(txt, draft.txt || '');
+    FastChat.checkEditable(tab.emojiId, txt);
     return true;
   },
   error: function (peer, msg) {
@@ -4030,7 +4109,9 @@ FastChat = {
     if (el.tt && el.tt.hide) {
       el.tt.hide();
     }
-  }
+  },
+
+  tplTab: '<div class="fc_tab_wrap"><div class="fc_tab %classname%"><div class="fc_tab_head clear_fix"><a class="fc_tab_close_wrap fl_r"><div class="fc_tab_close"></div></a><a class="fc_tab_max_wrap fl_r" href="/im?sel=%id%" onmousedown="event.cancelBubble = true;" onclick="return nav.go(this, event);"><div class="fc_tab_max"></div></a><div class="fc_tab_title noselect fl_l">%name%</div><div class="fl_l fc_tab_online_icon" onmouseover="FastChat.tip(this, {mid: %id%})" onmousedown="FastChat.promost(this)" onclick="return FastChat.promo(this, event)"></div></div><div class="fc_tab_log_wrap"><div class="fc_tab_notify_wrap"></div><div class="fc_tab_log"><div class="fc_tab_log_msgs"></div><div class="fc_tab_typing" id="fc_tab_typing%id%"></div></div></div><div class="fc_tab_txt_wrap"><div class="fc_tab_txt"><div class="fc_tab_txt_self"><img class="fc_tab_txt_self" src="%myphoto%"/></div>%cont%</div></div></div></div>'
 
 }
 
@@ -4263,12 +4344,12 @@ Scrollbar.prototype.wheel = function(event) {
   }
 }
 
-Scrollbar.prototype.hide = function() {
-  hide(this.topShadowDiv, this.bottomShadowDiv, this.scrollbar);
+Scrollbar.prototype.hide = function(anim) {
+  hide(this.topShadowDiv, this.bottomShadowDiv, this.scrollbar)
   this.hidden = true;
 }
-Scrollbar.prototype.show = function() {
-  show(this.topShadowDiv, this.bottomShadowDiv, this.scrollbar);
+Scrollbar.prototype.show = function(anim) {
+  show(this.topShadowDiv, this.bottomShadowDiv, this.scrollbar)
   this.hidden = false;
 }
 Scrollbar.prototype.disable = function() {

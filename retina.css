@@ -257,8 +257,8 @@
   background-image: url(/images/upload_2x.gif);
   background-size: 32px 8px;
 }
-.is_2x .im_smile_icon_on,
-.is_2x .im_smile_icon,
+.is_2x .emoji_smile_icon_on,
+.is_2x .emoji_smile_icon,
 .is_2x .mbe_smile_icon_on,
 .is_2x .mbe_smile_icon {
   background-image: url(/images/im_smile_cross_2x.png);
@@ -276,7 +276,7 @@
 .is_2x .like_tt .bottom .checkbox div,
 .is_2x .like_tt .bottom .on div,
 .is_2x .ttb.rich .bottom_pointer,
-.is_2x #im_emoji_pointer {
+.is_2x .emoji_pointer {
   background-image: url(/images/like_icons_bl_2x.png?2);
   background-size: 17px 65px;
 }
@@ -396,7 +396,7 @@
   background-image: url(/images/blacktip_2x.gif?2);
   background-size: 9px 10px;
 }
-.is_2x .im_emoji_smile_cont {
+.is_2x .emoji_smile_shadow {
   background-image: url(/images/emoji_shadow_2x.png);
   background-size: 18px 18px;
 }

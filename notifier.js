@@ -3480,7 +3480,7 @@ FastChat = {
       name: data.name,
       fname: data.fname,
       photo: data.photo,
-      link: 'id' + peer,
+      link: '/id' + peer,
       hash: data.hash,
       sendhash: FastChat.decodehash(data.hash),
       sex: data.sex || 0,
@@ -3937,9 +3937,9 @@ FastChat = {
     var tab = curFastChat.tabs[peer],
         txt = tab.txt;
     if (!txt || !tab) return;
-
+    var message = Emoji.editableVal(txt);
     var data = {
-      txt: trim(val(txt)) || '',
+      txt: trim(message) || '',
       medias: []
     };
     if (!data.txt.length) {
@@ -3956,7 +3956,11 @@ FastChat = {
         val(txt).length > draft.txt.length) {
       return false;
     }
-    val(txt, draft.txt || '');
+    if (tab.editable) {
+      txt.innerHTML = Emoji.emojiToHTML(draft.txt, 1);
+    } else {
+      val(txt, draft.txt || '');
+    }
     FastChat.checkEditable(tab.emojiId, txt);
     return true;
   },

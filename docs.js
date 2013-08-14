@@ -16,11 +16,6 @@ init: function() {
     paddings: 50,
     search: 1,
     placeholder: cur.lang['docs_placeholder'],
-    url: 'docs.php',
-    params: {
-      act: 'a_suggestion',
-      type: 'all'
-    },
     capitalCase: 1,
     onChange: function(force, obj) {
       if (force) {
@@ -30,6 +25,11 @@ init: function() {
       }
     }
   });
+  /*url: 'docs.php',
+  params: {
+    act: 'a_suggestion',
+    type: 'all'
+  },*/
 
   Docs.indexDocs();
   cur.searchDD.focusInput();
@@ -489,7 +489,7 @@ showFileTT: function(obj, oid, did) {
   var item = ge('docs_file_'+oid+'_'+did);
   if (!item) return false;
   var icon = geByClass1('docs_item_icon', item) || geByClass1('docs_item_thumb', item);
-  var href = icon.href;
+  var href = icon.href+'?wnd=1';
   var ext = trim(icon.getAttribute('ext'));
   if (ext == 'gif') {
     var img = new vkImage();

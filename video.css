@@ -257,7 +257,7 @@
   height: 1px;
 }
 .video_privacy_edit {
-  padding: 4px 0px 5px 0px;
+  margin-bottom: 10px;
 }
 #video_search_summary {
   margin: 0px 10px 10px;
@@ -690,6 +690,9 @@
   margin-top: 4px;
   margin-left: 0px;
   margin-right: 12px;
+}
+.video_edit_checkbox {
+  margin: 11px 0px 12px;
 }
 #video_create_album {
   padding-top: 4px;

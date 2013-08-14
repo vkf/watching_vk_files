@@ -1677,6 +1677,23 @@ wbr {
   padding: 17px 20px 18px;
   font-size: 1.09em;
 }
+#box_layer .box_dark .tabbed_box {
+  margin-bottom: 0px;
+}
+#box_layer .box_dark .tabbed_container {
+  margin-top: 0px;
+  margin-bottom: 0px;
+}
+.box_dark .tabbed_sh {
+  display: none;
+}
+.box_dark .tabbed_box .summary_tabs {
+  padding: 5px 8px;
+}
+.box_dark .tabbed_box .summary_tab,
+.box_dark .tabbed_box .summary_tab_sel {
+  padding: 8px 5px;
+}
 .box_no_controls {
   background-color: #DAE1E8;
   border: 1px solid #ADBBCA;

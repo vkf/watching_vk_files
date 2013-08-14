@@ -1234,26 +1234,26 @@ var Video = {
     }
   },
   deleteAlbum: function(section, ev) {
-    showBox('al_video.php', {act: 'delete_album', aid: section.substr(6), oid: cur.oid});
+    showBox('al_video.php', {act: 'delete_album', aid: section.substr(6), oid: cur.oid}, {dark: 1});
     return cancelEvent(ev);
   },
   editAlbum: function(aid, ev) {
-    showBox('al_video.php', {act: 'edit_album', oid: cur.oid, aid: aid, oid: cur.oid});
+    showBox('al_video.php', {act: 'edit_album', oid: cur.oid, aid: aid, oid: cur.oid}, {dark: 1});
     return cancelEvent(ev);
   },
   createAlbum: function() {
-    showBox('al_video.php', {act: 'edit_album', oid: cur.oid});
+    showBox('al_video.php', {act: 'edit_album', oid: cur.oid}, {dark: 1});
   },
   uploadVideoBox: function() {
     if (cur.uploadBanned) {
-      setTimeout(showFastBox(getLang('video_no_upload_title'), getLang('video_claims_no_upload')).hide, 5000);
+      setTimeout(showFastBox({title: getLang('video_no_upload_title'), dark: 1}, getLang('video_claims_no_upload')).hide, 5000);
       return false;
     }
-    var box = showTabbedBox('al_video.php', {act: 'upload_box', oid: cur.oid}, {stat: ['video_edit.css', 'privacy.css', 'privacy.js'], params: {bodyStyle: 'position: relative;'}});
+    var box = showTabbedBox('al_video.php', {act: 'upload_box', oid: cur.oid}, {stat: ['video_edit.css', 'privacy.css', 'privacy.js'], params: {bodyStyle: 'position: relative;', dark: 1}});
     return false;
   },
   removeAllTags: function() {
-    showBox('al_video.php', {act: 'remove_all_tags_box'});
+    showBox('al_video.php', {act: 'remove_all_tags_box'}, {dark: 1});
   },
 
   xRow: function(event, opacity, row, hint) {

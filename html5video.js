@@ -770,6 +770,10 @@ var html5video = {
   },
 
   onPause: function() {
+    var video = ge('the_video'), vars = html5video.vars;
+    if (vars.repeat && video.duration && Math.abs(video.duration - video.currentTime) < 1) {
+      return;
+    }
     if (ge('play_button')) ge('play_button').className = 'play_button';
     show('popup1');
   },
@@ -821,17 +825,24 @@ var html5video = {
   },
 
   onEnded: function() {
-    ge('the_video').pause();
-    if (html5video.incViewTimer) {
-      html5video.incViewTimer.pause();
-    }
-    ge('the_video').currentTime = 0;
-    html5video.updTime();
-    setStyle(ge('menu_layer'), {bottom: 46});
-    setStyle(ge('popup_actions'), {opacity: 0});
-    removeClass(ge('the_video'), 'no_cursor');
-    if (fullScreenApi.isFullScreen()) {
-      html5video.toggleFullscreen();
+    var video = ge('the_video'), vars = html5video.vars;
+    if (vars.repeat) {
+      video.currentTime = 0;
+      html5video.updTime();
+      video.play();
+    } else {
+      video.pause();
+      if (html5video.incViewTimer) {
+        html5video.incViewTimer.pause();
+      }
+      video.currentTime = 0;
+      html5video.updTime();
+      setStyle(ge('menu_layer'), {bottom: 46});
+      setStyle(ge('popup_actions'), {opacity: 0});
+      removeClass(video, 'no_cursor');
+      if (fullScreenApi.isFullScreen()) {
+        html5video.toggleFullscreen();
+      }
     }
   },
 

@@ -19,7 +19,7 @@
 }
 
 .video_upload_tab {
-  padding: 20px 40px 25px 40px;
+  padding: 3px 20px 10px;
 }
 
 .video_upload_tab #video_upload_error_msg {
@@ -44,7 +44,7 @@
   font-size: 1.09em;
   font-weight: bold;
   text-align: left;
-  margin: 10px auto;
+  margin: 17px auto 10px;
 }
 
 .video_upload_tab .text {
@@ -63,13 +63,12 @@
 }
 
 .video_upload_checkbox {
-  margin: 10px 0px;
+  margin: 11px 0px;
   width: 240px;
 }
 
 #video_upload_info {
   position: relative;
-  border: 1px solid #FFFFFF;
 }
 
 #video_add_from_youtube_tab {

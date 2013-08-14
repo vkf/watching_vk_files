@@ -427,6 +427,7 @@
 #pv_tags span {
   color: #000;
   cursor: default;
+  vertical-align: bottom;
 }
 .pv_tag_span {
   max-width: 375px;
@@ -434,11 +435,15 @@
   text-overflow: ellipsis;
   display: inline-block;
 }
+
+#pv_tags .delete {
+  display: inline-block;
+  height: 13px;
+}
 #pv_tags .delete,
 #pv_del_reply_to {
   background: #C4D2E1 url(/images/small_delete.gif) no-repeat 0px 0px;
   width: 0px;
-  height: 14px;
   z-index: 615;
   padding-left: 14px;
   overflow: hidden;
@@ -446,6 +451,7 @@
 }
 #pv_del_reply_to {
   display: none;
+  height: 14px;
   margin: 6px -10px 0px;
   -webkit-transition: all 100ms linear;
   -moz-transition: all 100ms linear;

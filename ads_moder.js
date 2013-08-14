@@ -624,25 +624,25 @@ AdsModer.cancelClicks = function(webSiteId, day, hash, box) {
   }
 }
 
-AdsModer.openClickfrauderPrepareBanBox = function(usersIds, day) {
+AdsModer.openClickfraudersPrepareBanBox = function(usersIds, day) {
   var ajaxParams = {};
   ajaxParams.users_ids = usersIds;
   ajaxParams.day       = day;
 
   var showOptions = {params: {}};
 
-  showBox('/adsweb?act=clickfrauder_prepare_ban_box', ajaxParams, showOptions);
+  showBox('/adsweb?act=clickfrauders_prepare_ban_box', ajaxParams, showOptions);
 }
 
-AdsModer.initClickfrauderPrepareBanBox = function(box, hash, usersIds, day) {
-  var prepareBanHandler = AdsModer.clickfrauderPrepareBan.pbind(box, hash, usersIds, day);
+AdsModer.initClickfraudersPrepareBanBox = function(box, hash, usersIds, day) {
+  var prepareBanHandler = AdsModer.clickfraudersPrepareBan.pbind(box, hash, usersIds, day);
   box.removeButtons();
   box.addButton(getLang('box_cancel'), false, 'no');
   box.addButton('Добавить', prepareBanHandler);
 }
 
-AdsModer.clickfrauderPrepareBan = function(box, hash, usersIds, day) {
-  if (!Ads.lock('clickfrauderPrepareBan', onLock, onUnlock)) {
+AdsModer.clickfraudersPrepareBan = function(box, hash, usersIds, day) {
+  if (!Ads.lock('clickfraudersPrepareBan', onLock, onUnlock)) {
     return;
   }
 
@@ -651,10 +651,10 @@ AdsModer.clickfrauderPrepareBan = function(box, hash, usersIds, day) {
   ajaxParams.users_ids = usersIds;
   ajaxParams.day       = day;
 
-  ajax.post('/adsweb?act=clickfrauder_prepare_ban', ajaxParams, {onDone: onComplete, onFail: onComplete});
+  ajax.post('/adsweb?act=clickfrauders_prepare_ban', ajaxParams, {onDone: onComplete, onFail: onComplete});
 
   function onComplete(response) {
-    Ads.unlock('clickfrauderPrepareBan');
+    Ads.unlock('clickfraudersPrepareBan');
     if (response && response.message) {
       showFastBox('Ок', response.message);
     } else {

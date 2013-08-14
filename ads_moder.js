@@ -602,8 +602,8 @@ AdsModer.cancelClicks = function(webSiteId, day, hash, box) {
 
   var ajaxParams = {};
   ajaxParams.web_site_id = webSiteId;
-  ajaxParams.day = day;
-  ajaxParams.hash = hash;
+  ajaxParams.day         = day;
+  ajaxParams.hash        = hash;
 
   ajax.post('/adsweb?act=log_cancel', ajaxParams, {onDone: onComplete, onFail: onComplete});
 
@@ -611,6 +611,52 @@ AdsModer.cancelClicks = function(webSiteId, day, hash, box) {
     Ads.unlock('cancelClicks');
     if (response && response.ok) {
       nav.reload();
+    } else {
+      showFastBox('Ошибка', 'Ошибка');
+    }
+    return true;
+  }
+  function onLock() {
+    box.showProgress();
+  }
+  function onUnlock() {
+    box.hide();
+  }
+}
+
+AdsModer.openClickfrauderPrepareBanBox = function(usersIds, day) {
+  var ajaxParams = {};
+  ajaxParams.users_ids = usersIds;
+  ajaxParams.day       = day;
+
+  var showOptions = {params: {}};
+
+  showBox('/adsweb?act=clickfrauder_prepare_ban_box', ajaxParams, showOptions);
+}
+
+AdsModer.initClickfrauderPrepareBanBox = function(box, hash, usersIds, day) {
+  var prepareBanHandler = AdsModer.clickfrauderPrepareBan.pbind(box, hash, usersIds, day);
+  box.removeButtons();
+  box.addButton(getLang('box_cancel'), false, 'no');
+  box.addButton('Добавить', prepareBanHandler);
+}
+
+AdsModer.clickfrauderPrepareBan = function(box, hash, usersIds, day) {
+  if (!Ads.lock('clickfrauderPrepareBan', onLock, onUnlock)) {
+    return;
+  }
+
+  var ajaxParams = {};
+  ajaxParams.hash      = hash;
+  ajaxParams.users_ids = usersIds;
+  ajaxParams.day       = day;
+
+  ajax.post('/adsweb?act=clickfrauder_prepare_ban', ajaxParams, {onDone: onComplete, onFail: onComplete});
+
+  function onComplete(response) {
+    Ads.unlock('clickfrauderPrepareBan');
+    if (response && response.message) {
+      showFastBox('Ок', response.message);
     } else {
       showFastBox('Ошибка', 'Ошибка');
     }

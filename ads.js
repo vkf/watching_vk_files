@@ -104,8 +104,15 @@ Ads.unlock = function(lockKey) {
 
 Ads.simpleAjax = function(url) {
   ajax.post(url, {}, {onDone: onComplete, onFail: onComplete});
-  function onComplete() {
-    nav.reload();
+  function onComplete(response) {
+    if (response && response.html) {
+      var boxOptions = {};
+      boxOptions.title  = 'Сообщение';
+      boxOptions.onHide = nav.reload;
+      showFastBox(boxOptions, response.html);
+    } else {
+      nav.reload();
+    }
     return true;
   }
 }

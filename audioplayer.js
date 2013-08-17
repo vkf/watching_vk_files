@@ -743,8 +743,9 @@ var audioPlayer = {
     }
   },
   canChangePr: function() {
-    var inp = cur.__focused || window.curFastChat && curFastChat.peer && geByTag1('textarea', ge('rb_box_fc_peer' + curFastChat.peer)) || window._pads && _pads.shown && geByTag1('textarea', _pads.content);
-    return (cur.module == 'audio' || window._pads && _pads.shown == 'mus') && !cur.pvShown && !curBox() && !(inp && inp.value);
+    var chatInput = window.curFastChat && curFastChat.peer && geByClass1('fc_editable', ge('rb_box_fc_peer' + curFastChat.peer)),
+        inp = cur.__focused || chatInput || window._pads && _pads.shown && geByTag1('textarea', _pads.content);
+    return (cur.module == 'audio' || window._pads && _pads.shown == 'mus') && !cur.pvShown && !curBox() && !(inp && trim(val(inp)) && !(chatInput && trim(val(inp)) == '<br>'));
   },
   changePr: function(delta) {
     var _a = audioPlayer, aid = currentAudioId();
@@ -1004,6 +1005,9 @@ var audioPlayer = {
       }
     }
     ajax.post('audio', {act: 'toggle_status', exp: (exp ? 1 : ''), oid: oid, hash: _a.addHash, id: aid, top: _a.playbackParams && (_a.playbackParams.top_audio || _a.playbackParams.top) ? 1 : ''});
+    if (window._pads && _pads.cache) {
+      delete _pads.cache.mus;
+    }
   },
   setControlsTitle: function() {
     var _a = audioPlayer;

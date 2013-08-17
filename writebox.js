@@ -34,13 +34,15 @@ var WriteBox = {
     val('mbe_rcemoji', cur.mbRcntEmoji || '');
 
 
+    cur.sharedImWrite = {};
     cur.emojiId = Emoji.init(cur.mbField, {
       ttDiff: -97,
       controlsCont: ge('mbe_emoji_wrap'),
       shouldFocus: true,
       onSend: WriteBox.send,
+      noEnterSend: 1,
       forceTxt: !opts.editable,
-      sharedTT: WriteBox,
+      sharedTT: cur.sharedImWrite,
       txt: ge('mail_box_editable'),
       checkEditable: WriteBox.checkEditable,
       saveDraft: WriteBox.saveDraft,

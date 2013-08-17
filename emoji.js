@@ -43,8 +43,10 @@ init: function(txt, opts) {
             if (!Emoji.emojiEnter(optId, e)) {
               return false;
             }
-            opts.onSend();
-            return cancelEvent(e);
+            if (!opts.noEnterSend) {
+              opts.onSend();
+              return cancelEvent(e);
+            }
           }
         }
         if (e.ctrlKey && e.keyCode == KEY.RETURN) {

@@ -735,6 +735,9 @@ h4.tickets_template.my {
   color: #555;
   width: 530px;
 }
+.tickets_sys_content .fw_reply_text {
+  color: #000;
+}
 #tickets_pass_comm,
 #tickets_send_comm {
   margin-top: 5px;
@@ -744,8 +747,6 @@ h4.tickets_template.my {
 .tickets_add_comm {
   padding-top: 10px;
   font-weight: bold;
-}
-.tickets_sys_name {
 }
 
 

@@ -718,7 +718,7 @@ var IM = {
         }
       }
       if (ge('im_rc_em_'+code)) continue;
-      rchtml += '<a id="im_rc_em_'+code+'" class="im_rc_emojibtn" onmousedown="Emoji.addEmoji('+cur.emojiId[peer]+', \''+code+'\', this); return cancelEvent(event);">'+Emoji.getEmojiHTML(code, false, true)+'</a>';
+      rchtml += '<a id="im_rc_em_'+code+'" class="im_rc_emojibtn" onmousedown="Emoji.addEmoji(cur.emojiId[cur.peer], \''+code+'\', this); return cancelEvent(event);">'+Emoji.getEmojiHTML(code, false, true)+'</a>';
       ml -= 22;
     }
     rcCont.insertBefore(cf(rchtml), rcCont.firstChild);
@@ -1637,13 +1637,14 @@ var IM = {
         autosizeSetup(txt, {minHeight: 42, maxHeight: 100, exact: 1, onResize: IM.updateScroll, preventEnter: true});
         tab.txt = txt.autosize;
       }
+      cur.sharedIm = {};
       cur.emojiId[peer] = Emoji.init(txt, {
         ttDiff: 44,
         controlsCont: ge('im_peer_controls'),
         shouldFocus: peer == cur.peer,
         onSend: IM.send,
         forceTxt: !cur.editable,
-        sharedTT: IM,
+        sharedTT: cur.sharedIm,
         checkEditable: IM.checkEditable,
         saveDraft: IM.saveDraft.pbind(peer),
         rceCont: ge('im_rcemoji_cont'),
@@ -5526,6 +5527,7 @@ var IM = {
       controlsCont: ge('imw_emoji_wrap'),
       shouldFocus: true,
       onSend: IM.send,
+      noEnterSend: 1,
       forceTxt: !cur.editable,
       checkEditable: IM.checkWriteEditable,
       saveDraft: IM.saveWriteDraft,

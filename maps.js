@@ -453,11 +453,11 @@ Marker.prototype.addData = function(options) {
         break;
         case 'icon':
           if(options.iconSize && options.iconAnchor) {
-            this.setIcon(options.icon, options.iconSize, options.iconAnchor);
+            this.setIcon(options.icon, options.iconSize, options.iconAnchor, options.icon2x);
           } else if(options.iconSize) {
-            this.setIcon(options.icon, options.iconSize);
+            this.setIcon(options.icon, options.iconSize, false, options.icon2x);
           } else {
-            this.setIcon(options.icon);
+            this.setIcon(options.icon, false, false, options.icon2x);
           }
         break;
         case 'iconShadow':
@@ -506,10 +506,13 @@ Marker.prototype.setInfoDiv = function(infoDiv,div) {
   this.infoDiv = infoDiv;
   this.div = div;
 };
-Marker.prototype.setIcon = function(iconUrl, iconSize, iconAnchor) {
+Marker.prototype.setIcon = function(iconUrl, iconSize, iconAnchor, retinaUrl) {
   this.iconUrl = iconUrl;
   if (iconSize) {
     this.iconSize = iconSize;
+  }
+  if (retinaUrl) {
+    this.iconRetinaUrl = retinaUrl;
   }
   if (iconAnchor) {
     this.iconAnchor = iconAnchor;
@@ -1064,8 +1067,7 @@ VKMap: {
     this.addControlsArgs.zoom = 'large';
   },
   addMapTypeControls: function() {
-    var map = map = this.maps[this.api],
-    onChange, div, input;
+    var map = this.maps[this.api], onChange, div, input;
     if (map.controls[google.maps.ControlPosition.TOP_RIGHT].length) {
       return;
     }
@@ -1375,6 +1377,412 @@ Geocoder: {
       return_location.sourceBounds = place.geometry.bounds;
       this.callback(return_location);
     }
+  }
+}
+});
+
+vkMaps.register('mapbox', {
+VKMap: {
+  init: function(element, api) {
+    var me = this;
+    if (window.L && window.L.mapbox) {
+      var mapboxMap = this.maps[api] = L.mapbox.map(element, 'brainfucker.map-4kfmp0z7', {zoomControl: false})
+      mapboxMap.on('click', function(e) {
+        me.click.fire({'location': new vkMaps.LatLonPoint(e.latlng.lat, e.latlng.lng)});
+      });
+      mapboxMap.on('zoomend', function(e) {
+        me.changeZoom.fire();
+      });
+      /*YMaps.Events.observe(yandexMap, yandexMap.Events.Click, function(map, mouseEvent) {
+        var lat = mouseEvent.getCoordPoint().getY(),
+        lon = mouseEvent.getCoordPoint().getX();
+        me.click.fire({'location': new vkMaps.LatLonPoint(lat, lon)});
+      });
+      YMaps.Events.observe(yandexMap, yandexMap.Events.SmoothZoomEnd, function(map) {
+        me.changeZoom.fire();
+      });*/
+      this.loaded[api] = true;
+      me.load.fire();
+    } else {
+      var stat = ['mapbox.css', 'mapbox.js'];
+      if (browser.msie && browser.version < 8) {
+        stat.push('mapbox_ie.css');
+      }
+      stManager.add(stat, function() {
+        me.reInit();
+      })
+    }
+  },
+  applyOptions: function(){
+    var map = this.maps[this.api];
+    if (!map) {
+      return;
+    }
+
+    if (this.options.enableScrollWheelZoom){
+      map.scrollWheelZoom.enable();
+    } else {
+      map.scrollWheelZoom.disbale();
+    }
+    if (this.options.enableDragging){
+      map.dragging.enable();
+    } else {
+      map.dragging.disbale();
+    }
+    /*if (this.options.enableScrollWheelZoom){
+      map.scrollWheelZoom.disbale();
+      map.enableScrollZoom({smooth: true});
+    }
+    if (this.options.enableDragging) {
+      map.enableDragging();
+    } else {
+      map.disableDragging();
+    }*/
+  },
+  resizeTo: function(width, height){
+    this.currentElement.style.width = width;
+    this.currentElement.style.height = height;
+    this.maps[this.api].redraw();
+  },
+  addControls: function(args) {
+    var map = this.maps[this.api];
+    if (args.zoom == 'large') {
+      this.addLargeControls();
+    }
+    else if (args.zoom == 'small') {
+      this.addSmallControls();
+    }
+    if (args.pan) {
+      this.controls.unshift(new L.Control.Layers());
+      this.addControlsArgs.pan = true;
+      map.addControl(this.controls[0]);
+    }
+    if (args.scale) {
+      this.controls.unshift(new L.Control.Scale());
+      this.addControlsArgs.scale = true;
+      map.addControl(this.controls[0]);
+    }
+    /*
+    if (args.pan) {
+      this.controls.unshift(new YMaps.ToolBar());
+      this.addControlsArgs.pan = true;
+      map.addControl(this.controls[0]);
+    }
+    if (args.scale) {
+      this.controls.unshift(new YMaps.ScaleLine());
+      this.addControlsArgs.scale = true;
+      map.addControl(this.controls[0]);
+    }*/
+    /*if (args.overview) {
+      if (typeof(args.overview) != 'number') {
+        args.overview = 5;
+      }
+      this.controls.unshift(new YMaps.MiniMap(args.overview));
+      this.addControlsArgs.overview = true;
+      map.addControl(this.controls[0]);
+    }*/
+  },
+  getMap: function() {
+    return this.maps[this.api];
+  },
+  addSmallControls: function() {
+    var map = this.maps[this.api];
+    this.controls.unshift(new L.Control.Zoom());
+    this.addControlsArgs.zoom = 'small';
+    map.addControl(this.controls[0]);
+  },
+  addLargeControls: function() {
+    var map = this.maps[this.api];
+    this.controls.unshift(new L.Control.Zoom({}));
+    this.addControlsArgs.zoom = 'large';
+    map.addControl(this.controls[0]);
+  },
+  addMapTypeControls: function() {
+    /*var me = this, map = this.maps[this.api],
+    onChange = function(type) {
+      this.setMapType(intval(type));
+    },
+    onAddToMap = function(ymap, position) {
+      var position = new YMaps.ControlPosition(YMaps.ControlPosition.TOP_RIGHT, new YMaps.Size(10, 10)),
+      div = ce('div', {}, {position: "absolute", zIndex: YMaps.ZIndex.CONTROL, backgroundColor: '#FFF', padding: 0, margin: 0}),
+      input = ce('input', {id: 'yandex_type_dd'}, {padding: 0, margin: 0});
+      position.apply(div);
+      ymap.getContainer().appendChild(div).appendChild(input);
+      new Dropdown(ge('yandex_type_dd'), vkMaps.VKMap.TYPES_LIST, {
+        width: 80,
+        onChange: onChange.bind(me)
+      });
+    },
+    onRemoveFromMap = function() {
+
+    };
+    this.controls.unshift({onAddToMap: onAddToMap, onRemoveFromMap: onRemoveFromMap});
+    this.addControlsArgs.map_type = true;
+    map.addControl(this.controls[0]);*/
+  },
+  setCenterAndZoom: function(point, zoom) {
+    var map = this.maps[this.api];
+    map.setView([point.lat, point.lon], zoom)
+    /*pt = point.toProprietary(this.api);
+    map.setCenter(pt, zoom);*/
+  },
+  addMarker: function(marker, old) {
+    var map = this.maps[this.api],
+    pin = marker.toProprietary(this.api);
+    map.addLayer(pin);
+    return pin;
+  },
+  removeMarker: function(marker) {
+    var map = this.maps[this.api];
+    map.removeLayer(marker.proprietary_marker);
+  },
+  getCenter: function() {
+    var map = this.maps[this.api],
+    pt = map.getCenter(),
+    point = new vkMaps.LatLonPoint(pt.lat, pt.lng);
+    return point;
+  },
+  setCenter: function(point, options) {
+    var map = this.maps[this.api],
+    pt = point.toProprietary(this.api);
+    map.panTo(pt);
+  },
+  setZoom: function(zoom) {
+    var map = this.maps[this.api];
+    map.setZoom(zoom);
+  },
+  getZoom: function() {
+    var map = this.maps[this.api],
+    zoom = map.getZoom();
+    return zoom;
+  },
+  getZoomLevelForBoundingBox: function(bbox) {
+    var map = this.maps[this.api];
+    var ne = bbox.getNorthEast().toProprietary(this.api);
+    var sw = bbox.getSouthWest().toProprietary(this.api);
+
+    map.fitBounds([sw, ne]);
+    return map.getZoom();
+  },
+  setMapType: function(type) {
+    var map = this.maps[this.api];
+    /*switch(type) {
+      case vkMaps.VKMap.ROAD:
+        map.setType(YMaps.MapType.MAP);
+        break;
+      case vkMaps.VKMap.SATELLITE:
+        map.setType(YMaps.MapType.SATELLITE);
+        break;
+      case vkMaps.VKMap.HYBRID:
+        map.setType(YMaps.MapType.HYBRID);
+        break;
+      default:
+        map.setType(type || YMaps.MapType.MAP);
+    }*/
+  },
+  getMapType: function() {
+    var map = this.maps[this.api],
+    type = map.getType();
+    /*switch(type) {
+      case YMaps.MapType.MAP:
+        return vkMaps.vkMap.ROAD;
+      case YMaps.MapType.SATELLITE:
+        return vkMaps.vkMap.SATELLITE;
+      case YMaps.MapType.HYBRID:
+        return vkMaps.vkMap.HYBRID;
+      default:
+        return null;
+    }*/
+    return vkMaps.vkMap.ROAD;
+  },
+  getBounds: function () {
+    var map = this.maps[this.api],
+    gbox = map.getBounds(),
+    sw = gbox.getSouthWest(),
+    ne = gbox.getNorthEast();
+    return new vkMaps.BoundingBox(sw.lat, sw.lng, ne.lat, ne.lng);
+  },
+  setBounds: function(bounds){
+    var map = this.maps[this.api],
+    sw = bounds.getSouthWest(),
+    ne = bounds.getNorthEast();
+    map.fitBounds([
+      [sw.lat, sw.lon],
+      [ne.lat, ne.lon]
+    ]);
+  },
+  removeMap: function() {
+    var map = this.maps[this.api];
+    map.remove();
+  }
+},
+
+LatLonPoint: {
+  toProprietary: function() {
+    return new L.LatLng(this.lat, this.lon);
+  },
+  fromProprietary: function(mapboxPoint) {
+    this.lat = mapboxPoint.lat;
+    this.lon = mapboxPoint.lng;
+    return this;
+  }
+},
+
+Marker: {
+  toProprietary: function() {
+    var options = {
+      draggable: this.draggable
+    };
+    if (this.iconUrl) {
+      var iconPreps = {
+        iconUrl: this.iconUrl,
+        iconSize: this.iconSize,
+        iconAnchor: this.iconAnchor
+      }
+
+      if (this.iconRetinaUrl) {
+        iconPreps.iconRetinaUrl = this.iconRetinaUrl;
+      }
+      if (this.iconShadowUrl) {
+        iconPreps.shadowUrl = this.iconShadowUrl;
+        if (this.iconShadowSize) {
+          iconPreps.shadowSize = this.iconShadowSize;
+        }
+      }
+      if (this.iconShadowRetinaUrl) {
+        iconPreps.shadowRetinaUrl = this.iconShadowRetinaUrl;
+      }
+      options.icon = L.icon(iconPreps);
+      /*var style = new YMaps.Style(),
+      icon = style.iconStyle = new YMaps.IconStyle();
+      icon.href = this.iconUrl;
+      if (this.iconSize) {
+        icon.size = new YMaps.Point(this.iconSize[0], this.iconSize[1]);
+        var anchor;
+        if (this.iconAnchor) {
+          anchor = new YMaps.Point(-this.iconAnchor[0], -this.iconAnchor[1]);
+        }
+        else {
+          anchor = new YMaps.Point(0, 0);
+        }
+        icon.offset = anchor;
+      }
+      if (this.iconShadowUrl) {
+        icon.shadow = new YMaps.IconShadowStyle();
+        icon.shadow.href = this.iconShadowUrl;
+        if (this.iconShadowSize) {
+          icon.shadow.size = new YMaps.Point(this.iconShadowSize[0], this.iconShadowSize[1]);
+          icon.shadow.offset = new YMaps.Point(0, 0);
+        }
+      }
+      options.style = style;*/
+    }
+    if (this.labelText) {
+      options.title = this.labelText;
+    }
+    var lmarker = new L.Marker(this.location.toProprietary('mapbox'), options);
+    /*var ymarker = new YMaps.Placemark(this.location.toProprietary('yandex'), options);
+    if (this.hoverIconUrl) {
+      var me = this;
+      YMaps.Events.observe(ymarker, ymarker.Events.MouseEnter, function(map, mouseEvent) {
+        var markerOptions = ymarker.getOptions();
+        if (! me.iconUrl) {
+          me.iconUrl = ymarker._icon._context._computedStyle.iconStyle.href;
+          markerOptions.style = ymarker._icon._context._computedStyle;
+        }
+        markerOptions.style.iconStyle.href = me.hoverIconUrl;
+        ymarker.setOptions(markerOptions);
+      });
+      YMaps.Events.observe(ymarker, ymarker.Events.MouseLeave, function(map, mouseEvent) {
+        var markerOptions = ymarker.getOptions();
+        markerOptions.style.iconStyle.href = me.iconUrl;
+        ymarker.setOptions(markerOptions);
+      });
+    }*/
+
+    // need to add info baloon
+    if (this.infoBubble) {
+      ymarker.setOptions({hasBalloon: true, hideIcon: true});
+      ymarker.setBalloonContent(this.infoBubble);
+    }
+    lmarker.on('dragend', function(e) {
+      var latLon = new vkMaps.LatLonPoint().fromProprietary('mapbox', lmarker.getLatLng());
+      this.VKMap_marker.location = latLon;
+      if (this.VKMap_marker.dragend) {
+        this.VKMap_marker.dragend.fire(latLon);
+      }
+    })
+    /*YMaps.Events.observe(ymarker, ymarker.Events.DragEnd, function(ymarker) {
+      var latLon = new vkMaps.LatLonPoint().fromProprietary('yandex', ymarker.getGeoPoint());
+      this.VKMap_marker.location = latLon;
+      if (this.VKMap_marker.dragend) {
+        this.VKMap_marker.dragend.fire(latLon);
+      }
+    });*/
+    return lmarker;
+  },
+  openBubble: function() {
+    this.proprietary_marker.openBalloon();
+  },
+  closeBubble: function() {
+    this.proprietary_marker.closeBalloon();
+  },
+  hide: function() {
+    this.proprietary_marker.hide();
+  },
+  show: function() {
+    this.proprietary_marker.show();
+  },
+  update: function() {
+    point = new vkMaps.LatLonPoint();
+    point.fromProprietary('mapbox', this.proprietary_marker.getLatLng());
+    this.location = point;
+  }
+},
+
+Geocoder: {
+  init: function() {
+    var me = this;
+  },
+  geocode: function(address) {
+    var VKMap_geocoder = this;
+    if (!address.hasOwnProperty('address') || address.address === null || address.address === '') {
+      address.address = [address.street, address.locality, address.region, address.country ].join(', ');
+    }
+    var geocoder = new YMaps.Geocoder(address.address, { results: 1 });
+    YMaps.Events.observe(geocoder, geocoder.Events.Load, function (response) {
+      if (response.found > 0) {
+        VKMap_geocoder.geocode_callback(response.get(0));
+      } else {
+        VKMap_geocoder.error_callback(response);
+      }
+    });
+    YMaps.Events.observe(geocoder, geocoder.Events.Fault, function (error) {
+      VKMap_geocoder.error_callback(error.message);
+    });
+  },
+  geocode_callback: function(response) {
+    var return_location = {street: '', locality: '', region: '', country: ''};
+    var locLev;
+    if ((locLev = response.AddressDetails.Country)) {
+      return_location.country = locLev.CountryName;
+      if ((locLev = locLev.AdministrativeArea)) {
+        return_location.region = locLev.AdministrativeAreaName;
+        if ((locLev = locLev.Locality)) {
+          return_location.locality = locLev.LocalityName;
+          if ((locLev = locLev.Thoroughfare)) {
+            return_location.street = locLev.ThoroughfareName;
+          }
+        }
+      }
+    }
+    var ypoint = response.getGeoPoint();
+    ybounds = response.getBounds(),
+    ltop = ybounds.getLeftTop(),
+    rbottom = ybounds.getRightBottom();
+    return_location.point = new vkMaps.LatLonPoint(ypoint.getLat(), ypoint.getLng());
+    return_location.bounds = new vkMaps.BoundingBox(ltop.getLat(), ltop.getLng(), rbottom.getLat(), rbottom.getLng());
+    this.callback(return_location);
   }
 }
 });

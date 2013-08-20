@@ -234,6 +234,9 @@ var Friends = {
       onDone: (function(data, preload) {
         removeClass(cur.showMore, 'load_more');
         var response = eval('('+data+')')
+        if (!cur.friendsList) {
+          return;
+        }
         if (!cur.friendsList[list]) {
           cur.friendsList[list] = [];
         }

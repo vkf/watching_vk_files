@@ -11,7 +11,7 @@
   width: 638px;
   height: 370px;
 }
-#place_map_yandex, #place_map_google {
+#place_map_yandex, #place_map_google, #place_map_mapbox {
   display: none;
 }
 #place_recent_checkins {

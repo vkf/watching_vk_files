@@ -3263,7 +3263,7 @@ a.choose:hover {
 .page_add_place_box .places_map {
   height: 300px;
 }
-#place_map_yandex, #place_map_google {
+#place_map_yandex, #place_map_google, #place_map_mapbox {
   display: none;
 }
 

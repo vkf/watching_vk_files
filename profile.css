@@ -1030,3 +1030,6 @@ b.profile_mob_onl {
   height: 12px;
   margin-left: 5px;
 }
+#profile_map_cont {
+  cursor: pointer;
+}

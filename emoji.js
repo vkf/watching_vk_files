@@ -83,7 +83,7 @@ init: function(txt, opts) {
           }
           return false;
         }
-        if (e.keyCode == KEY.TAB) {
+        if (e.keyCode == KEY.TAB && !(e.ctrlKey || browser.mac && e.metaKey)) {
           if (Emoji.shown) {
             Emoji.editableFocus(txt, false, true);
             Emoji.ttClick(optId, geByClass1('emoji_smile', opts.controlsCont), true);
@@ -273,11 +273,14 @@ codeToChr: function(code) {
 checkEditable: function(optId, obj, options) {
   var scH = obj.scrollHeight;
   var opts = Emoji.opts[optId];
+  if (!opts) {
+    return false;
+  }
   var bl = opts.tt;
   if (scH > options.height + 10) {
     if (!opts.isSized) {
       setStyle(obj, {height: options.height+'px', overflowY: 'auto'});
-      var sm = ge('im_smile');
+      var sm = geByClass1('emoji_smile', opts.controlsCont);
       var ph = ge('im_upload');
       var diff = sbWidth();
       setStyle(sm, vk.rtl ? {left: 1 + diff} : {right: 1 + diff});
@@ -289,7 +292,7 @@ checkEditable: function(optId, obj, options) {
     }
   } else if (opts.isSized) {
     setStyle(obj, {height: 'auto', overflowY: 'hidden'});
-    var sm = ge('im_smile');
+    var sm = geByClass1('emoji_smile', opts.controlsCont);
     var ph = ge('im_upload');
     setStyle(sm, vk.rtl ? {left: 1} : {right: 1});
     if (ph) {
@@ -860,7 +863,7 @@ emojiToHTML: function(str, enabled) {
     });
   }
   str = str.replace(/\n/g, '<br>');
-  str = str.replace(Emoji.emojiRegEx, Emoji.emojiReplace);
+  str = str.replace(Emoji.emojiRegEx, Emoji.emojiReplace).replace(/\uFE0F/g, '');
 
   return str;
 },

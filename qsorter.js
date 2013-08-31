@@ -99,7 +99,7 @@ var qsorter = {
     if (qsorter.current) return;
     cur.qsorterOver = false;
 
-    var el = this, inner = qsorter.first(el), s = el.parentNode.qsorter, evc = qsorter.evCoords(ev);
+    var el = this, inner = qsorter.first(el), s = el.parentNode.qsorter, evc = qsorter.evCoords(ev), size;
     if (s.canDrag) {
       if (!s.canDrag(el)) return;
     } else if (ev.target.getAttribute('nosorthandle') || el.getAttribute('nodrag')) return;
@@ -108,13 +108,15 @@ var qsorter = {
     qsorter.nextEl = el.nextSibling;
     extend(s, {drag: el});
     setStyle(inner, {left: el.x + 'px', top: el.y + s.offset + 'px', zIndex: 150});
+    if (cur.qsorterSetSize) {
+      size = getSize(inner);
+    }
     if (s.cls) {
       el.className = s.clsUp;
     } else {
       addClass(el, s.clsUp);
     }
     if (cur.qsorterSetSize) {
-      var size = getSize(inner);
       setStyle(el, {width: size[0], height: size[1]});
     }
 

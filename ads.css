@@ -70,6 +70,10 @@ a .ads_sub_link:hover {
   padding: 0;
 }
 
+#ads_page_top {
+  padding-top: 15px;
+}
+
 .ads_page_extra_wide #ads_page_wrap2,
 .ads_page_extra_wide #ads_page_wrap1 {
   width: auto;
@@ -270,6 +274,40 @@ a .ads_sub_link:hover {
   height: 1px;
   overflow: hidden;
   margin: 7px 0px 8px 0;
+}
+
+/* ---- */
+/* Tabs */
+/* ---- */
+
+.ads_tabs_filters {
+  background-color: #F7F7F7;
+  border-bottom: 1px solid #DAE1E8;
+  padding: 10px 10px 5px 10px;
+}
+.ads_tabs_filters.separate {
+  border-top: 1px solid #DAE1E8;
+}
+.ads_round_tab_wrap {
+  padding: 0 5px 5px 0;
+  text-align: center;
+}
+.ads_round_tab_wrap .round_tab.disabled:hover,
+.ads_round_tab_wrap .round_tab.label:hover {
+  background-color: transparent;
+  cursor: default;
+}
+.ads_round_tab_wrap .round_tab.label {
+  color: #555555;
+}
+.ads_round_tabs_period_day .round_tab {
+  width: 100px;
+}
+.ads_round_tabs_period_week .round_tab {
+  width: 180px;
+}
+.ads_round_tabs_period_month .round_tab {
+  width: 100px;
 }
 
 /* Other */

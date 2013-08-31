@@ -1537,3 +1537,9 @@ div.pad_msg_text div.im_fwd_log_wrap {
   line-height: 200%;
   padding: 22px 0px;
 }
+.pads_gr_clubinv_block {
+  white-space: nowrap;
+  overflow: hidden;
+  -o-text-overflow: ellipsis;
+  text-overflow: ellipsis;
+}

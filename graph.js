@@ -1168,7 +1168,8 @@ Graph.prototype = {
     this.title.innerHTML = fullDate(this.localLeft) + (this.localRight > this.localLeft ? ' &ndash; ' + fullDate(this.localRight) : '');
 
     // redraw zinView
-    var ctx = getContext(this.zinView), ctxS = getContext(this.vScaleView);
+    var ctx = getContext(this.zinView);
+    var ctxS = getContext(this.vScaleView);
     ctx.clearRect(0, 0, this.viewWidth, this.viewHeight);
     ctx.fillStyle = '#fafafa';
     ctx.fillRect(0, 9, this.viewWidth, this.viewHeight - 9);
@@ -1429,7 +1430,7 @@ Graph.prototype = {
 
       line.legend = ce('div', {
         innerHTML: '<canvas width="20" height="20" style="vertical-align: middle; padding-right: 2px;"></canvas>' +
-          '<span>' + ((line.name.length >= 30) ? line.name.substr(0, 27) + '...' : line.name)  + '</span>' +
+          '<span title="' + clean(line.name) + '">' + ((line.name.length >= 30) ? line.name.substr(0, 27) + '...' : line.name)  + '</span>' +
           '<div style="position: absolute; top: 0px; left: 0px; padding: 2px 3px; white-space: nowrap; display: none; background: ' + line.hexColor + '; color: white; -webkit-border-radius: 2px; -khtml-border-radius: 2px; -moz-border-radius: 2px; border-radius: 2px;"></div>'
       }, {
         color: line.hexColor,
@@ -1719,7 +1720,8 @@ Graph.prototype = {
     this.xfactorIn = 1;
 
     // redraw zinView
-    var ctx = getContext(this.zinView), ctxS = getContext(this.vScaleView);
+    var ctx = getContext(this.zinView);
+    var ctxS = getContext(this.vScaleView);
     ctx.clearRect(0, 0, this.viewWidth, this.viewHeight);
     ctx.fillStyle = '#fafafa';
     ctx.fillRect(0, 9, this.viewWidth, this.viewHeight - 9);

@@ -217,13 +217,29 @@ var audioPlayer = {
     data = aid.split('_');
     var oid = data[0], aid = data[1], canAdd = (oid != vk.id) ? 1 : 0;
     if (!canAdd && data[2] && data[3]) {
-      var post = ge('post' + data[2] + '_' + data[3]);
-      if (post) {
-        var author = geByClass1('author', post);
-        if (author) {
-          var author_id = intval(author.getAttribute('data-from-id'));
-          if (author_id && author_id != vk.id) {
-            canAdd = 1;
+      var wpt = ge('wpt' + data[2] + '_' + data[3]), post = wpt, postFound = false;
+      if (wpt) {
+        while (post) {
+          post = post.parentNode;
+          each(['reply_table', 'post_table', 'fw_reply_table', 'fw_post_table', 'pad_nwsa', 'pad_nws_data', 'feedback_row_content'], function() {
+            if (hasClass(post, this)) {
+              postFound = true;
+              return false;
+            }
+          });
+          if (postFound) break;
+        }
+        if (post) {
+          var author = false;
+          each(['author', 'fw_reply_author', 'fw_post_author', 'pad_nws_name'], function() {
+            author = geByClass1(this, post);
+            if (author) return false;
+          });
+          if (author) {
+            var author_id = intval(author.getAttribute('data-from-id'));
+            if (author_id && author_id != vk.id) {
+              canAdd = 1;
+            }
           }
         }
       }
@@ -731,21 +747,21 @@ var audioPlayer = {
         _a.nextTrack();
         break;
       case KEY.LEFT:
-        if (_a.canChangePr()) {
+        if (_a.canChangePr(e)) {
           _a.changePr(-1);
         }
         break;
       case KEY.RIGHT:
-        if (_a.canChangePr()) {
+        if (_a.canChangePr(e)) {
           _a.changePr(1);
         }
         break;
     }
   },
-  canChangePr: function() {
+  canChangePr: function(e) {
     var chatInput = window.curFastChat && curFastChat.peer && geByClass1('fc_editable', ge('rb_box_fc_peer' + curFastChat.peer)),
         inp = cur.__focused || chatInput || window._pads && _pads.shown && geByTag1('textarea', _pads.content);
-    return (cur.module == 'audio' || window._pads && _pads.shown == 'mus') && !cur.pvShown && !curBox() && !(inp && trim(val(inp)) && !(chatInput && trim(val(inp)) == '<br>'));
+    return !e.shiftKey && !e.ctrlKey && !e.metaKey && (cur.module == 'audio' || window._pads && _pads.shown == 'mus') && !cur.pvShown && !curBox() && !(inp && trim(val(inp)) && !(chatInput && trim(val(inp)) == '<br>'));
   },
   changePr: function(delta) {
     var _a = audioPlayer, aid = currentAudioId();

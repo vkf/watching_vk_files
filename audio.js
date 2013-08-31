@@ -1406,6 +1406,9 @@ var Audio = {
         nav.setLoc(nav.objLoc);
         var _a = window.audioPlayer;
         if (_a && _a.showCurrentTrack) _a.showCurrentTrack();
+        if (window.Pads && Pads.updateAudioPlaylist) {
+          Pads.updateAudioPlaylist();
+        }
       },
       onFail: function(msg) {
         delete cur.loadingRecs;
@@ -1623,6 +1626,9 @@ var Audio = {
         if (window.tooltips) {
           tooltips.destroyAll();
         }
+        if (window.Pads && Pads.updateAudioPlaylist) {
+          Pads.updateAudioPlaylist();
+        }
         if (options.infoJS) {
           eval('(function(){' + options.infoJS + ';})()');
         }
@@ -1638,6 +1644,12 @@ var Audio = {
   },
 
   loadFeed: function(update) {
+    if (cur.silent) {
+      cur.onSilentLoad = function() {
+        Audio.loadFeed(update);
+      };
+      return;
+    }
     if (cur.isFeedLoading) return;
     cur.isFeedLoading = true;
     if (cur.audiosList['all'] && cur.allAudiosIndex != 'all') {

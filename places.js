@@ -323,7 +323,8 @@ initPhotoMap: function(opts) {
       m.iconNum = cur.iconLastNum++;
       return m;
     }
-    map = opts.map || L.mapbox.map(opts.cont, 'brainfucker.map-4kfmp0z7', {zoomControl: false, scrollWheelZoom: false});
+    var mapboxApiId = 'vkmaps.map-an1xcr4f';
+    map = opts.map || L.mapbox.map(opts.cont, mapboxApiId, {zoomControl: false, scrollWheelZoom: false, touchZoom: false, detectRetina: true, retinaVersion: mapboxApiId});
     setMapOpts(map);
 
     if (opts.bounds) {

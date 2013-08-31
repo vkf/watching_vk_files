@@ -326,6 +326,13 @@ div.gl_message {
 .group_list_row:last-child {
   border-bottom: 0px;
 }
+.group_row_blockinv {
+  white-space: nowrap;
+  overflow: hidden;
+  -o-text-overflow: ellipsis;
+  text-overflow: ellipsis;
+  padding-top: 10px;
+}
 .group_row_photo {
   height: 100px;
   overflow: hidden;

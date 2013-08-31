@@ -184,8 +184,9 @@ var html5video = {
     }
     setStyle(ge('quality_panel_wrap'), {top: -4 - linksCount * 20});
     setStyle(ge('quality_bk'), {height: linksCount * 20 - 10});
+    var initQuality = Math.min(this.max_res, intval(getCookie('video_quality') || 360))
 
-    this.changeQuality(360);
+    this.changeQuality(initQuality);
   },
 
   addVideoListeners: function() {
@@ -267,6 +268,9 @@ var html5video = {
       videoCallback(['onVideoResolutionChanged', vars.oid, vars.vid, vars.hash, resInt]);
     }
     html5video.playStarted = false;
+    if (force) {
+      setCookie('video_quality', res, 365);
+    }
   },
 
   onResize: function() {
@@ -524,10 +528,10 @@ var html5video = {
                     <div id="quality_panel_wrap" class="quality_panel_wrap fl_l" onmouseover="html5video.unhideResMenu()" onmouseout="html5video.hideResMenu()">\
                       <div id="quality_bk" class="quality_bk"></div>\
                       <div id="quality_panel" class="quality_panel">\
-                        <button id="button720" value="720p" onclick="html5video.changeQuality(720);"><span>720</span></button>\
-                        <button id="button480" value="480p" onclick="html5video.changeQuality(480);"><span>480</span></button>\
-                        <button id="button360" value="360p" onclick="html5video.changeQuality(360);" class="selected"><span>360</span></button>\
-                        <button id="button240" value="240p" onclick="html5video.changeQuality(240);"><span>240</span></button>\
+                        <button id="button720" value="720p" onclick="html5video.changeQuality(720, true);"><span>720</span></button>\
+                        <button id="button480" value="480p" onclick="html5video.changeQuality(480, true);"><span>480</span></button>\
+                        <button id="button360" value="360p" onclick="html5video.changeQuality(360, true);" class="selected"><span>360</span></button>\
+                        <button id="button240" value="240p" onclick="html5video.changeQuality(240, true);"><span>240</span></button>\
                         <div id="quality_label">360</button>\
                       </div>\
                     </div>\
@@ -630,7 +634,7 @@ var html5video = {
   },
 
   playHD: function() {
-    this.changeQuality(this.max_res);
+    this.changeQuality(this.max_res, true);
     this.playHDClicked = true;
     return false;
   },
@@ -771,7 +775,7 @@ var html5video = {
 
   onPause: function() {
     var video = ge('the_video'), vars = html5video.vars;
-    if (vars.repeat && video.duration && Math.abs(video.duration - video.currentTime) < 1) {
+    if (!video || vars.repeat && video.duration && Math.abs(video.duration - video.currentTime) < 1) {
       return;
     }
     if (ge('play_button')) ge('play_button').className = 'play_button';
@@ -780,6 +784,9 @@ var html5video = {
 
   onProgress: function() {
     var video = ge('the_video'), ratio = 0;
+    if (!video) {
+      return;
+    }
     if (video.duration && video.buffered.length > 1) {
       ratio = video.buffered.end(0) / video.duration;
     }
@@ -826,6 +833,9 @@ var html5video = {
 
   onEnded: function() {
     var video = ge('the_video'), vars = html5video.vars;
+    if (!video) {
+      return;
+    }
     if (vars.repeat) {
       video.currentTime = 0;
       html5video.updTime();

@@ -4,52 +4,20 @@
 /* General */
 /* ------- */
 
-td.ads_table_overflow_hidden {
-  height: 20px;
-  vertical-align: top;
-}
-td.ads_table_overflow_hidden div {
-  position: relative;
-}
-td.ads_table_overflow_hidden div div {
-  position: absolute;
+.ads_overflow_hidden_wrap1 {
   overflow: hidden;
+}
+.ads_overflow_hidden_wrap2 {
+  overflow: visible;
   white-space: nowrap;
-  width: 100%;
+  width: 1px;
 }
 
 .ads_moder_tabs {
   padding-top: 0;
 }
 .ads_moder_tabs ul.t0 {
-  width: 700px;
-}
-
-.ads_moder_stat_filter {
-  background-color: #F7F7F7;
-  border-bottom: 1px solid #DAE1E8;
-  padding: 10px 10px 5px 10px;
-}
-.ads_moder_stat_filter_tab_wrap {
-  padding: 0 5px 5px 0;
-  text-align: center;
-}
-.ads_moder_stat_filter_tab_wrap .round_tab.disabled:hover,
-.ads_moder_stat_filter_tab_wrap .round_tab.label:hover {
-  background-color: transparent;
-  cursor: default;
-}
-.ads_moder_stat_filter_tab_wrap .round_tab.label {
-  color: #555555;
-}
-.ads_moder_stat_filter_period_day .round_tab {
-  width: 100px;
-}
-.ads_moder_stat_filter_period_week .round_tab {
-  width: 180px;
-}
-.ads_moder_stat_filter_period_month .round_tab {
-  width: 100px;
+  width: auto;
 }
 
 /* -- */
@@ -338,7 +306,7 @@ td.ads_table_overflow_hidden div div {
 .ads_premoderation_request_wrap {
   float: left;
   height: 480px;
-  margin: 5px 30px 0 0;
+  margin: 10px 30px 0 0;
 }
 .ads_premoderation_request_wrap.first {
   margin-right: 31px;
@@ -346,6 +314,29 @@ td.ads_table_overflow_hidden div div {
 
 .ads_premoderation_requests .ads_ad_box_border {
   border-width: 1px;
+}
+
+.ads_premoderation_requests_office .label {
+  padding-right: 10px;
+  vertical-align: top;
+}
+.ads_premoderation_requests_office_columns {
+  width: 100%;
+}
+.ads_premoderation_requests_office_column {
+  vertical-align: top;
+}
+.ads_premoderation_requests_office_column_domains {
+  text-align: right;
+}
+.ads_premoderation_requests_office_domains {
+  display: inline-block;
+}
+.ads_premoderation_requests_office_domains .labeled {
+  text-align: left;
+}
+.ads_premoderation_requests_office_domain_similar {
+  color: #aa0000;
 }
 
 .ads_premoderation_request {
@@ -374,7 +365,7 @@ a.ads_premoderation_request_ad_page_link {
   padding: 5px 3px 0 3px;
 }
 .ads_premoderation_request_notes_wrap {
-  padding: 0 3px;
+  padding: 5px 3px 0 3px;
 }
 .ads_premoderation_request_comment_wrap {
   padding-top: 3px;
@@ -464,10 +455,6 @@ table.ads_logs_info th {
 /* ------------ */
 /* Stat summary */
 /* ------------ */
-
-.ads_stat_sumary_content {
-  padding: 20px;
-}
 
 .ads_moder_stat_summary_range_wrap {
   margin-top: -2px;

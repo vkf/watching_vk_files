@@ -27,7 +27,7 @@ var WriteBox = {
       for (var a = opts.emojiRcnt, i = 0, l = a.length; i < l; ++i) {
         var code = a[i];
         if (!code) continue;
-        html.push('<a id="mbe_rc_em_' + code + '" class="mbe_rc_emojibtn" onmousedown="Emoji.addEmoji(cur.emojiId, \'' + code + '\', this); return cancelEvent(event);">' + Emoji.getEmojiHTML(code, false, true) + '</a>');
+        html.push('<a id="mbe_rc_em_' + code + '" class="mbe_rc_emojibtn" onmousedown="Emoji.addEmoji(cur.emojiWId, \'' + code + '\', this); return cancelEvent(event);">' + Emoji.getEmojiHTML(code, false, true) + '</a>');
       }
       cur.mbRcntEmoji = html.join('');
     }
@@ -35,7 +35,7 @@ var WriteBox = {
 
 
     cur.sharedImWrite = {};
-    cur.emojiId = Emoji.init(cur.mbField, {
+    cur.emojiWId = Emoji.init(cur.mbField, {
       ttDiff: -97,
       controlsCont: ge('mbe_emoji_wrap'),
       shouldFocus: true,
@@ -50,6 +50,8 @@ var WriteBox = {
       addMediaBtn: ge('mail_box_add_row'),
       sendWrap: ge('mail_box_controls'),
       onKeyAction: function(e) {
+        clearTimeout(cur.saveWriteBoxDraft);
+        cur.saveWriteBoxDraft = setTimeout(WriteBox.saveDraft, e.type == 'paste' ? 0 : 300);
       }
     });
 
@@ -72,7 +74,7 @@ var WriteBox = {
     box.setOptions({onHide: function() {
       removeClass(boxLayerBG, 'bg_dark');
       removeEvent(document, 'keydown', WriteBox.onKey);
-      if (cur.mbEmojiShown) Emoji.ttClick(cur.emojiId, cur.mbSmile, true);
+      if (cur.mbEmojiShown) Emoji.ttClick(cur.emojiWId, cur.mbSmile, true);
       if (cur.mbOnMouseClick) {
         cur.onMouseClick = cur.mbOnMouseClick;
         cur.mbOnMouseClick = false;
@@ -88,6 +90,10 @@ var WriteBox = {
       }
       if (browser.mozilla) {
 //        document.execCommand("enableObjectResizing", false, false);
+      }
+      if (cur.sorterClbk) {
+        cur.sorterClbk();
+        delete cur.sorterClbk;
       }
     }, onClean: function() {
       clearTimeout(cur.mbSaveDraftTO);
@@ -212,7 +218,7 @@ var WriteBox = {
         }});
       }
     }
-    WriteBox.checkEditable(cur.emojiId, cur.mbField);
+    WriteBox.checkEditable(cur.emojiWId, cur.mbField);
     WriteBox.checkLen(cur.mbField);
   },
   saveDraft: function() {
@@ -387,14 +393,14 @@ var WriteBox = {
     var emjs = geByClass('emoji', cur.mbField);
     var newRc = {};
     for(var i in emjs) {
-      newRc[emjs[i].getAttribute('emoji')] = 1;
+      newRc[Emoji.getCode(emjs[i])] = 1;
     }
     var rcCont = ge('mbe_rcemoji');
     var rchtml = '';
     var ml = 0;
     for (var code in newRc) {
       if (ge('mbe_rc_em_'+code)) continue;
-      rchtml += '<a id="mbe_rc_em_'+code+'" class="mbe_rc_emojibtn" onmousedown="Emoji.addEmoji(cur.emojiId, \''+code+'\', this); return cancelEvent(event);">'+Emoji.getEmojiHTML(code, false, true)+'</a>';
+      rchtml += '<a id="mbe_rc_em_'+code+'" class="mbe_rc_emojibtn" onmousedown="Emoji.addEmoji(cur.emojiWId, \''+code+'\', this); return cancelEvent(event);">'+Emoji.getEmojiHTML(code, false, true)+'</a>';
       ml -= 22;
     }
     cur.mbRcntEmoji = (rchtml + val(rcCont)).split('a><a').slice(0, 7).join('a><a');

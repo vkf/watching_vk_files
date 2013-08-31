@@ -10,6 +10,7 @@
 .place_map {
   width: 638px;
   height: 370px;
+  position: relative;
 }
 #place_map_yandex, #place_map_google, #place_map_mapbox {
   display: none;
@@ -511,4 +512,10 @@ input.place_map_point_search {
 }
 .places_group_checkins {
   padding-left: 10px;
+}
+.places_map_type {
+  font-size: 11px;
+}
+.font_medium .places_map_type {
+  font-size: 12px;
 }

@@ -2732,6 +2732,10 @@ AdsViewEditor.prototype.onUiEvent = function(paramName, event) {
           targetElem.blur();
           targetElem.focus();
         }
+        if (browser.chrome) { // Bug: Chrome counts new lines as 2 chars
+          var maxLengthNew = this.params[paramName].max_length + paramValue.split("\n").length - 1;
+          targetElem.setAttribute('maxlength', maxLengthNew);
+        }
         if (delayed) {
           this.onParamUpdate(paramName, paramValue);
         }

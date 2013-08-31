@@ -1340,7 +1340,7 @@ Ads.createInlineEdit = function(editElem, progressElem, unionType, unionId, valu
     switch (valueGeneralType) {
       case 'cost_per_click':
         if (value == '' || value == '0' || value == 0) {
-          return getLang('ads_error_cost_per_click_no_value');
+          return (additionalParams.is_cost_per_click ? getLang('ads_error_cost_per_click_no_value') : getLang('ads_error_cost_per_views_no_value'));
         }
         if (!value.match(/[0-9.,]/)) {
           return (additionalParams.is_cost_per_click ? getLang('ads_error_cost_per_click_invalid_value') : getLang('ads_error_cost_per_views_invalid_value'));

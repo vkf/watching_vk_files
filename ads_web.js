@@ -53,6 +53,12 @@ AdsWeb.onAdsResizeWidget = function() {
   ge('ads_web_widget_resize').innerHTML = 'Widget: ' + widgetWidth + ' x ' + widgetHeight;
 }
 
+AdsWeb.siteStatSelectGraph = function(itemElem, graphIndex) {
+  removeClass(geByClass1('selected', ge('ads_web_graph_filters')), 'selected');
+  addClass(itemElem, 'selected');
+  cur.pageGraphs.ads_web_graph.loadGraph(graphIndex);
+}
+
 AdsWeb.initSiteCode = function(widgetHtml, adsParams, adsParamsExtra, openapiVersion) {
   cur.widgetHtml     = widgetHtml;
   cur.adsParams      = adsParams;

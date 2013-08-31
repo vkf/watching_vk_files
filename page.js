@@ -425,7 +425,9 @@ var Page = {
     var info = ge('current_info').firstChild, input = ge('currinfo_input'), link = geByTag1('a', info);
     cur.infoEditing = (info.className == 'my_current_info');
     if (cur.infoEditing) {
-      cur.infoOld = stripHTML(link ? link.innerHTML : info.innerHTML);
+      var infoHtml = link ? link.innerHTML : info.innerHTML;
+      infoHtml = infoHtml.replace(/<img[^>]+alt="([^"]+)"[^>]*>/g, '$1');
+      cur.infoOld = stripHTML(infoHtml);
     } else {
       cur.infoOld = '';
     }
@@ -2945,7 +2947,7 @@ var Wall = {
           pageWide = st > maxSt,
           rowsCont = cur.suggesting ? ge('page_suggestions') : ge('page_wall_posts');
 
-      if (cur.wallPageWide != pageWide && (!pageWide || rowsCont.offsetHeight > 3 * lastWindowHeight || isVisible('wall_more_link'))) {
+      if (cur.wallPageWide != pageWide && (!pageWide || rowsCont.offsetHeight > 3 * lastWindowHeight || isVisible('wall_more_link')) && !layers.visible) {
         var lastOffsetParent, lastOffsetTop, lastPost, lastPostY;
         each(rowsCont.childNodes, function () {
           if (!this.offsetParent || !this.offsetTop) return;
@@ -4034,7 +4036,7 @@ var Wall = {
   },
   switchOwner: function(obj, sw) {
     obj.innerHTML = '<div class="progress_inline"></div>';
-    nav.change({owners_only: sw || false});
+    nav.change({owners_only: sw});
   }
 }
 
@@ -4579,7 +4581,7 @@ function initAddMedia(lnk, previewId, mediaTypes, opts) {
         handler = showBox.pbind('docs.php', extend(params, {act: 'a_choose_doc_box'}), {stat: ['docs.css']});
         break;
       case 'map':
-        handler = showBox.pbind('al_places.php', extend(params, {act: 'a_choose_place_box'}), {stat: ['places.css', 'map.css', 'maps.js', 'ui_controls.css', 'ui_controls.js', 'boxes.css'], cache: 1, width: 640, bodyStyle: 'padding: 0px;', dark: 1});
+        handler = showBox.pbind('al_places.php', extend(params, {act: 'a_choose_place_box'}), {stat: ['places.css', 'map.css', 'maps.js', 'ui_controls.css', 'ui_controls.js', 'boxes.css'], width: 640, bodyStyle: 'padding: 0px;', dark: 1});
         break;
       case 'note':
         handler = showWiki.pbind({note: 'new'}, true);
@@ -4935,10 +4937,18 @@ function initAddMedia(lnk, previewId, mediaTypes, opts) {
           if (sortable) {
             if (toEl == docsEl) {
               stManager.add(['sorter.js'], function() {
-                if (docsEl.sorter) {
-                  sorter.added(docsEl);
-                } else if (toEl.childNodes.length > 1) {
-                  sorter.init(docsEl, {});
+                var dXY = getXY(docsEl), dSz = getSize(docsEl),
+                docsSorter = function() {
+                  if (docsEl.sorter) {
+                    sorter.added(docsEl);
+                  } else if (toEl.childNodes.length > 1) {
+                    sorter.init(docsEl, {});
+                  }
+                };
+                if (!dXY[0] && !dXY[1] && !dSz[0] && !dSz[1]) {
+                  cur.sorterClbk = docsSorter;
+                } else {
+                  docsSorter();
                 }
               }, true);
             } else if (toEl == dpicsEl) {
@@ -5003,7 +5013,7 @@ function initAddMedia(lnk, previewId, mediaTypes, opts) {
       if (ev && ev.type == 'click' && (event.ctrlKey || event.metaKey || event.shiftKey)) {
         noboxhide = true;
       }
-      if (!cur.fileApiUploadStarted && !cur.preventBoxHide && noboxhide !== true && !inArray(type, ['poll', 'share', 'page', 'postpone'])) {
+      if ((!cur.fileApiUploadStarted || data.upload_ind === undefined) && !cur.preventBoxHide && noboxhide !== true && !inArray(type, ['poll', 'share', 'page', 'postpone'])) {
         boxQueue.hideLast();
       }
 
@@ -5914,7 +5924,7 @@ Composer = {
   getSendParams: function(composer, delayedCallback) {
     var addMedia = composer.addMedia || {},
         media = addMedia.chosenMedia || {},
-        medias = composer.addMedia ? addMedia.getMedias() : [],
+        medias = (addMedia && addMedia.getMedias) ? addMedia.getMedias() : [],
         share = (addMedia.shareData || {}),
         limit = composer && composer.options.media && composer.options.media.options.limit || 0,
         input = composer.input,

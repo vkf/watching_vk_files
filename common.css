@@ -1180,7 +1180,7 @@ a.ad_box_new:hover {
   height: 15px;
 }
 .left_count_wrap {
-  margin: 1px !important;
+  margin: 1px 0px 1px 1px !important;
   zoom: 1;
   padding: 4px !important;
   vertical-align: top;
@@ -1199,9 +1199,22 @@ a.ad_box_new:hover {
   -o-transition: background-color 200ms linear, color 200ms linear;
   transition: background-color 200ms linear, color 200ms linear;
 }
+.is_rtl1 .left_count_wrap {
+  margin: 1px 1px 1px 0px !important;
+}
+#side_bar ol li .left_row:hover .left_count_wrap {
+  margin-top: 0px !important;
+  margin-bottom: 0px !important;
+  padding: 5px 4px !important;
+}
 .font_medium .left_count_wrap {
   font-size: 11px;
-  margin: 2px 1px 2px 0px !important;
+  margin: 2px 0px 2px 0px !important;
+}
+.font_medium #side_bar ol li .left_row:hover .left_count_wrap {
+  margin-top: 0px !important;
+  margin-bottom: 0px !important;
+  padding: 6px 4px !important;
 }
 a:hover .left_count_wrap {
   background: #D5DDE5;
@@ -3402,7 +3415,7 @@ a.ts_search_link.active {
 #mvk_footer_lnk {
   padding: 7px 0px 5px;
 }
-.emoji {
+.emoji, .emoji_css {
   width: 16px;
   height: 16px;
   *height: 17px;

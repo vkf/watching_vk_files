@@ -646,6 +646,9 @@ div.wl_owner_head_date span.explain {
 div#wl_post_body_wrap {
   padding: 10px 23px 10px;
 }
+#wl_post_body .emoji {
+  vertical-align: middle;
+}
 
 div.wl_post_deleted {
   color: #777;

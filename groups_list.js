@@ -33,7 +33,7 @@ var GroupsList = {
 
     var shown = false;
     cur.invSwitching = true;
-    if (GroupsList.switchInvite(gid)) {
+    if (GroupsList.switchInvite(gid, (act == 'decline' && !past))) {
       shown = true;
       sp = false;
       hp = false;
@@ -79,6 +79,11 @@ var GroupsList = {
         }
 
         if (shown) {
+          if (cur.switchedInvite && act == 'decline' && !past) {
+            var switchedHtml = getLang('groups_event_left') + ' <a onclick="GroupsList.spam(this.parentNode, ' + gid + ', \'' + hash + '\', cur.switchedInvite)">' + getLang('its_spam') + '</a>';
+            if (ge('clubinv' + gid)) switchedHtml += '<div class="group_row_blockinv"><a onclick="GroupsList.spam(domPN(domPN(this)), ' + gid + ', \'' + hash + '\', cur.switchedInvite, 1)">' + getLang('groups_block_clubinv').replace('{club}', '<b>' + val(domPS(ge('clubinv' + gid))) + '</b>') + '</a></div>';
+            cur.switchedInvite.innerHTML = switchedHtml;
+          }
           return;
         }
 
@@ -116,9 +121,8 @@ var GroupsList = {
               var statHTML = getLang('groups_unsure_event');
             } else if (act == 'decline') {
               var statHTML = getLang('groups_event_left');
-              //if (tab == 'inv') {
-                acts += '<span class="divider">|</span><a onclick="GroupsList.spam(this.parentNode, ' + gid + ', \'' + hash + '\')">' + getLang('its_spam') + '</a>';
-              //}
+              acts += '<span class="divider">|</span><a onclick="GroupsList.spam(this.parentNode, ' + gid + ', \'' + hash + '\')">' + getLang('its_spam') + '</a>';
+              if (ge('clubinv' + gid)) acts += '<div class="group_row_blockinv"><a onclick="GroupsList.spam(domPN(domPN(this)), ' + gid + ', \'' + hash + '\', false, 1)">' + getLang('groups_block_clubinv').replace('{club}', '<b>' + val(domPS(ge('clubinv' + gid))) + '</b>') + '</a></div>';
             } else {
               var statHTML = getLang('groups_you_in_event');
             }
@@ -318,8 +322,6 @@ var GroupsList = {
           text = getLang('groups_group_deny_message');
         }
 
-
-
         GroupsList.addInvite(newRow, false, false);
 
         if (shown) {
@@ -343,7 +345,7 @@ var GroupsList = {
       ajax.post('al_groups.php', {act: 'reject_all', hash: hash}, {progress: box.progress});
     }, getLang('global_cancel'));
   },
-  spam: function(el, gid, hash, applyCont) {
+  spam: function(el, gid, hash, applyCont, block) {
     var sp, hp, tab = cur.scrollList.tab;
 
     if (el.firstChild && el.firstChild.className == 'progress_inline') return;
@@ -358,20 +360,36 @@ var GroupsList = {
     var key = GroupsList.rand(), value = GroupsList.rand();
     cur.scrollList[key] = value;
 
-    ajax.post('al_groups.php', {act: 'spam', gid: gid, hash: hash, context: 1}, {
+    ajax.post('al_groups.php', {act: 'spam', gid: gid, hash: hash, context: 1, block: block}, {
       onDone: function(respText) {
         if (!cur.scrollList || cur.scrollList[key] != value) return;
+        if (block > 0) {
+          respText = respText.replace('{club}', '<b>' + val(domPS(ge('clubinv' + gid))) + '</b>');
+        }
         if (applyCont) {
-          applyCont.innerHTML = respText;
+          if (block < 0) {
+            applyCont.innerHTML = applyCont.basehtml;
+          } else {
+            applyCont.basehtml = applyCont.innerHTML;
+            var applyContText = respText;
+            if (block > 0) {
+              respText += '<div class="group_row_blockinv"><a onclick="GroupsList.spam(domPN(domPN(this)), ' + gid + ', \'' + hash + '\', cur.switchedInvite, -1)">' + getLang('global_cancel') + '</div>';
+            } else if (ge('clubinv' + gid)) {
+              respText += '<div class="group_row_blockinv"><a onclick="GroupsList.spam(domPN(domPN(this)), ' + gid + ', \'' + hash + '\', cur.switchedInvite, 1)">' + getLang('groups_block_clubinv').replace('{club}', '<b>' + val(domPS(ge('clubinv' + gid))) + '</b>') + '</a></div>'
+            }
+            applyCont.innerHTML = respText;
+          }
         }
 
-        var list = cur.scrollList.lists[tab];
-        if (!list || list == 'loading' || list == 'update') {
-          cur.scrollList.processed[tab][gid] = -2;
-        } else {
-          for (var i = 0, count = list.length; i < count; ++i) {
-            if (list[i][2] == gid) {
-              list[i][1] = -2;
+        if (!block) {
+          var list = cur.scrollList.lists[tab];
+          if (!list || list == 'loading' || list == 'update') {
+            cur.scrollList.processed[tab][gid] = -2;
+          } else {
+            for (var i = 0, count = list.length; i < count; ++i) {
+              if (list[i][2] == gid) {
+                list[i][1] = -2;
+              }
             }
           }
         }
@@ -380,10 +398,22 @@ var GroupsList = {
         if (!row) return;
 
         var status = geByClass1('group_row_status', row), actions = geByClass1('group_row_actions', row);
-        status.basehtml = status.innerHTML;
-        actions.basehtml = actions.innerHTML;
-        status.innerHTML = getLang('groups_ajax_inv_declined_spam');
-        actions.innerHTML = '';
+        if (block < 0) {
+          status.innerHTML = status.blockhtml;
+          actions.innerHTML = actions.blockhtml;
+        } else {
+          if (block) {
+            status.blockhtml = status.innerHTML;
+            actions.blockhtml = actions.innerHTML;
+            status.innerHTML = '<div class="group_row_blockinv">' + respText + '</div>';
+            actions.innerHTML = '<div class="group_row_blockinv"><a onclick="GroupsList.spam(domPN(domPN(this)), ' + gid + ', \'' + hash + '\', false, -1)">' + getLang('global_cancel') + '</a></div>';
+          } else {
+            status.basehtml = status.innerHTML;
+            actions.basehtml = actions.innerHTML;
+            status.innerHTML = getLang('groups_ajax_inv_declined_spam');
+            actions.innerHTML = '';
+          }
+        }
       },
       showProgress: sp, hideProgress: hp
     });

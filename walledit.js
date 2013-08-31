@@ -183,9 +183,9 @@ var WallEdit = {
       }
       setTimeout(animate.pbind(info, {opacity: 0}, 500, re.pbind(info)), 1500);
       if (post.match(/^-?\d+photo_/)) {
-        Photoview.commSaved(post);
+        window.Photoview && Photoview.commSaved(post);
       } else if (post.match(/^-?\d+video_/)) {
-        Videoview.commSaved(post);
+        window.Videoview && Videoview.commSaved(post);
       }
     } else {
       re(info);
@@ -209,7 +209,14 @@ var WallEdit = {
 
     var composer = cur.wallEditComposer,
         addMedia = cur.wallEditMedia || {},
-        params = Composer.getSendParams(composer, WallEdit.savePost);
+        params = Composer.getSendParams(composer, WallEdit.savePost),
+        from = cur.onepost ? 'one' : ((window.wkcur || {}).shown ? 'wk' : '');
+
+    if (post.match(/^-?\d+photo_/) && cur.pvShown) {
+      from = 'photo';
+    } else if (post.match(/^-?\d+video_/) && window.mvcur && mvcur.mvShown && !mvcur.minimized) {
+      from = 'video';
+    }
 
     if (params.delayed) {
       return;
@@ -221,7 +228,7 @@ var WallEdit = {
       whole: 1,
       hash: cur.editHash,
       signed: isChecked('wpe_signed'),
-      from: cur.onepost ? 'one' : ((window.wkcur || {}).shown ? 'wk' : '')
+      from: from
     });
     var chk;
     if (chk = ge('status_export' + addMedia.lnkId)) {

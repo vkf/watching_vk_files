@@ -100,13 +100,16 @@ getPage: function(offset) {
 },
 
 getBrowser: function() {
-  var _uan = false, _uafull, browsersList = ['opera_mini', 'opera_mobile', 'safari_mobile', 'msie_mobile', 'bada', 'android', 'ipad', 'ipod', 'iphone', 'mozilla', 'chrome', 'safari', 'opera', 'msie10', 'msie9', 'msie8', 'msie7', 'msie6', 'msie'],
+  var _uan = false, _uafull, browsersList = ['opera_mini', 'opera_mobile', 'safari_mobile', 'msie_mobile', 'bada', 'android', 'ipad', 'ipod', 'iphone', 'mozilla', 'opera', 'chrome', 'safari', 'msie10', 'msie9', 'msie8', 'msie7', 'msie6', 'msie'],
   versions = ['opera_mini', 'opera_mobile', 'bada'], version;
   for (var i in browsersList) {
     if (window.browser[browsersList[i]] === true) {
       _uan = browsersList[i];
       break;
     }
+  }
+  if (window._ua && /yabrowser/i.test(_ua)) {
+    _uan = 'yabrowser';
   }
   if (_uan) {
     if (window.browser.msie) {

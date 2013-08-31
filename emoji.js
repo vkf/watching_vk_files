@@ -27,7 +27,7 @@ init: function(txt, opts) {
     }
     addEvent(txt, browser.opera ? 'click' : 'mousedown', function(e) {
       if (e.target && e.target.tagName == 'IMG') {
-        if (e.target.getAttribute('emoji')) {
+        if (Emoji.getCode(e.target)) {
           Emoji.editableFocus(txt, e.target, e.offsetX > 8);
           return cancelEvent(e);
         }
@@ -51,7 +51,7 @@ init: function(txt, opts) {
         }
         if (e.ctrlKey && e.keyCode == KEY.RETURN) {
           var val = this.value;
-          if (cur.editable) {
+          if (opts.editable) {
             if (browser.msie) {
               var r = document.selection.createRange();
               if (r.pasteHTML) {
@@ -143,7 +143,7 @@ cleanCont: function(cont) {
           el.id = '';
           Emoji.cleanCont(el);
         } else if (el.tagName == 'IMG') {
-          if (!el.getAttribute('emoji')) {
+          if (!Emoji.getCode(el)) {
             re(el);
           }
         } else if (el.tagName != 'BR' ){
@@ -221,7 +221,7 @@ editableVal: function(cont, opts) {
           }
 
         } else if (el.tagName == 'IMG') {
-          var code = el.getAttribute('emoji');
+          var code = Emoji.getCode(el);
           if (code) {
             if (opts && opts.saveEmoji) {
               str += Emoji.getEmojiHTML(code);
@@ -249,12 +249,12 @@ getEmojiHTML: function(code, symbol, enabled) {
   var editable = (browser.msie && intval(browser.version) > 8) ? ' contenteditable="false"' : '';
   if (Emoji.cssEmoji[code] != undefined) {
     var num = -Emoji.cssEmoji[code][0] * 17;
-    return '<img'+editable+' src="/images/blank.gif" class="emoji emoji_css" style="background-position: 0px '+num+'px;" emoji="'+code+'" align="middle" />';
+    return '<img'+editable+' src="/images/blank.gif" emoji="'+code+'" class="emoji_css" style="background-position: 0px '+num+'px;" />';
   } else {
     if (!Emoji.imgEmoji[code] && symbol && !enabled) {
       return symbol;
     } else {
-      return '<img class="emoji" emoji="'+code+'" align="middle" src="/images/emoji'+(window.devicePixelRatio >= 2 ? '_2x' : '')+'/'+code+'.png" />';
+      return '<img class="emoji" src="/images/emoji'+(window.devicePixelRatio >= 2 ? '_2x' : '')+'/'+code+'.png" />';
     }
   }
 },
@@ -307,7 +307,7 @@ emojiEnter: function(optId, e) {
   var opts = Emoji.opts[optId]
   if (opts.emojiFocused && opts.emojiOvered) {
     var img = geByTag1('img', opts.emojiOvered);
-    Emoji.addEmoji(optId, img.getAttribute('emoji'), opts.emojiOvered);
+    Emoji.addEmoji(optId, Emoji.getCode(img), opts.emojiOvered);
     opts.emojiFocused = true;
     Emoji.ttClick(optId, ge((cur.peer == -3) ? 'imw_smile' : 'im_smile'), true);
     debugLog('canceling');
@@ -360,6 +360,7 @@ addEmoji: function(optId, code, obj) {
       document.execCommand('insertHTML', false, img);
     }
     var emojies = geByClass('emoji', editable);
+    emojies.push.apply(emojies, geByClass('emoji_css', editable));
     for (i in emojies) {
       var prev = emojies[i].previousSibling;
       if (prev && prev.nodeType == 3 && prev.textContent && prev.textContent.charCodeAt(0) == 32) {
@@ -405,6 +406,9 @@ showShadow: function() {
 
 ttClick: function(optId, obj, needHide, needShow, ev) {
   var opts = Emoji.opts[optId];
+  if (!opts) {
+    return;
+  }
   if ((needHide && !Emoji.shown) || (needShow && Emoji.shown)) {
     return;
   }
@@ -810,24 +814,24 @@ tplSmile: function(optId, placeholder, classAddr) {
 },
 
 
-emojiToHTML: function(str, enabled) {
+emojiToHTML: function(str, replaceSymbols) {
   if (browser.ipad || browser.iphone) {
     return str;
   }
   str = str.replace(/&nbsp;/g, ' ').replace(/<br>/g, "\n");
   var regs = {
-    'D83DDE07': /(\s|^)([0OÐž]:\))([\s\.,]|$)/g,
+    'D83DDE07': /(\s|^)([0OÎ]:\))([\s\.,]|$)/g,
     'D83DDE09': /(\s|^)(;-\)+)([\s\.,]|$)/g,
-    'D83DDE06': /(\s|^)([XÐ¥xÑ…]-?D)([\s\.,]|$)/g,
+    'D83DDE06': /(\s|^)([XÕxõ]-?D)([\s\.,]|$)/g,
     'D83DDE0E': /(\s|^)(B-\))([\s\.,]|$)/g,
     'D83DDE0C': /(\s|^)(3-\))([\s\.,]|$)/g,
     'D83DDE20': /(\s|^)(&gt;\()([\s\.,]|$)/g,
-    'D83DDE30': /(\s|^)(;[oÐ¾OÐž])([\s\.,]|$)/g,
+    'D83DDE30': /(\s|^)(;[oîOÎ])([\s\.,]|$)/g,
     'D83DDE33': /(\s|^)(8\|)([\s\.,]|$)/g,
-    'D83DDE32': /(\s|^)(8-?[oÐ¾OÐž])([\s\.,]|$)/g,
+    'D83DDE32': /(\s|^)(8-?[oîOÎ])([\s\.,]|$)/g,
     'D83DDE0D': /(\s|^)(8-\))([\s\.,]|$)/g,
-    'D83DDE37': /(\s|^)(:[XÐ¥])([\s\.,]|$)/g,
-    'D83DDE28': /(\s|^)(:[oÐ¾OÐž])([\s\.,]|$)/g,
+    'D83DDE37': /(\s|^)(:[XÕ])([\s\.,]|$)/g,
+    'D83DDE28': /(\s|^)(:[oîOÎ])([\s\.,]|$)/g,
     '2764': /(\s|^)(&lt;3)([\s\.,]|$)/g
   };
   for (var code in regs) {
@@ -838,8 +842,8 @@ emojiToHTML: function(str, enabled) {
   var regs = {
     'D83DDE0A': /(:-\))([\s\.,]|$)/g,
     'D83DDE03': /(:-D)([\s\.,]|$)/g,
-    'D83DDE1C': /(;-[PÐ ])([\s\.,]|$)/g,
-    'D83DDE0B': /(:-[pÑ€])([\s\.,]|$)/g,
+    'D83DDE1C': /(;-[PÐ])([\s\.,]|$)/g,
+    'D83DDE0B': /(:-[pð])([\s\.,]|$)/g,
     'D83DDE12': /(:-\()([\s\.,]|$)/g,
     'D83DDE0F': /(:-?\])([\s\.,]|$)/g,
     'D83DDE14': /(3-?\()([\s\.,]|$)/g,
@@ -855,15 +859,18 @@ emojiToHTML: function(str, enabled) {
     'D83DDC4E': /(:dislike:)([\s\.,]|$)/g,
     '261D': /(:up:)([\s\.,]|$)/g,
     '270C': /(:v:)([\s\.,]|$)/g,
-    'D83DDC4C': /(:ok:|:Ð¾Ðº:)([\s\.,]|$)/g
+    'D83DDC4C': /(:ok:|:îê:)([\s\.,]|$)/g
   };
   for (var code in regs) {
     str = str.replace(regs[code], function(match, smile, space) {
       return Emoji.getEmojiHTML(code)+(space || '');
     });
   }
+
   str = str.replace(/\n/g, '<br>');
-  str = str.replace(Emoji.emojiRegEx, Emoji.emojiReplace).replace(/\uFE0F/g, '');
+  if (replaceSymbols) {
+    str = str.replace(Emoji.emojiRegEx, Emoji.emojiReplace).replace(/\uFE0F/g, '');
+  }
 
   return str;
 },
@@ -892,6 +899,19 @@ emojiReplace: function (symbol) {
 },
 
 emojiRegEx: /([\uE000-\uF8FF\u270A-\u2764\u2122\u25C0\u25FB-\u25FE\u2615\u263a\u2648-\u2653\u2660-\u2668\u267B\u267F\u2693\u261d\u26A0-\u26FA\u2708]|\uD83C[\uDC00-\uDFFF]|[\u2600\u26C4\u26BE\u23F3\u2764]|\uD83D[\uDC00-\uDFFF]|\uD83C[\uDDE8-\uDDFA]\uD83C[\uDDEA-\uDDFA]|[0-9]\u20e3)/g,
+
+getCode: function(obj) {
+  var code = false;
+  if (obj.className == 'emoji') {
+    var m = obj.src.match(/\/([a-zA-Z0-9]+).png/);
+    if (m) {
+      var code = m[1];
+    }
+  } else if (obj.className == 'emoji_css') {
+    var code = obj.getAttribute('emoji');
+  }
+  return code;
+},
 
 __eof: 1}}
 try{stManager.done('emoji.js');}catch(e){}

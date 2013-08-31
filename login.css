@@ -650,6 +650,21 @@ table.login_blocked_reason_thumbs {
   display: block;
 }
 
+#login_relogin_wrap {
+  padding-top: 40px;
+  padding-bottom: 0;
+}
+#login_relogin_wrap .info {
+  padding: 0;
+}
+#login_relogin_wrap .button_blue,
+#login_relogin_wrap .button_cancel {
+  margin-top: 20px;
+}
+#login_relogin_wrap .button_cancel {
+  margin-left: 10px;
+}
+
 #login_auth_frame_wrap {
   padding: 30px 10px 60px;
   margin: 30px 114px 0px;

@@ -951,6 +951,9 @@ b.profile_mob_onl {
 .profile_photo_prev {
   line-height: 160%;
 }
+#profile_map {
+  position: relative;
+}
 .profile_map_photo {
   width: 35px;
   height: 35px;

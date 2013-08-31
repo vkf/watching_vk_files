@@ -33,6 +33,9 @@
   width: 390px;
   padding: 0px;
 }
+.wall_fixed .wall_module .wall_text_name {
+  width: 390px;
+}
 .wall_fixed .wide_wall_module .wall_text {
   width: 580px;
 }

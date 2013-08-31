@@ -586,7 +586,7 @@ createChildClass('Selector', UiControl, {
     var placeholderTextNew       = ((this.disabled && this.options.disabledText) ? this.options.disabledText : this.options.placeholder);
     var placeholderColorNew      = (this.hasFocus ? this.options.placeholderColorBack : this.options.placeholderColor);
     var placeholderInputColorNew = ((zeroPlaceholder || this.disabled) && this.options.placeholderColor || '#000');
-    var placeholderVisibleNew    = !(this._selectedItems.length || this.input.value.length || zeroPlaceholder);
+    var placeholderVisibleNew    = !(this._selectedItems.length && this.options.multiselect || this.input.value.length || zeroPlaceholder);
     if (placeholderTextNew !== this.placeholderTextPrev) {
       this.placeholderContent.innerHTML = placeholderTextNew;
     }

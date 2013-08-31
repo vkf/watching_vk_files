@@ -965,28 +965,40 @@ var Pads = {
 
     showTabbedBox('places.php', {act: 'a_get_place_box', id: place}, {stat: ['places.css', 'map.css', 'maps.js', 'ui_controls.css', 'ui_controls.js']});
   },
-  grDone: function(gid, fail, text) {
+  grDone: function(gid, fail, res, block, text) {
     if (fail) {
       text = '<span class="pad_error">' + text + '</span>';
       if (_pads.cur.processed[gid] > 0) {
         delete(_pads.cur.processed[gid]);
       }
-    } else if (_pads.cur.processed[gid] > 0 && vk.counts.gr >= _pads.cur.savedcnts[gid]) {
-      Pads.decr('gr');
-      for (var i in _pads.cur.savedcnts) {
-        --_pads.cur.savedcnts[i];
+    } else {
+      if (_pads.cur.processed[gid] > 0 && vk.counts.gr >= _pads.cur.savedcnts[gid]) {
+        Pads.decr('gr');
+        for (var i in _pads.cur.savedcnts) {
+          --_pads.cur.savedcnts[i];
+        }
+      }
+      if (block > 0) {
+        text = '<div class="pads_gr_clubinv_block">' + text.replace('{club}', '<b>' + val(domPS(ge('pads_clubinv' + gid))) + '</b>') + '</div>';
+        text += '<div class="pads_gr_clubinv_block"><a onclick="Pads.grProcess(this, ' + gid + ', -2, -1)">' + getLang('global_cancel') + '</a></div>';
+      } else if (!block && res < 0 && ge('pads_clubinv' + gid)) {
+        text += '<div class="pads_gr_clubinv_block"><a onclick="Pads.grProcess(this, ' + gid + ', -2, 1)">' + val('groups_block_clubinv').replace('{club}', '<b>' + val(domPS(ge('pads_clubinv' + gid))) + '</b>') + '</a></div>';
       }
     }
     delete(_pads.cur.savedcnts[gid]);
 
     var el = ge('pad_gr' + gid), btns = geByClass1('pad_gr_btns', el) || geByClass1('pad_gr_result', el);
+    if (!fail && block < 0) {
+      text = btns.oldtext;
+    }
     domPN(btns).replaceChild(ce('div', {
       innerHTML: text,
-      className: 'pad_gr_result'
+      className: 'pad_gr_result',
+      oldtext: val(btns)
     }), btns);
     return true;
   },
-  grProcess: function(el, gid, res) {
+  grProcess: function(el, gid, res, block) {
     if (!_pads.cur.processed[gid]) {
       _pads.cur.processed[gid] = 1;
       _pads.cur.savedcnts[gid] = vk.counts.gr;
@@ -997,9 +1009,9 @@ var Pads = {
       _pads.cur.processed[gid] = -1;
     }
     var act = (res == -2) ? 'spam' : (res ? 'enter' : 'leave'), context = (res == -1) ? '_decline' : ((res == 2) ? '_unsure' : '');
-    ajax.post('al_groups.php', {act: act, gid: gid, from: 'pad', context: context, hash: _pads.hash}, {
-      onDone: Pads.grDone.pbind(gid, false),
-      onFail: Pads.grDone.pbind(gid, true),
+    ajax.post('al_groups.php', {act: act, gid: gid, from: 'pad', context: context, hash: _pads.hash, block: block}, {
+      onDone: Pads.grDone.pbind(gid, false, res, block),
+      onFail: Pads.grDone.pbind(gid, true, res, block),
       showProgress: Pads.lock.pbind(el),
       hideProgress: Pads.unlock.pbind(el)
     });

@@ -92,6 +92,9 @@ div.fw_post_info {
 #fw_post .post_media {
   width: 537px;
 }
+.fw_post_name {
+  width: 537px;
+}
 #fw_post .published_by_quote .wall_text,
 #fw_post .published_by_quote .wall_post_text,
 #fw_post .published_by_quote .post_media {

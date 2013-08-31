@@ -346,7 +346,7 @@ var ProfileEditor = {
           val('pedit_last_name') != peditData.last_name ||
           ge('pedit_middle_name') && val('pedit_middle_name') != peditData.middle_name ||
           val('pedit_maiden_name') != peditData.maiden_name||
-          val('pedit_langs') != peditData.lang;
+          val('pedit_langs') != peditData.lang && (val('pedit_langs') || peditData.lang);
         break;
 
       case 'contacts':
@@ -584,8 +584,9 @@ var ProfileEditor = {
     cur.relGuid = 0;
     cur.relIds = {grandparent: 0, parent: 0, sibling: 0, child: 0, grandchild: 0};
     relations = [];
-    if(!family) return;
-    each(family || [], function(i,v){
+    if (!family) return;
+
+    each(family || [], function(i,v) {
       var guid = cur.relGuid;
       sel = v.id > 0 ? v.id : [v.id, v.name, '', v.birth];
       ProfileEditor.addRelation(v.type, sel);
@@ -835,63 +836,68 @@ var ProfileEditor = {
       return;
     }
 
-    var i = 1;
-    each(geByClass('pedit_relation_input', ge('pedit_grandparents')), function() {
-      params['grandparents['+i+']'] = geByClass('resultField', this)[0].value;
-      params['grandparents_custom['+i+']'] = geByClass('customField', this)[0].value;
-      if (params['grandparents['+i+']'] == -1 && params['grandparents_custom['+i+']']) {
-        var name = params['grandparents_custom['+i+']'];
-        var n = name.split(/\s+/);
-        params['grandparents_custom['+i+']'] = cleanName(n[0] || '', n[1] || '').join(' ');
-      }
-      i++;
-    });
-    i = 1;
-    each(geByClass('pedit_relation_input', ge('pedit_parents')), function() {
-      params['parents['+i+']'] = geByClass('resultField', this)[0].value;
-      params['parents_custom['+i+']'] = geByClass('customField', this)[0].value;
-      if(params['parents['+i+']'] == -1 && params['parents_custom['+i+']']) {
-        var name = params['parents_custom['+i+']'];
-        var n = name.split(/\s+/);
-        params['parents_custom['+i+']'] = cleanName(n[0] || '', n[1] || '').join(' ');
-      }
-      i++;
-    });
-    i = 1;
-    each(geByClass('pedit_relation_input', ge('pedit_siblings')), function() {
-      params['siblings['+i+']'] = geByClass('resultField', this)[0].value;
-      params['siblings_custom['+i+']'] = geByClass('customField', this)[0].value;
-      if(params['siblings['+i+']'] == -1 && params['siblings_custom['+i+']']) {
-        var name = params['siblings_custom['+i+']'];
-        var n = name.split(/\s+/);
-        params['siblings_custom['+i+']'] = cleanName(n[0] || '', n[1] || '').join(' ');
-      }
-      i++;
-    });
-    i = 1;
-    each(geByClass('pedit_relation_input', ge('pedit_children')), function() {
-      params['children['+i+']'] = geByClass('resultField', this)[0].value;
-      params['children_custom['+i+']'] = geByClass('customField', this)[0].value;
-      params['children_date['+i+']'] = (geByClass('pedit_date_field', this)[0]||{value:0}).value;
-      if (params['children['+i+']'] == -1 && params['children_custom['+i+']']) {
-        var name = params['children_custom['+i+']'];
-        var n = name.split(/\s+/);
-        params['children_custom['+i+']'] = cleanName(n[0] || '', n[1] || '').join(' ');
-      }
-      i++;
-    });
-    i = 1;
-    each(geByClass('pedit_relation_input', ge('pedit_grandchildren')), function() {
-      params['grandchildren['+i+']'] = geByClass('resultField', this)[0].value;
-      params['grandchildren_custom['+i+']'] = geByClass('customField', this)[0].value;
-      params['grandchildren_date['+i+']'] = (geByClass('pedit_date_field', this)[0]||{value:0}).value;
-      if (params['grandchildren['+i+']'] == -1 && params['grandchildren_custom['+i+']']) {
-        var name = params['grandchildren_custom['+i+']'];
-        var n = name.split(/\s+/);
-        params['grandchildren_custom['+i+']'] = cleanName(n[0] || '', n[1] || '').join(' ');
-      }
-      i++;
-    });
+
+    var i = 0;
+    if (peditData.family !== false) {
+      params['familyedit'] = 1;
+      i = 1;
+      each(geByClass('pedit_relation_input', ge('pedit_grandparents')), function() {
+        params['grandparents['+i+']'] = geByClass('resultField', this)[0].value;
+        params['grandparents_custom['+i+']'] = geByClass('customField', this)[0].value;
+        if (params['grandparents['+i+']'] == -1 && params['grandparents_custom['+i+']']) {
+          var name = params['grandparents_custom['+i+']'];
+          var n = name.split(/\s+/);
+          params['grandparents_custom['+i+']'] = cleanName(n[0] || '', n[1] || '').join(' ');
+        }
+        i++;
+      });
+      i = 1;
+      each(geByClass('pedit_relation_input', ge('pedit_parents')), function() {
+        params['parents['+i+']'] = geByClass('resultField', this)[0].value;
+        params['parents_custom['+i+']'] = geByClass('customField', this)[0].value;
+        if(params['parents['+i+']'] == -1 && params['parents_custom['+i+']']) {
+          var name = params['parents_custom['+i+']'];
+          var n = name.split(/\s+/);
+          params['parents_custom['+i+']'] = cleanName(n[0] || '', n[1] || '').join(' ');
+        }
+        i++;
+      });
+      i = 1;
+      each(geByClass('pedit_relation_input', ge('pedit_siblings')), function() {
+        params['siblings['+i+']'] = geByClass('resultField', this)[0].value;
+        params['siblings_custom['+i+']'] = geByClass('customField', this)[0].value;
+        if(params['siblings['+i+']'] == -1 && params['siblings_custom['+i+']']) {
+          var name = params['siblings_custom['+i+']'];
+          var n = name.split(/\s+/);
+          params['siblings_custom['+i+']'] = cleanName(n[0] || '', n[1] || '').join(' ');
+        }
+        i++;
+      });
+      i = 1;
+      each(geByClass('pedit_relation_input', ge('pedit_children')), function() {
+        params['children['+i+']'] = geByClass('resultField', this)[0].value;
+        params['children_custom['+i+']'] = geByClass('customField', this)[0].value;
+        params['children_date['+i+']'] = (geByClass('pedit_date_field', this)[0]||{value:0}).value;
+        if (params['children['+i+']'] == -1 && params['children_custom['+i+']']) {
+          var name = params['children_custom['+i+']'];
+          var n = name.split(/\s+/);
+          params['children_custom['+i+']'] = cleanName(n[0] || '', n[1] || '').join(' ');
+        }
+        i++;
+      });
+      i = 1;
+      each(geByClass('pedit_relation_input', ge('pedit_grandchildren')), function() {
+        params['grandchildren['+i+']'] = geByClass('resultField', this)[0].value;
+        params['grandchildren_custom['+i+']'] = geByClass('customField', this)[0].value;
+        params['grandchildren_date['+i+']'] = (geByClass('pedit_date_field', this)[0]||{value:0}).value;
+        if (params['grandchildren['+i+']'] == -1 && params['grandchildren_custom['+i+']']) {
+          var name = params['grandchildren_custom['+i+']'];
+          var n = name.split(/\s+/);
+          params['grandchildren_custom['+i+']'] = cleanName(n[0] || '', n[1] || '').join(' ');
+        }
+        i++;
+      });
+    }
     // debugLog(params);
     if (cur.onProfileEditSave) {
       cur.onProfileEditSave();
@@ -917,13 +923,18 @@ var ProfileEditor = {
         peditData.last_name        = val('pedit_last_name');
         peditData.middle_name      = val('pedit_middle_name');
         peditData.maiden_name      = val('pedit_maiden_name');
-        peditData.family           = response.family;
 
         cur.uiStatus.val(response.status, true);
         if (cur.uiPartner.val() != response.partner)
           cur.uiPartner.val(response.partner, true);
 
-        ProfileEditor.updateFamily(peditData.family);
+        if (peditData.family !== false) {
+          peditData.family         = response.family;
+          ProfileEditor.updateFamily(peditData.family);
+          if (peditData.family === false) {
+            each(geByClass('pedit_general_family_row'), function() { hide(this); });
+          }
+        }
 
         val('pedit_status_detail_content', response.relation_text);
         if (peditData.partner) {

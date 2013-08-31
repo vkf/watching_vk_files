@@ -230,6 +230,63 @@ var VKMap = vkMaps.VKMap = function(element, opts, debug) {
   init.apply(this);
 };
 
+vkMaps.load = function(api, callback, lngcode) {
+  switch (api) {
+    case 'yandex':
+      if (window.YMaps) {
+        callback();
+      } else {
+        vkMaps.util.loadLib(vkMaps.util.getLibUrl(
+          (window.locProtocol || 'http:') + '//api-maps.yandex.ru/1.1/index.xml',
+          {
+            key: ([
+              'AGzlA0wBAAAAokbPJgIA_zBVgmsPMsMpjxEq4umhgUT8SaUAAAAAAAAAAAANQY4j1Xt0b5km4jLx23VAo8goxw==',
+              'AKPeBEwBAAAA0qePSQIA03AwA4O4ze6XTqIecsNp7REB6VYAAAAAAAAAAADNzChqedeUxsCAyYkFUHiD7MPITA=='
+            ])[/^(?:.+\.)?vk.com$/i.test(location.hostname) ? 1 : 0],
+            loadByRequire: 1
+          }
+        ), function() {
+          YMaps.load(function() {
+            callback();
+          });
+        });
+      }
+      break;
+    case 'google':
+      if (window.google && google.maps) {
+        callback();
+      } else {
+        window.gMapsInit = function() {
+          callback();
+          delete window.gMapsInit;
+        };
+        vkMaps.util.loadLib(vkMaps.util.getLibUrl(
+          (window.locProtocol || 'http:') + '//maps.google.com/maps/api/js',
+          {
+            sensor: 'false',
+            callback: 'gMapsInit',
+            language: lngcode || 'en'
+          }
+        ));
+      }
+      break;
+    case 'mapbox':
+      if (window.L && window.L.mapbox) {
+        callback();
+      } else {
+        var stat = ['mapbox.css', 'mapbox.js'];
+        if (browser.msie && browser.version < 8) {
+          stat.push('mapbox_ie.css');
+        }
+        stManager.add(stat, function() {
+          callback();
+        });
+      }
+      break;
+  }
+}
+
+
 VKMap.ROAD = 1;
 VKMap.SATELLITE = 2;
 VKMap.HYBRID = 3;
@@ -587,35 +644,19 @@ Geocoder.prototype.swap = function(api) {
 vkMaps.register('yandex', {
 VKMap: {
   init: function(element, api) {
-    var me = this;
-    if (window.YMaps) {
+    vkMaps.load(api, (function() {
       var yandexMap = this.maps[api] = new YMaps.Map(element);
-      YMaps.Events.observe(yandexMap, yandexMap.Events.Click, function(map, mouseEvent) {
+      YMaps.Events.observe(yandexMap, yandexMap.Events.Click, (function(map, mouseEvent) {
         var lat = mouseEvent.getCoordPoint().getY(),
         lon = mouseEvent.getCoordPoint().getX();
-        me.click.fire({'location': new vkMaps.LatLonPoint(lat, lon)});
-      });
-      YMaps.Events.observe(yandexMap, yandexMap.Events.SmoothZoomEnd, function(map) {
-        me.changeZoom.fire();
-      });
+        this.click.fire({'location': new vkMaps.LatLonPoint(lat, lon)});
+      }).bind(this));
+      YMaps.Events.observe(yandexMap, yandexMap.Events.SmoothZoomEnd, (function(map) {
+        this.changeZoom.fire();
+      }).bind(this));
       this.loaded[api] = true;
-      me.load.fire();
-    } else {
-      vkMaps.util.loadLib(vkMaps.util.getLibUrl(
-        (window.locProtocol || 'http:') + '//api-maps.yandex.ru/1.1/index.xml',
-        {
-          key: ([
-            'AGzlA0wBAAAAokbPJgIA_zBVgmsPMsMpjxEq4umhgUT8SaUAAAAAAAAAAAANQY4j1Xt0b5km4jLx23VAo8goxw==',
-            'AKPeBEwBAAAA0qePSQIA03AwA4O4ze6XTqIecsNp7REB6VYAAAAAAAAAAADNzChqedeUxsCAyYkFUHiD7MPITA=='
-          ])[/^(?:.+\.)?vk.com$/i.test(location.hostname) ? 1 : 0],
-          loadByRequire: 1
-        }
-      ), function() {
-        YMaps.load(function() {
-          me.reInit();
-        });
-      });
-    }
+      this.load.fire();
+    }).bind(this));
   },
   applyOptions: function(){
     var map = this.maps[this.api];
@@ -685,7 +726,7 @@ VKMap: {
     },
     onAddToMap = function(ymap, position) {
       var position = new YMaps.ControlPosition(YMaps.ControlPosition.TOP_RIGHT, new YMaps.Size(10, 10)),
-      div = ce('div', {}, {position: "absolute", zIndex: YMaps.ZIndex.CONTROL, backgroundColor: '#FFF', padding: 0, margin: 0}),
+      div = ce('div', {className: 'places_map_type'}, {position: "absolute", zIndex: YMaps.ZIndex.CONTROL, backgroundColor: '#FFF', padding: 0, margin: 0}),
       input = ce('input', {id: 'yandex_type_dd'}, {padding: 0, margin: 0});
       position.apply(div);
       ymap.getContainer().appendChild(div).appendChild(input);
@@ -943,8 +984,7 @@ Geocoder: {
 vkMaps.register('google', {
 VKMap: {
   init: function(element, api) {
-    var me = this;
-    if (window.google && google.maps) {
+    vkMaps.load(api, (function() {
       var myOptions = {
         disableDefaultUI: true,
         mapTypeId: google.maps.MapTypeId.ROADMAP,
@@ -972,36 +1012,23 @@ VKMap: {
       }
       if (element) {
         var map = new google.maps.Map(element, myOptions);
-        google.maps.event.addListener(map, 'click', function(location){
-          me.click.fire({'location':
+        google.maps.event.addListener(map, 'click', (function(location){
+          this.click.fire({'location':
             new vkMaps.LatLonPoint(location.latLng.lat(), location.latLng.lng())
           });
-        });
-        google.maps.event.addListener(map, 'zoom_changed', function(){
-          me.changeZoom.fire();
-        });
-        google.maps.event.addListener(map, 'dragend', function(){
-          me.moveendHandler(me);
-          me.endPan.fire();
-        });
+        }).bind(this));
+        google.maps.event.addListener(map, 'zoom_changed', (function(){
+          this.changeZoom.fire();
+        }).bind(this));
+        google.maps.event.addListener(map, 'dragend', (function(){
+          this.moveendHandler(this);
+          this.endPan.fire();
+        }).bind(this));
         this.maps[api] = map;
       }
       this.loaded[api] = true;
-      me.load.fire();
-    } else {
-      window.gMapsInit = function() {
-        me.reInit();
-        delete window.gMapsInit;
-      };
-      vkMaps.util.loadLib(vkMaps.util.getLibUrl(
-        (window.locProtocol || 'http:') + '//maps.google.com/maps/api/js',
-        {
-          sensor: 'false',
-          callback: 'gMapsInit',
-          language: this.lngcode || 'en'
-        }
-      ));
-    }
+      this.load.fire();
+    }).bind(this), this.lngcode);
   },
   applyOptions: function() {
     var map = this.maps[this.api];
@@ -1074,7 +1101,7 @@ VKMap: {
     onChange = function(type) {
       this.setMapType(intval(type));
     };
-    div = ce('div', {}, {position: 'absolute', zIndex: 10000, background: '#FFF', padding: 0, margin: 10});
+    div = ce('div', {className: 'places_map_type'}, {position: 'absolute', zIndex: 10000, background: '#FFF', padding: 0, margin: 10});
     input = ce('input', {id: 'google_type_dd'}, {padding: 0, margin: 0});
     div.appendChild(input);
     new Dropdown(input, vkMaps.VKMap.TYPES_LIST, {
@@ -1381,37 +1408,26 @@ Geocoder: {
 }
 });
 
+vkMaps.mapboxApiId = 'vkmaps.map-an1xcr4f';
+vkMaps.mapboxSatellite = 'vkmaps.map-b2y5af4k';
+vkMaps.mapboxMixed = 'vkmaps.map-c1iw1x3v';
+
 vkMaps.register('mapbox', {
 VKMap: {
   init: function(element, api) {
-    var me = this;
-    if (window.L && window.L.mapbox) {
-      var mapboxMap = this.maps[api] = L.mapbox.map(element, 'brainfucker.map-4kfmp0z7', {zoomControl: false})
-      mapboxMap.on('click', function(e) {
-        me.click.fire({'location': new vkMaps.LatLonPoint(e.latlng.lat, e.latlng.lng)});
-      });
-      mapboxMap.on('zoomend', function(e) {
-        me.changeZoom.fire();
-      });
-      /*YMaps.Events.observe(yandexMap, yandexMap.Events.Click, function(map, mouseEvent) {
-        var lat = mouseEvent.getCoordPoint().getY(),
-        lon = mouseEvent.getCoordPoint().getX();
-        me.click.fire({'location': new vkMaps.LatLonPoint(lat, lon)});
-      });
-      YMaps.Events.observe(yandexMap, yandexMap.Events.SmoothZoomEnd, function(map) {
-        me.changeZoom.fire();
-      });*/
+    vkMaps.load(api, (function() {
+      var mapboxMap = this.maps[api] = L.mapbox.map(element, false, {zoomControl: false, detectRetina: true, retinaVersion: vkMaps.mapboxApiId})
+      mapboxMap.on('click', (function(e) {
+        this.click.fire({'location': new vkMaps.LatLonPoint(e.latlng.lat, e.latlng.lng)});
+      }).bind(this));
+      mapboxMap.on('zoomend', (function(e) {
+        this.changeZoom.fire();
+      }).bind(this));
+      this.tileLayer = L.mapbox.tileLayer(vkMaps.mapboxApiId).addTo(mapboxMap);
+      this.mapType = vkMaps.VKMap.ROAD;
       this.loaded[api] = true;
-      me.load.fire();
-    } else {
-      var stat = ['mapbox.css', 'mapbox.js'];
-      if (browser.msie && browser.version < 8) {
-        stat.push('mapbox_ie.css');
-      }
-      stManager.add(stat, function() {
-        me.reInit();
-      })
-    }
+      this.load.fire();
+    }).bind(this));
   },
   applyOptions: function(){
     var map = this.maps[this.api];
@@ -1498,27 +1514,31 @@ VKMap: {
     map.addControl(this.controls[0]);
   },
   addMapTypeControls: function() {
-    /*var me = this, map = this.maps[this.api],
-    onChange = function(type) {
+    var me = this, map = this.maps[this.api];
+    var onChange = function(type) {
       this.setMapType(intval(type));
-    },
-    onAddToMap = function(ymap, position) {
-      var position = new YMaps.ControlPosition(YMaps.ControlPosition.TOP_RIGHT, new YMaps.Size(10, 10)),
-      div = ce('div', {}, {position: "absolute", zIndex: YMaps.ZIndex.CONTROL, backgroundColor: '#FFF', padding: 0, margin: 0}),
-      input = ce('input', {id: 'yandex_type_dd'}, {padding: 0, margin: 0});
-      position.apply(div);
-      ymap.getContainer().appendChild(div).appendChild(input);
-      new Dropdown(ge('yandex_type_dd'), vkMaps.VKMap.TYPES_LIST, {
-        width: 80,
-        onChange: onChange.bind(me)
-      });
-    },
-    onRemoveFromMap = function() {
-
     };
-    this.controls.unshift({onAddToMap: onAddToMap, onRemoveFromMap: onRemoveFromMap});
+    var Control = L.Control.extend({
+      options: {
+          position: 'topright'
+      },
+      onAdd: function (map) {
+        div = ce('div', {className: 'places_map_type'}, {backgroundColor: '#FFF', padding: 0, margin: 10}),
+        addEvent(div, 'click dblclick', function(e) {
+          return cancelEvent(e);
+        });
+        input = ce('input', {padding: 0, margin: 0});
+        div.appendChild(input);
+        new Dropdown(input, vkMaps.VKMap.TYPES_LIST, {
+          width: 80,
+          onChange: onChange.bind(me)
+        });
+        return div;
+      }
+    });
+    this.controls.unshift(new Control());
     this.addControlsArgs.map_type = true;
-    map.addControl(this.controls[0]);*/
+    map.addControl(this.controls[0]);
   },
   setCenterAndZoom: function(point, zoom) {
     var map = this.maps[this.api];
@@ -1566,34 +1586,26 @@ VKMap: {
   },
   setMapType: function(type) {
     var map = this.maps[this.api];
-    /*switch(type) {
+    cur.m = map;
+    map.removeLayer(this.tileLayer);
+    this.mapType = type;
+
+    switch(type) {
       case vkMaps.VKMap.ROAD:
-        map.setType(YMaps.MapType.MAP);
+        this.tileLayer = L.mapbox.tileLayer(vkMaps.mapboxApiId).addTo(map);
         break;
       case vkMaps.VKMap.SATELLITE:
-        map.setType(YMaps.MapType.SATELLITE);
+        this.tileLayer = L.mapbox.tileLayer(vkMaps.mapboxSatellite).addTo(map);
         break;
       case vkMaps.VKMap.HYBRID:
-        map.setType(YMaps.MapType.HYBRID);
+        this.tileLayer = L.mapbox.tileLayer(vkMaps.mapboxMixed).addTo(map);
         break;
       default:
-        map.setType(type || YMaps.MapType.MAP);
-    }*/
+        this.tileLayer = L.mapbox.tileLayer(vkMaps.mapboxApiId).addTo(map);
+    }
   },
   getMapType: function() {
-    var map = this.maps[this.api],
-    type = map.getType();
-    /*switch(type) {
-      case YMaps.MapType.MAP:
-        return vkMaps.vkMap.ROAD;
-      case YMaps.MapType.SATELLITE:
-        return vkMaps.vkMap.SATELLITE;
-      case YMaps.MapType.HYBRID:
-        return vkMaps.vkMap.HYBRID;
-      default:
-        return null;
-    }*/
-    return vkMaps.vkMap.ROAD;
+    return this.mapType;
   },
   getBounds: function () {
     var map = this.maps[this.api],
@@ -1742,47 +1754,18 @@ Marker: {
 
 Geocoder: {
   init: function() {
-    var me = this;
+    this.geocoder = L.mapbox.geocoder(vkMaps.mapboxApiId);
+    debugLog('geocoder init', vkMaps.mapboxApiId);
   },
   geocode: function(address) {
-    var VKMap_geocoder = this;
     if (!address.hasOwnProperty('address') || address.address === null || address.address === '') {
       address.address = [address.street, address.locality, address.region, address.country ].join(', ');
     }
-    var geocoder = new YMaps.Geocoder(address.address, { results: 1 });
-    YMaps.Events.observe(geocoder, geocoder.Events.Load, function (response) {
-      if (response.found > 0) {
-        VKMap_geocoder.geocode_callback(response.get(0));
-      } else {
-        VKMap_geocoder.error_callback(response);
-      }
-    });
-    YMaps.Events.observe(geocoder, geocoder.Events.Fault, function (error) {
-      VKMap_geocoder.error_callback(error.message);
-    });
+    debugLog('send query', address.address);
+    this.geocoder.query(address.address, this.geocode_callback.bind(this));
   },
   geocode_callback: function(response) {
-    var return_location = {street: '', locality: '', region: '', country: ''};
-    var locLev;
-    if ((locLev = response.AddressDetails.Country)) {
-      return_location.country = locLev.CountryName;
-      if ((locLev = locLev.AdministrativeArea)) {
-        return_location.region = locLev.AdministrativeAreaName;
-        if ((locLev = locLev.Locality)) {
-          return_location.locality = locLev.LocalityName;
-          if ((locLev = locLev.Thoroughfare)) {
-            return_location.street = locLev.ThoroughfareName;
-          }
-        }
-      }
-    }
-    var ypoint = response.getGeoPoint();
-    ybounds = response.getBounds(),
-    ltop = ybounds.getLeftTop(),
-    rbottom = ybounds.getRightBottom();
-    return_location.point = new vkMaps.LatLonPoint(ypoint.getLat(), ypoint.getLng());
-    return_location.bounds = new vkMaps.BoundingBox(ltop.getLat(), ltop.getLng(), rbottom.getLat(), rbottom.getLng());
-    this.callback(return_location);
+    debugLog('geocode callback', response, arguments);
   }
 }
 });

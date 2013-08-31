@@ -202,7 +202,7 @@ Notifier = {
     curNotifier.is_server = false;
     curNotifier.lp_connected = false;
     curNotifier.error_timeout = 1;
-    curNotifier.post_message = Notifier.debug || !(browser.opera || browser.msie);
+    curNotifier.post_message = Notifier.debug || !(browser.opera && intval(browser.version) < 15 || browser.msie);
     curNotifier.transport = 'frame';
 
     this.lcInit();
@@ -2374,7 +2374,7 @@ FastChat = {
           });
           if (!ge('fc_msg' + ev[3])) {
             stManager.add(['im.js'], function() {
-              ev[5] = Emoji.emojiToHTML(ev[5], true);
+              //ev[5] = Emoji.emojiToHTML(ev[5], true);
               FastChat.addMsg(FastChat.prepareMsgData(ev.slice(2)));
             });
             tab.msgs[ev[3]] = [ev[4] & 2 ? 1 : 0, ev[4] & 1];

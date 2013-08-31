@@ -243,8 +243,7 @@ var IM = {
       i++;
     }
     if (kludges.emoji) {
-      message = Emoji.emojiToHTML(message, kludges.emoji);
-      //message = message.replace()
+      message = Emoji.emojiToHTML(message, true);
     }
     message = '<div class="im_msg_text">'+message+'</div>';
     if (kludges.geo) {
@@ -271,6 +270,13 @@ var IM = {
           domain = matches[3] || '',
           url = domain + (matches[4] || ''),
           full = (matches[2] || '') + matches[3] + matches[4];
+
+      if (matches[4] == '/images/blank.gif') {
+        return url;
+      }
+      if (matches[4].match(/^\/images\/im_emoji_2x\.png/)) {
+        return url;
+      }
 
       if (domain.indexOf('.') == -1 || domain.indexOf('..') != -1) return matches[0];
       var topDomain = domain.split('.').pop();
@@ -700,10 +706,14 @@ var IM = {
     }
   },
   extractEmoji: function(txt, peer) {
-    var emjs = geByClass('emoji', txt);
     var newRc = {};
+    var emjs = geByClass('emoji', txt);
     for(var i in emjs) {
-      newRc[emjs[i].getAttribute('emoji')] = 1;
+      newRc[Emoji.getCode(emjs[i])] = 1;
+    }
+    var emjs = geByClass('emoji_css', txt);
+    for(var i in emjs) {
+      newRc[Emoji.getCode(emjs[i])] = 1;
     }
     var rcCont = ge('im_rcemoji');
     var rchtml = '';
@@ -960,7 +970,7 @@ var IM = {
     });
 
     if (cur.emoji) {
-      rowMsg = Emoji.emojiToHTML(rowMsg, cur.emoji);
+      rowMsg = Emoji.emojiToHTML(rowMsg, false);
     }
     if (peerTab.data) {
       kludges.from = cur.id;
@@ -1217,7 +1227,7 @@ var IM = {
         body = body.substr(0, prevLen) + '..';
       }
       if (kludges.emoji) {
-        body = Emoji.emojiToHTML(body, kludges.emoji);
+        body = Emoji.emojiToHTML(body, true);
       }
       body = title + body;
       // Attachment
@@ -1559,7 +1569,7 @@ var IM = {
     if (!cur.unreadMsgs) return IM.restoreTitle();
     if (!cur.old_title) {
       cur.old_title = document.title.toString();
-      document.title = getLang('mail_im_new_messages', cur.unreadMsgs);
+      document.title = winToUtf(getLang('mail_im_new_messages', cur.unreadMsgs));
       var icon_num = cur.unreadMsgs > 9 ? 10 : cur.unreadMsgs;
       setFavIcon('/images/icons/fav_im' + icon_num + '.ico');
     } else {
@@ -2105,6 +2115,9 @@ var IM = {
   },
   // from: 1 - initial, -1 - more new messages loaded, by q_offset (down-scroll)
   updatePeer: function(peer, msgs, all_shown, from) {
+    if (!cur.tabs[peer]) {
+      return false;
+    }
     cur.tabs[peer].history = 1;
 
     var count = 0,
@@ -2752,6 +2765,7 @@ var IM = {
 
     ajax.post('al_im.php', params, {
       onDone: function (res) {
+        if (!cur.tabs[res.peer]) return;
         if (res.peer && cur.tabs[res.peer]) {
           IM.activateTab(res.peer);
         } else {
@@ -2843,7 +2857,9 @@ var IM = {
       if (events) {
         IM.feed(mid, events);
       }
-      cur.tabs[mid].history = false;
+      if (cur.tabs[mid]) {
+        cur.tabs[mid].history = false;
+      }
       if (activate) {
         IM.activateTab(mid, false, msgId);
         IM.attachMsgs();
@@ -3000,6 +3016,9 @@ var IM = {
     cur.imEl.nav.style.left = cur.imEl.controls.style.left = '';
   },
   updateScroll: function (e, noev) {
+    if (!cur.imEl.nav) {
+      return false;
+    }
     var winH = Math.max(intval(window.innerHeight), intval(document.documentElement.clientHeight)),
         headH = cur.imEl.head.clientHeight,
         imNavH = cur.imEl.nav.offsetHeight,
@@ -3160,6 +3179,9 @@ var IM = {
     }
   },
   onScroll: function () {
+    if (!cur.imEl) {
+      return false;
+    }
     var winH = lastWindowHeight,
         contentST = scrollGetY(true),
         contentSH = Math.max(bodyNode.scrollHeight, pageNode.scrollHeight, scrollNode.scrollHeight),
@@ -4352,7 +4374,9 @@ var IM = {
         } else {
           IM.addTab(res.peer, res.tab, res.name, res.photo, res.hash, 0, res.data);
           IM.updateScroll();
-          cur.tabs[res.peer].history = false;
+          if (cur.tabs[res.peer]) {
+            cur.tabs[res.peer].history = false;
+          }
           IM.activateTab(res.peer);
         }
         IM.attachMsgs();
@@ -4837,7 +4861,7 @@ var IM = {
           target.onclick ||
           target.onmousedown ||
           target.tagName == 'A' ||
-          target.tagName == 'IMG' && !hasClass(target, 'emoji') && !hasClass(target, 'im_gift') ||
+          target.tagName == 'IMG' && !hasClass(target, 'emoji') && !hasClass(target, 'emoji_css') && !hasClass(target, 'im_gift') ||
           target.tagName == 'TEXTAREA' ||
           target.className == 'play_new' ||
           (foundGood = checkeRE.test(target.className))
@@ -5535,6 +5559,8 @@ var IM = {
       //addMediaBtn: ge('im_add_media'),
       sendWrap: ge('imw_buttons'),
       onKeyAction: function(e) {
+        clearTimeout(cur.saveWriteDraftTO);
+        cur.saveWriteDraftTO = setTimeout(IM.saveWriteDraft, e.type == 'paste' ? 0 : 300);
       }
     });
 
@@ -5545,7 +5571,7 @@ var IM = {
       });
       addEvent(IM.getNewTxt(), browser.opera ? 'click' : 'mousedown', function(e) {
         if (e.target && e.target.tagName == 'IMG') {
-          if (e.target.getAttribute('emoji')) {
+          if (Emoji.getCode(e.target)) {
             Emoji.editableFocus(IM.getNewTxt(), e.target, e.offsetX > 8);
             return cancelEvent(e);
           }

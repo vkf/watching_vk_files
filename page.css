@@ -963,7 +963,7 @@ div.wall_module .ext_video div {
 .wall_post_text,
 .wall_reply_text {
   padding-top: 2px;
-  line-height: 130%;
+  line-height: 140%;
 }
 .font_medium .wall_post_text,
 .font_medium .wall_reply_text {
@@ -1015,6 +1015,10 @@ div.wall_module .ext_video div {
   padding: 5px 4px 0px 0px;
   margin-left: 0px;
   margin-right: -4px;
+}
+.wall_text_name {
+  width: 305px;
+  overflow: hidden;
 }
 .published_by_quote .wall_text {
   width: 320px;
@@ -3906,6 +3910,9 @@ img.page_preview_video, img.page_preview_graffiti {
 .wide_wall_module .post_media {
   width: 537px;
 }
+.wide_wall_module .wall_text_name {
+  width: 505px;
+}
 
 .wide_wall_module .reply_table .post_media {
   width: 465px;
@@ -4620,6 +4627,10 @@ b.wall_mob_onl {
   position: relative;
   display: block;
   text-align: center;
+}
+.page_album_row a.img_link {
+  width: 178px;
+  height: 118px;
 }
 .page_photo_thumb_big {
   vertical-align: top;

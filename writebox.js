@@ -181,7 +181,7 @@ var WriteBox = {
   },
   getPeer: function () {
     var dd = cur.wdd['mail_box_dd'],
-        sel = dd.selCount,
+        sel = (dd) ? dd.selCount : false,
         peer = false;
     if (sel != 1) {
       return false;

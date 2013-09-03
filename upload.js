@@ -607,7 +607,17 @@ onFileApiSend: function(i, files, force) {
   if (!options.multi_progress) this.onUploadStart(i);
   var max_files = files.length;
   if (options.max_files) {
-    var curCount = cur.attachCount ? cur.attachCount() : 0;
+    var attachCount = cur.attachCount;
+    if (!attachCount && cur.addMedia) {
+      var maxIndex = -1;
+      for (var j in cur.addMedia) {
+        if (j > maxIndex) maxIndex = j;
+      }
+      if (maxIndex >= 0 && cur.addMedia[maxIndex] && cur.addMedia[maxIndex].attachCount) {
+        attachCount = cur.addMedia[maxIndex].attachCount;
+      }
+    }
+    var curCount = attachCount ? attachCount() : 0;
     if (options.max_files - curCount < files.length && options.lang && options.lang.max_files_warning) {
       max_files = options.max_files - curCount;
       showFastBox({

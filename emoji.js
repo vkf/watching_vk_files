@@ -38,15 +38,15 @@ init: function(txt, opts) {
     addEvent(txt, 'keypress keydown keyup paste', function(e) {
       if (e.type == 'keydown') {
         if (e.keyCode == KEY.RETURN || e.keyCode == 10) {
-          if (cur.ctrl_submit && (e.ctrlKey || browser.mac && e.metaKey) ||
-              !cur.ctrl_submit && !e.shiftKey && !(e.ctrlKey || browser.mac && e.metaKey)) {
+          if ((cur.ctrl_submit || opts.noEnterSend) && (e.ctrlKey || browser.mac && e.metaKey) ||
+              !(cur.ctrl_submit || opts.noEnterSend) && !e.shiftKey && !(e.ctrlKey || browser.mac && e.metaKey)) {
             if (!Emoji.emojiEnter(optId, e)) {
               return false;
             }
-            if (!opts.noEnterSend) {
+            //if (!opts.noEnterSend) {
               opts.onSend();
               return cancelEvent(e);
-            }
+            //}
           }
         }
         if (e.ctrlKey && e.keyCode == KEY.RETURN) {

@@ -264,6 +264,7 @@ var Restore = {
     }
 
     var params = {act: 'a_request'};
+
     if (request_type == 4) {
       extend(params, {hash: cur.options.fhash, login: login, email: email, phone: phone, old_phone: old_phone, password: password});
     } else {
@@ -279,6 +280,15 @@ var Restore = {
         if (!cur.images[i].deleted) {
           params.images.push(cur.images[i].id + '_' + cur.images[i].hash);
         }
+      }
+    }
+
+    cur.validationLastCallback = function(res) {
+      hide('request_phone_res');
+      if (res) {
+        Restore.submitRequest();
+      } else {
+        elfocus('phone');
       }
     }
 

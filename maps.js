@@ -943,6 +943,9 @@ Geocoder: {
     if (!address.hasOwnProperty('address') || address.address === null || address.address === '') {
       address.address = [address.street, address.locality, address.region, address.country ].join(', ');
     }
+    if (address.lat && address.lon) {
+      address.address = new YMaps.GeoPoint(address.lon, address.lat)
+    }
     var geocoder = new YMaps.Geocoder(address.address, { results: 1 });
     YMaps.Events.observe(geocoder, geocoder.Events.Load, function (response) {
       if (response.found > 0) {
@@ -960,15 +963,18 @@ Geocoder: {
     var locLev;
     if ((locLev = response.AddressDetails.Country)) {
       return_location.country = locLev.CountryName;
-      if ((locLev = locLev.AdministrativeArea)) {
-        return_location.region = locLev.AdministrativeAreaName;
-        if ((locLev = locLev.Locality)) {
-          return_location.locality = locLev.LocalityName;
-          if ((locLev = locLev.Thoroughfare)) {
-            return_location.street = locLev.ThoroughfareName;
-          }
-        }
+      if (locLev.AdministrativeArea) {
+        locLev = locLev.AdministrativeArea;
       }
+      return_location.region = locLev.AdministrativeAreaName;
+      if (locLev.Locality) {
+        locLev = locLev.Locality;
+      }
+      return_location.locality = locLev.LocalityName;
+      if (locLev.Thoroughfare) {
+        locLev = locLev.Thoroughfare;
+      }
+      return_location.street = locLev.ThoroughfareName;
     }
     var ypoint = response.getGeoPoint();
     ybounds = response.getBounds(),
@@ -1340,7 +1346,9 @@ Geocoder: {
   },
   geocode: function(address){
     var me = this;
-    if (address && address.location) {
+    if (address && address.lat && address.lon) {
+      var opts = {location: new google.maps.LatLng(address.lat, address.lon)};
+    } else if (address && address.location) {
       var opts = {location: address.location};
     } else {
       if (!address.hasOwnProperty('address') || address.address === null || address.address === '') {
@@ -1411,12 +1419,14 @@ Geocoder: {
 vkMaps.mapboxApiId = 'vkmaps.map-an1xcr4f';
 vkMaps.mapboxSatellite = 'vkmaps.map-b2y5af4k';
 vkMaps.mapboxMixed = 'vkmaps.map-c1iw1x3v';
+vkMaps.mapboxApiId_2x = 'vkmaps.map-40lc3e3w';
+//vkMaps.mapboxSatellite_2x = 'vkmaps.map-40lc3e3w';
 
 vkMaps.register('mapbox', {
 VKMap: {
   init: function(element, api) {
     vkMaps.load(api, (function() {
-      var mapboxMap = this.maps[api] = L.mapbox.map(element, false, {zoomControl: false, detectRetina: true, retinaVersion: vkMaps.mapboxApiId})
+      var mapboxMap = this.maps[api] = L.mapbox.map(element, false, {zoomControl: false, detectRetina: true, retinaVersion: vkMaps.mapboxApiId_2x})
       mapboxMap.on('click', (function(e) {
         this.click.fire({'location': new vkMaps.LatLonPoint(e.latlng.lat, e.latlng.lng)});
       }).bind(this));

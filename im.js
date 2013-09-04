@@ -70,7 +70,7 @@ var IM = {
     var n = v.split('.');
     return (n[0] < 10 ? '0' : '') + n[0] + (n[1] < 10 ? '0' : '') + n[1] + n[2];
   },
-  updateLoc: function (ret) {
+  updateLoc: function (ret, msgId) {
     var peers = [], newLoc = {'0': 'im'};
     if (cur.peer == -2) {
       newLoc.q = IM.fullQ();
@@ -86,6 +86,9 @@ var IM = {
     }
     if (peers.length) {
       newLoc.peers = peers.join('_');
+    }
+    if (msgId && ge('mess' + msgId)) {
+      newLoc.msgid = msgId;
     }
     if (ret) {
       return nav.toStr(newLoc);
@@ -124,6 +127,7 @@ var IM = {
                 animate(to, {backgroundColor: '#FFF'}, 1000, setStyle.pbind(to, {backgroundColor: ''}));
               }, 1000);
             });
+            IM.updateLoc(false, toMsg); // add msgid
           }
         } else {
           st = contOH - winH + headH + imNavH;
@@ -226,6 +230,10 @@ var IM = {
         IM.updateMoreNew(peer_id);
       }
       return;
+    }
+
+    if (nav.objLoc.msgid && !cur.setLocTO) {
+      IM.updateLoc(); // remove msgid
     }
 
     if (peer_id > 2e9 && actual_peer < 2e9 && actual_peer) {
@@ -516,6 +524,9 @@ var IM = {
       moreEl = 'im_morenew' + peer_id;
     } else if (more) {
       offset = cur.tabs[peer_id].q_offset + cur.tabs[peer_id].msg_count;
+    }
+    if (more && nav.objLoc.msgid) {
+      IM.updateLoc(); // remove msgid
     }
     ajax.post('al_im.php', {
       act: 'a_history',
@@ -1862,7 +1873,7 @@ var IM = {
         break;
 
       case 'map':
-        preview = '<div class="fl_l"><a onclick="return showBox(\'al_places.php\', {act: \'geo_box\', lat: '+data[0]+', long: '+data[1]+'}, {dark: 1});"><div class="page_media_map_point"></div><img class="page_preview_map" width="180" height="70" src="'+locProtocol+'//maps.googleapis.com/maps/api/staticmap?center='+data[0]+','+data[1]+'&zoom=11&size='+(window.devicePixelRatio >= 2 ? '360x140' : '180x70')+'&sensor=false&language='+data[2]+'" /></a></div>';
+        preview = '<div class="fl_l"><a onclick="return showBox(\'al_places.php\', {act: \'geo_box\', lat: '+data[0]+', long: '+data[1]+'}, {dark: 1});"><div class="page_media_map_point"></div><img class="page_preview_map" width="180" height="70" src="/maps?lat='+data[0]+'&lng='+data[1]+'&z=11&'+(window.devicePixelRatio >= 2 ? 'w=360&h=140' : 'w=180&h=70')+'" /></a></div>';
         contIndex = 3;
         cls = 'fl_l';
         var lnk = cur.imMedia.lnkId;
@@ -2083,6 +2094,9 @@ var IM = {
     return (previewEl.childNodes.length + dpreviewEl.childNodes.length + mpreviewEl.childNodes.length + docsEl.childNodes.length / (docsEl.sorter ? 2 : 1) + sdocsEl.childNodes.length + progressNode.childNodes.length);
   },
   toEnd: function() {
+    if (nav.objLoc.msgid) {
+      IM.updateLoc(); // remove msgid
+    }
     IM.loadHistory(cur.peer);
     var toEndWrap = ge('im_to_end_wrap');
     if (domFC(toEndWrap).className != 'progress_inline') {
@@ -2237,7 +2251,7 @@ var IM = {
       cur.tabs[i] = extend(cur.tabs[i], {
         hash: IM.decodehash(cur.tabs[i].hash),
         msg_count: 0,
-        q_offset: 0,
+        q_offset: (i == cur.peer) ? cur.tabs[i].q_offset : 0,
         q_new: {},
         q_new_cnt: 0,
         history: 0,
@@ -2248,7 +2262,6 @@ var IM = {
         delayed: []
       });
     }
-
     cur.fixedScroll = !(browser.msie && browser.version < 8 || browser.mobile);
     cur.scrollNode = browser.msie6 ? pageNode : window;
     cur.withUpload = !(browser.msie111 || browser.safari_mobile) && cur.upload_options;
@@ -2422,7 +2435,12 @@ var IM = {
     if (!IM.r()) {
       IM.updatePeer(cur.peer, cur.tabs[cur.peer].msgs, cur.tabs[cur.peer].all_shown, 1);
       IM.applyPeer();
-      IM.scrollOn();
+      if (nav.objLoc.msgid) {
+        IM.updateScroll(false, true);
+        IM.scrollOn(false, nav.objLoc.msgid);
+      } else {
+        IM.scrollOn();
+      }
       var chatTab;
       if (window.curFastChat && curFastChat.inited && (chatTab = curFastChat.tabs[cur.peer]) && chatTab.box && !chatTab.box.minimized) {
         chatTab.box.minimize();
@@ -2467,7 +2485,9 @@ var IM = {
     if (cur.peer == -3) {
       IM.initWrite();
     }
-    IM.updateScroll();
+    if (IM.r() || !nav.objLoc.msgid) {
+      IM.updateScroll();
+    }
 
     cur.imPeerMedias = {};
     cur.imSortedMedias = {};
@@ -2481,7 +2501,8 @@ var IM = {
     cur.nav.push(function(changed, old, n, opts) {
       if (changed[0] !== undefined || n.act) return;
       if (n.sel && !IM.r(n.sel)) {
-        IM.addPeer(IM.idToPeer(n.sel));
+        cur.multi_appoint = false;
+        IM.selectPeer(IM.idToPeer(n.sel), n.msgid);
       } else if (n.email) {
         IM.addEmail(-2e9, n.email);
       } else if (n.q) {
@@ -3395,14 +3416,18 @@ var IM = {
         IM.updateFriends(true);
         setTimeout("if (!cur.peer) ge('im_filter').focus()", browser.msie ? 100 : 0);
       } else if (msgId) {
-        IM.loadHistory(peer, 0, msgId);
+        if (ge('mess' + msgId)) {
+          IM.scrollOn(false, msgId);
+        } else {
+          IM.loadHistory(peer, 0, msgId);
+        }
       }
       return;
     }
 
     cur.multi = false;
     cur.multi_friends = {};
-    cur.multi_appoint = from == 2 ? cur.peer : false;
+    cur.multi_appoint = (from == 2) ? cur.peer : false;
 
     clearTimeout(cur.scrollTO);
     var old_peer = cur.peer;
@@ -3514,7 +3539,11 @@ var IM = {
 
     if (!IM.r(peer)) {
       if (!cur.tabs[peer].history || msgId) {
-        IM.loadHistory(peer, 0, msgId);
+        if (msgId && ge('mess' + msgId)) {
+          IM.scrollOn(false, msgId);
+        } else {
+          IM.loadHistory(peer, 0, msgId);
+        }
       } else {
         IM.updateScroll(true, true);
       }

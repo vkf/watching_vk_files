@@ -3668,9 +3668,7 @@ FastChat = {
       tab.posSeq = ++curFastChat.posSeq;
     }
     if (!opts.minimized && options !== undefined && nav.objLoc[0] == 'im' &&
-        nav.objLoc.sel == peer ||
-        peer > 2e9 && (nav.objLoc.sel == ('c' + (peer - 2e9))) ||
-        peer < -2e9 && (nav.objLoc.sel == ('e' + (- peer - 2e9)))
+        nav.objLoc.sel == FastChat.nicePeer(peer)
       ) {
       opts.minimized = true;
       cur.hiddenChats[peer] = 1;
@@ -4006,7 +4004,7 @@ FastChat = {
         setTimeout(FastChat.needMsgMedia.pbind(peer, arr[1]), 5);
       }
       if (attFlags & 6) {
-        attText += rs(curFastChat.tpl.msg_fwd, {msg_id: arr[1], label: getLang(attFlags & 2 ? 'mail_im_fwd_msg' : 'mail_im_fwd_msgs')});
+        attText += rs(curFastChat.tpl.msg_fwd, {msg_id: arr[1], peer_nice: FastChat.nicePeer(peer), label: getLang(attFlags & 2 ? 'mail_im_fwd_msg' : 'mail_im_fwd_msgs')});
       }
       data.text += '<div class="fc_msg_attachments" id="fc_msg_attachments' + data.id + '">' + attText + '</div>';
     }
@@ -4094,6 +4092,15 @@ FastChat = {
   closeTab: function (peer) {
     var box = curFastChat.tabs[peer].box;
     box.close();
+  },
+
+  nicePeer: function(peer) {
+    if (peer > 2e9) {
+      return 'c' + intval(peer - 2e9);
+    } else if (peer < -2e9) {
+      return 'e' + intval(-peer - 2e9);
+    }
+    return peer;
   },
 
   // mobile online

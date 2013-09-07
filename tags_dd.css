@@ -22,11 +22,13 @@
 .tdd_input {
   outline: none;
   border: none;
+  font-family: "Tahoma";
   font-size: 1em;
-  padding: 4px 4px 2px 4px;
+  padding: 3px 5px;
   margin: 2px 0px;
   line-height: 1.18em;
   background: transparent;
+  font-family: Tahoma, Verdana, Arial, Sans-Serif, Lucida Sans;
 }
 
 .tdd_tag {

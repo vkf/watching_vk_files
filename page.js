@@ -1093,36 +1093,110 @@ var Wall = {
       hide(pw);
     }
   },
-  postChanged: function(value, force, onlyHash) {
-    //Wall.checkPostLen('post_field', 'post_warn', value);
+  postChanged: function(force) {
     if (!isVisible('submit_post')) Wall.showEditPost();
     if (vk.id && intval(cur.oid) == vk.id) {
-      var params = {
-        act: 'save_draft',
-        msg: value,
-        hash: cur.options.post_hash
-      }
-      var queryHash = params.msg
-      if (cur.wallAddMedia) {
-        var media = cur.wallAddMedia.getMedias(), num = 1;
-        for (var i in media) {
-          queryHash += params['media' + (num++)] = media[i][0]+'|'+media[i][1];
-        }
-      }
-      if (cur.lastPostMsg === queryHash) return;
       clearTimeout(cur.postAutosave);
-      if (onlyHash) {
-        cur.lastPostMsg = queryHash;
+      if (force === true) {
+        Wall.saveDraft();
+      } else {
+        cur.postAutosave = setTimeout(Wall.saveDraft, (force === 10) ? 10 : 3000);
+      }
+    }
+  },
+  saveDraft: function() {
+    if (cur.noDraftSave) {
+      cur.noDraftSave = false;
+      return;
+    }
+    if (cur.postSent || vk.id != intval(cur.oid)) return;
+
+    var addmedia = cur.wallAddMedia || {},
+        media = addmedia.chosenMedia || {},
+        medias = cur.wallAddMedia ? addmedia.getMedias() : [],
+        share = (addmedia.shareData || {})
+        msg = val(ge('post_field')), attachI = 0,
+        params = {
+      act: 'save_draft',
+      message: msg,
+      hash: cur.options.post_hash
+    };
+
+    if (isArray(media) && media.length) {
+      medias.push(clone(media));
+    }
+
+    if (medias.length) {
+      var ret = false;
+      each (medias, function (k, v) {
+        if (!v) return;
+
+        var type = this[0], attachVal = this[1];
+        switch (type) {
+          case 'poll':
+            var poll = addmedia.pollData(true);
+            if (!poll) {
+              ret = true;
+              return false;
+            }
+            attachVal = poll.media;
+            delete poll.media;
+            params = extend(params, poll);
+          break;
+          case 'share':
+            if (share.failed || !share.url ||
+                !share.title && (!share.images || !share.images.length) && !share.photo_url) {
+              if (cur.shareLastParseSubmitted && vkNow() - cur.shareLastParseSubmitted < 2000) {
+                ret = true;
+                return false;
+              } else {
+                return;
+              }
+            }
+            attachVal = share.user_id + '_' + share.photo_id;
+            if (share.images && share.images.length) {
+              addmedia.uploadShare(Wall.postChanged.pbind(10));
+              ret = true;
+              return false;
+            }
+            if (share.initialPattern && (trim(msg) == share.initialPattern)) {
+              params.message = '';
+            }
+            params = extend(params, {
+              url: share.url,
+              title: replaceEntities(share.title),
+              description: replaceEntities(share.description),
+              extra: share.extra,
+              extra_data: share.extraData,
+              photo_url: replaceEntities(share.photo_url),
+              open_graph_data: (share.openGraph || {}).data,
+              open_graph_hash: (share.openGraph || {}).hash
+            });
+            break;
+          case 'page':
+            if (share.initialPattern && (trim(msg) == share.initialPattern)) {
+              params.message = '';
+            }
+            break;
+          case 'postpone':
+            var ts = val('postpone_date' + addmedia.lnkId);
+            params = extend(params, {postpone: ts});
+            return;
+        }
+        if (this[3] && trim(msg) == this[3]) {
+          params.message = '';
+        }
+        params['attach' + (attachI + 1) + '_type'] = type;
+        params['attach' + (attachI + 1)] = attachVal;
+        attachI++;
+      });
+      if (ret) {
         return;
       }
-      cur.postAutosave = setTimeout(function () {
-        if (!cur.postAutosave) return;
-        cur.lastPostMsg = queryHash;
-        ajax.post('al_wall.php', params, {onFail: function() {
-          return true;
-        }});
-      }, (!params.msg || force) ? 0 : 3000);
     }
+    ajax.post('al_wall.php', Wall.fixPostParams(params), {onFail: function() {
+      return true;
+    }});
   },
   setDraft: function(data) {
     if (!data[0] && !data[1]) return;
@@ -1135,10 +1209,10 @@ var Wall = {
       setTimeout(function() {
         if (data[1] && cur.wallAddMedia) {
           for (var i in data[1]) {
+            cur.noDraftSave = true;
             cur.wallAddMedia.chooseMedia.apply(cur.wallAddMedia, data[1][i]);
           }
         }
-        Wall.postChanged(draftUncleaned, false, true);
       }, 0);
 
     });
@@ -1396,11 +1470,12 @@ var Wall = {
     }
     hide('submit_post_error');
 
+    cur.postSent = true;
     setTimeout(function() {
       ajax.post('al_wall.php', Wall.fixPostParams(params), {
         onDone: function(rows, names) {
           Wall.clearInput(inputType);
-
+          cur.postSent = false;
           if (postponePost) {
             if (pType == 'feed') {
               showDoneBox(rows, {out: 3000});
@@ -1444,6 +1519,7 @@ var Wall = {
           }
         },
         onFail: function(msg) {
+          cur.postSent = false;
           if (!msg) {
             return true;
           }
@@ -3967,15 +4043,16 @@ var Wall = {
 
     if (opts.media_types) {
       cur.wallAddMedia = initAddMedia(ge('page_add_media').firstChild, 'media_preview', opts.media_types, {
-        onMediaAdd: function() {
+        onAddMediaChange: function() {
           if (cur.module == 'profile' || cur.module == 'feed' || cur.module == 'wall') {
-            Wall.postChanged(val('post_field'), true);
+            Wall.postChanged(10);
+          }
+        }, onMediaChange: function() {
+          if (cur.module == 'profile' || cur.module == 'feed' || cur.module == 'wall') {
+            Wall.postChanged();
           }
         }, editable: 1, sortable: 1
       });
-      cur.wallAddMedia.onChange = function() {
-        //Wall.checkPostLen('post_field', 'post_warn', val('post_field'), true);
-      }
     }
     cur.withUpload = window.WallUpload && !(browser.msie111 || browser.safari_mobile) && (cur.wallType == 'all' || cur.wallType == 'own' || cur.wallType == 'feed') && Wall.withMentions && cur.wallUploadOpts;
     if (cur.withUpload && WallUpload.checkDragDrop()) {
@@ -4584,7 +4661,7 @@ function initAddMedia(lnk, previewId, mediaTypes, opts) {
         handler = showBox.pbind('al_places.php', extend(params, {act: 'a_choose_place_box'}), {stat: ['places.css', 'map.css', 'maps.js', 'ui_controls.css', 'ui_controls.js', 'boxes.css'], width: 640, bodyStyle: 'padding: 0px;', dark: 1});
         break;
       case 'note':
-        handler = showWiki.pbind({note: 'new'}, true);
+        handler = showWiki.pbind({note: 'new'}, true, false, {queue: 1});
         break;
       case 'postpone':
         handler = function () {addMedia.chooseMedia('postpone', v[1], v[2])};
@@ -4668,6 +4745,7 @@ function initAddMedia(lnk, previewId, mediaTypes, opts) {
       if (addMedia.onChange && addMedia.onChange(type, media, data, url) === false) {
         return false;
       }
+      if (type == 'note') cur.pbNoteAdded = false;
       if (inArray(type, opts.disabledTypes || [])) {
         return false;
       }
@@ -4704,7 +4782,11 @@ function initAddMedia(lnk, previewId, mediaTypes, opts) {
         case 'photos_list':
           hide(this._addMediaLink);
           vkImage().src = data[1];
-          oncl = opts.nocl ? '' : ' onclick="return showPhoto(\'' + data[4] + '\', \'' + data[2] + '\', ' + data[3].replace(/"/g, '&quot;') + ');"';
+          var _vopts = data[3].replace(/^{|}$/g, '');
+          if (_vopts) _vopts += ',';
+          _vopts += 'queue:1';
+
+          oncl = opts.nocl ? '' : ' onclick="return showPhoto(\'' + data[4] + '\', \'' + data[2] + '\', ' + _vopts.replace(/"/g, '&quot;') + ');"';
           preview = '<div' + oncl + ' class="fl_l page_preview_photo"><img class="page_preview_photo" src="' + data[1] + '" /></div>';
           toEl = toPics = picsEl;
         break;
@@ -4720,15 +4802,16 @@ function initAddMedia(lnk, previewId, mediaTypes, opts) {
             };
           }
           vkImage().src = data.thumb_m;
-          if (editable) {
-            if (!data.editable) return false;
-            if (!opts.nocl) data.editable.click = showPhoto.pbind(media, data.list, parseJSON(data.view_opts));
-          }
-
-          var _vopts = data.view_opts.replace(/"/g, '&quot;').replace(/^{|}$/g, '');
+          var _vopts = data.view_opts.replace(/^{|}$/g, '');
           if (_vopts) _vopts += ',';
           _vopts += 'queue:1';
-          oncl = opts.nocl ? '' : ' onclick="return showPhoto(\'' + media + '\', \'' + data.list + '\', {' + _vopts + '});"';
+
+          if (editable) {
+            if (!data.editable) return false;
+            if (!opts.nocl) data.editable.click = showPhoto.pbind(media, data.list, parseJSON('{' + _vopts + '}'));
+          }
+
+          oncl = opts.nocl ? '' : ' onclick="return showPhoto(\'' + media + '\', \'' + data.list + '\', {' + _vopts.replace(/"/g, '&quot;') + '});"';
           preview = '<div ' + oncl + ' class="fl_l page_preview_photo'+(isGraffiti ? ' page_preview_ph_graff' : '')+'"><img class="page_preview_photo" src="' + data.thumb_m + '" /></div>';
           toPics = 1;
           toEl = picsEl;
@@ -4742,7 +4825,7 @@ function initAddMedia(lnk, previewId, mediaTypes, opts) {
           }
           if (editable) {
             if (!data.editable) return false;
-            if (!opts.nocl) data.editable.click = showVideo.pbind(media);
+            if (!opts.nocl) data.editable.click = showVideo.pbind(media, false, {queue:1});
           }
 
           oncl = opts.nocl ? '' : ' onclick="return showVideo(\'' + media + '\', false, {queue:1});"';
@@ -4805,7 +4888,7 @@ function initAddMedia(lnk, previewId, mediaTypes, opts) {
         break;
 
         case 'map':
-          preview = '<div class="fl_l"><a onclick="return showBox(\'al_places.php\', {act: \'geo_box\', lat: '+data[0]+', long: '+data[1]+', provider: '+intval(data[3])+'}, {dark: 1});"><div class="page_media_map_point"></div><img class="page_preview_map" width="180" height="70" src="'+locProtocol+'//maps.googleapis.com/maps/api/staticmap?center='+data[0]+','+data[1]+'&zoom=11&size='+(window.devicePixelRatio >= 2 ? '360x140' : '180x70')+'&sensor=false&language='+data[2]+'" /></a></div>';
+          preview = '<div class="fl_l"><a onclick="return showBox(\'al_places.php\', {act: \'geo_box\', lat: '+data[0]+', long: '+data[1]+', provider: '+intval(data[3])+'}, {dark: 1});"><div class="page_media_map_point"></div><img class="page_preview_map" width="180" height="70" src="/maps?lat='+data[0]+'&lng='+data[1]+'&z=11&'+((window.devicePixelRatio >= 2 || true) ? 'w=360&h=140' : 'w=180&h=70')+'" /></a></div>';
           toEl = toPics = mpicsEl;
           hide(geByClass1('add_media_type_' + lnkId + '_map', ge('add_media_menu_' + lnkId)));
         break;
@@ -4847,8 +4930,8 @@ function initAddMedia(lnk, previewId, mediaTypes, opts) {
 
         case 'note':
           if (!data.lang) return false;
-          preview = '<a onclick="showWiki({w: \'note' + data.raw + '\', edit: 1}, true, event)" class="medadd_h medadd_h_note inl_bl">' + data.lang.profile_choose_note + '</a>';
-          postview = '<div class="medadd_c medadd_c_note"><a onclick="showWiki({w: \'note' + data.raw + '\', edit: 1}, true, event)" id="share_note_title' + data.raw + '">' + data.title + '</a></div>';
+          preview = '<a onclick="showWiki({w: \'note' + data.raw + '\', edit: 1}, true, event, {queue: 1})" class="medadd_h medadd_h_note inl_bl">' + data.lang.profile_choose_note + '</a>';
+          postview = '<div class="medadd_c medadd_c_note"><a onclick="showWiki({w: \'note' + data.raw + '\', edit: 1}, true, event, {queue: 1})" id="share_note_title' + data.raw + '">' + data.title + '</a></div>';
           toEl = ldocsEl;
         break;
 
@@ -4879,6 +4962,8 @@ function initAddMedia(lnk, previewId, mediaTypes, opts) {
               exp = '';
             }
             geByTag1('button', geByClass1('button_blue', ge('post'+cur.editingPost[0]))).innerHTML = getLang('global_save');
+          } else if (data.draft) {
+            data.date = intval(media);
           } else {
             if (cur.postponedLastDate) {
               data.date = intval(cur.postponedLastDate) + 14400;
@@ -5172,11 +5257,6 @@ function initAddMedia(lnk, previewId, mediaTypes, opts) {
       }
 
       cur.lastPostMsg = false;
-      if (inArray(cur.module, ['profile', 'feed', 'wall']) && cur.postTo && cur.wallAddMedia == addMedia) {
-        setTimeout(function() {
-          Wall.postChanged(val('post_field'), true);
-        }, 0);
-      }
 
       if (addMedia.onChange) addMedia.onChange(false);
     },
@@ -5296,13 +5376,13 @@ function initAddMedia(lnk, previewId, mediaTypes, opts) {
 <div class="medadd_c_pollans" id="create_poll_answers' + lnkId + '"></div>\
 <div class="medadd_c_polladd_wr" id="create_poll_add' + lnkId + '">\
   <div class="medadd_c_polladd" onclick="cur.addMedia[' + lnkId + '].incPoll()">' + data.lang.i + '</div>\
-</div>' + (data.edit ? '' : '<div class="checkbox medadd_c_pollcb' + (data.anon ? ' on' : '') + '" id="create_poll_anonymous' + lnkId + '" onclick="checkbox(this)"><div></div>' + data.lang.c + '</div>')}));
+</div>' + (data.edit ? '' : '<div class="checkbox medadd_c_pollcb' + (data.anon ? ' on' : '') + '" id="create_poll_anonymous' + lnkId + '" onclick="checkbox(this);cur.addMedia[' + lnkId + '].changedPoll();"><div></div>' + data.lang.c + '</div>')}));
       if (!data.answers) data.answers = [[0, ''], [0, '']];
       cur.pollAnswerTemplate = '<input onkeydown="cur.addMedia[%lnkid%].keyPoll(this, event)" class="text medadd_c_polla" %attrs%/><div class="page_media_x_wrap medadd_c_pollrem inl_bl" '+ (browser.msie ? 'title' : 'tootltip') + '="'+data.lang.d+'" onmouseover="if (browser.msie) return; showTooltip(this, {text: this.getAttribute(\'tootltip\'), shift: [14, 3, 3], black: 1})" onclick="cur.addMedia[%lnkid%].decPoll(this)"><div class="page_media_x"></div></div>';
       for (var i = 0, l = data.answers.length; i < l; ++i) {
         ans = data.answers[i];
         html.push('<div class="medadd_c_polla_wr">' + rs(cur.pollAnswerTemplate, {
-          attrs: (ans[0] ? 'id="create_poll_ans' + ans[0] + '" value="' + ans[1] + '" ' : ''),
+          attrs: (ans[0] ? 'id="create_poll_ans' + ans[0] + '" ' : '') + (ans[1] ? '" value="' + ans[1] + '" ' : ''),
           lnkid: lnkId
         }) + '</div>');
         if (i == 9) hide('create_poll_add' + lnkId);
@@ -5347,9 +5427,14 @@ function initAddMedia(lnk, previewId, mediaTypes, opts) {
           this.incPoll();
         }
         return cancelEvent(ev);
+      } else {
+        addMedia.changedPoll();
       }
     },
-    pollData: function() {
+    changedPoll: function() {
+      opts.onMediaChange && opts.onMediaChange();
+    },
+    pollData: function(silentCheck) {
       var answers = ge('create_poll_answers' + lnkId), q = trim(val('create_poll_question' + lnkId)), a;
       var result = {media: q, anonymous: isChecked('create_poll_anonymous' + lnkId)}, ind = 0, found = false;
       for (var el = domFC(answers); el; el = domNS(el)) {
@@ -5361,12 +5446,16 @@ function initAddMedia(lnk, previewId, mediaTypes, opts) {
         }
       }
       if (!q) {
-        notaBene('create_poll_question' + lnkId);
+        if (silentCheck !== true) {
+          notaBene('create_poll_question' + lnkId);
+        }
         return false;
       }
       if (!found) {
         if (!domFC(answers)) cur.addMedia[lnkId].incPoll();
-        notaBene(domFC(domFC(answers)));
+        if (silentCheck !== true) {
+          notaBene(domFC(domFC(answers)));
+        }
         return false;
       }
       return result;
@@ -5635,7 +5724,7 @@ function initAddMedia(lnk, previewId, mediaTypes, opts) {
       addMedia.postponePreview = toEl.appendChild(ce('div', {className: 'medadd_c medadd_c_timer clear_fix' + (addedhtml ? ' medadd_c_nofixed' : ''), innerHTML: html}));
       addMedia.postponePreview.style.height = h;
       stManager.add(['ui_controls.css', 'ui_controls.js', 'datepicker.css', 'datepicker.js'], function() {
-        new Datepicker('postpone_date' + lnkId, {time: 'postpone_time' + lnkId, width: 120, noPast: true});
+        new Datepicker('postpone_date' + lnkId, {time: 'postpone_time' + lnkId, width: 120, noPast: true, onUpdate: opts.onMediaChange});
         if (!browser.msie6 && !ed && multi) {
           animate(addMedia.postponePreview, {height: 33}, 200, function() {
             addMedia.postponePreview.style.height = '';
@@ -5676,6 +5765,7 @@ function initAddMedia(lnk, previewId, mediaTypes, opts) {
   }
 
   cur.addMedia[lnkId] = addMedia;
+  if (opts.onAddMediaChange) addMedia.onChange = opts.onAddMediaChange;
   return addMedia;
 };
 
@@ -5921,7 +6011,7 @@ Composer = {
     }
     return len;
   },
-  getSendParams: function(composer, delayedCallback) {
+  getSendParams: function(composer, delayedCallback, silentCheck) {
     var addMedia = composer.addMedia || {},
         media = addMedia.chosenMedia || {},
         medias = (addMedia && addMedia.getMedias) ? addMedia.getMedias() : [],
@@ -5952,7 +6042,7 @@ Composer = {
 
         switch (type) {
           case 'poll':
-            var poll = addMedia.pollData();
+            var poll = addMedia.pollData(silentCheck);
             if (!poll) {
               params.delayed = true;
               return false;

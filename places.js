@@ -6,6 +6,8 @@ initPhotoMap: function(opts) {
     cur.iconLastNum = 0;
   }
   if (opts.provider == 'mapbox') {
+    cur.provider = 'mapbox';
+    cur.providerId = 3;
     isMapbox = 1;
     if (!window.L || !window.L.mapbox) {
       var stat = ['mapbox.css', 'mapbox.js'];
@@ -18,6 +20,8 @@ initPhotoMap: function(opts) {
       return false;
     }
   } else {
+    cur.provider = 'google';
+    cur.providerId = 2;
     isGoogle = 1;
     if (!window.google || !google.maps.OverlayView) {
       if (!opts.googleAttaced) {
@@ -324,7 +328,8 @@ initPhotoMap: function(opts) {
       return m;
     }
     var mapboxApiId = 'vkmaps.map-an1xcr4f';
-    map = opts.map || L.mapbox.map(opts.cont, mapboxApiId, {zoomControl: false, scrollWheelZoom: false, touchZoom: false, detectRetina: true, retinaVersion: mapboxApiId});
+    var mapboxApiId_2x = 'vkmaps.map-40lc3e3w';
+    map = opts.map || L.mapbox.map(opts.cont, mapboxApiId, {zoomControl: false, scrollWheelZoom: false, touchZoom: false, detectRetina: true, retinaVersion: mapboxApiId_2x});
     setMapOpts(map);
 
     if (opts.bounds) {
@@ -592,8 +597,8 @@ selectPhoto: function(pids, photoSrc, lat, lng) {
   hide('place_map_edit');
   show('place_map_point');
   var mapChoose = new vkMaps.VKMap('place_map_point_cont', {
-    provider: 'google',
-    providerId: 2,
+    provider: cur.provider || 'google',
+    providerId: cur.providerId || 2,
     lngcode: cur.vkLngCode,
   });
   cur.placesChooseMap = mapChoose;

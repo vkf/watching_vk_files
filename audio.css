@@ -1792,7 +1792,8 @@
   border-bottom: none;
 }
 #audio.new .wall_module .post_info,
-#audio.new .wall_text {
+#audio.new .wall_text,
+#audio.new .wall_text_name {
   width: 365px;
 }
 #audio.new .wall_module .reply_link_wrap {

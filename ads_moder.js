@@ -587,23 +587,22 @@ AdsModer.switchOfficeBlock = function(actionLocation, confirmTitle, confirmText,
   showFastBox(confirmTitle, confirmText, actionText, switchBlocked, getLang('box_cancel'));
 }
 
-AdsModer.openCancelClicksBox = function(webSiteId, day, hash, boxHtml) {
-  var box = showFastBox({title: 'Отмена кликов'}, boxHtml);
-  var cancelClicksHandler = AdsModer.cancelClicks.pbind(webSiteId, day, hash, box);
-  box.removeButtons();
-  box.addButton(getLang('box_cancel'), false, 'no');
-  box.addButton('Отменить клики', cancelClicksHandler, 'yes');
+AdsModer.openCancelClicksBox = function(ajaxParams) {
+  var showOptions = {params: {}};
+  showBox('/adsweb?act=log_cancel_box', ajaxParams, showOptions);
 }
 
-AdsModer.cancelClicks = function(webSiteId, day, hash, box) {
+AdsModer.initCancelClicksBox = function(box, ajaxParams) {
+  var handler = AdsModer.cancelClicks.pbind(box, ajaxParams);
+  box.removeButtons();
+  box.addButton(getLang('box_cancel'), false, 'no');
+  box.addButton('Отменить клики', handler, 'yes');
+}
+
+AdsModer.cancelClicks = function(box, ajaxParams) {
   if (!Ads.lock('cancelClicks', onLock, onUnlock)) {
     return;
   }
-
-  var ajaxParams = {};
-  ajaxParams.web_site_id = webSiteId;
-  ajaxParams.day         = day;
-  ajaxParams.hash        = hash;
 
   ajax.post('/adsweb?act=log_cancel', ajaxParams, {onDone: onComplete, onFail: onComplete});
 
@@ -638,7 +637,7 @@ AdsModer.initClickfraudersPrepareBanBox = function(box, hash, usersIds, day) {
   var prepareBanHandler = AdsModer.clickfraudersPrepareBan.pbind(box, hash, usersIds, day);
   box.removeButtons();
   box.addButton(getLang('box_cancel'), false, 'no');
-  box.addButton('Добавить', prepareBanHandler);
+  box.addButton('Добавить', prepareBanHandler, 'yes');
 }
 
 AdsModer.clickfraudersPrepareBan = function(box, hash, usersIds, day) {

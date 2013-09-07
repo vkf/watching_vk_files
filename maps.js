@@ -1426,7 +1426,20 @@ vkMaps.register('mapbox', {
 VKMap: {
   init: function(element, api) {
     vkMaps.load(api, (function() {
-      var mapboxMap = this.maps[api] = L.mapbox.map(element, false, {zoomControl: false, detectRetina: true, retinaVersion: vkMaps.mapboxApiId_2x})
+      var mapboxLogo = ce('a', {href: 'http://mapbox.com/about/maps/'}, {
+        position: 'absolute',
+        left: '5px',
+        bottom: '5px',
+        zIndex: 99999,
+        display: 'block',
+        width: '65px',
+        height: '20px',
+        textIndent: '-9999px',
+        overflow: 'hidden',
+        background: 'url(/images/mapbox_logo.png) 0px -30px no-repeat',
+      });
+      element.appendChild(mapboxLogo);
+      var mapboxMap = this.maps[api] = L.mapbox.map(element, false, {zoomControl: false, detectRetina: true, retinaVersion: vkMaps.mapboxApiId_2x});
       mapboxMap.on('click', (function(e) {
         this.click.fire({'location': new vkMaps.LatLonPoint(e.latlng.lat, e.latlng.lng)});
       }).bind(this));

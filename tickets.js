@@ -164,6 +164,7 @@ saveTicket: function(hash) {
   if (nav.objLoc.act == 'new_pay') query.section = 16;
   if (nav.objLoc.act == 'new_name') query.section = 20;
   if (nav.objLoc.act == 'new_api') query.section = 12;
+  if (nav.objLoc.act == 'new_mobile') query.section = 24;
   ajax.post(nav.objLoc[0], query, {
     showProgress: lockButton.pbind(ge('tickets_send')),
     hideProgress: unlockButton.pbind(ge('tickets_send'))
@@ -1939,8 +1940,13 @@ switchToNameForm: function(event) {
 },
 
 switchToApiForm: function(event) {
-  lockButton('tickets_create_name');
+  lockButton('tickets_create_api');
   return nav.go({0: nav.objLoc[0], act: 'new_api', title: ge('tickets_title').value}, event);
+},
+
+switchToMobileForm: function(event) {
+  lockButton('tickets_create_mobile');
+  return nav.go({0: nav.objLoc[0], act: 'new_mobile', title: ge('tickets_title').value}, event);
 },
 
 updateFAQ: function(e, obj) {

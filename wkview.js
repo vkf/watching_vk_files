@@ -317,6 +317,7 @@ saveInfo: function(autosave) {
           if (!autosave) {
             WkView.hide(false, true);
           }
+          cur.pbNoteAdded = data;
           cur.chooseMedia('note', data.raw, data);
           return true;
         } else {
@@ -516,7 +517,7 @@ show: function(title, html, options, script, ev) {
 <div id="wk_left_arrow" class="no_select"></div>\
 <div id="wk_right_arrow" class="no_select"></div>\
 <div class="no_select" id="wk_left_nav" style="'+hideLeft+'" '+'onmouseover="WkView.activate(wkcur.wkLeft)" onmouseout="WkView.deactivate(wkcur.wkLeft)" onmousedown="wkcur.wkClicked = true; WkView.back();" onselectstart="return cancelEvent(event);"></div>\
-<div class="no_select" id="wk_right_nav" '+'onmouseover="WkView.activate(wkcur.wkRight)" onmouseout="WkView.deactivate(wkcur.wkRight)" onmousedown="wkcur.wkClicked = true; WkView.hide();"></div>\
+<div class="no_select" id="wk_right_nav" '+'onmouseover="WkView.activate(wkcur.wkRight)" onmouseout="WkView.deactivate(wkcur.wkRight)" onmousedown="if (!wkcur.noClickHide) { wkcur.wkClicked = true; WkView.hide(); }"></div>\
 <div id="wk_left_arrow_bg" class="no_select" onclick="return WkView.navigate(this, event, -1);" onmouseover="WkView.activateArrow(false, event)" onmouseout="WkView.deactivateArrow(false, event)"><div class="wk_arrow_bg_inner"></div></div>\
 <div id="wk_right_arrow_bg" class="no_select" onclick="return WkView.navigate(this, event, 1);" onmouseover="WkView.activateArrow(true, event)" onmouseout="WkView.deactivateArrow(true, event)"><div class="wk_arrow_bg_inner"></div></div>';
 
@@ -713,7 +714,7 @@ cmp: function(id1, id2) {
 
 
 onClick: function(e) {
-  if (wkcur.wkClicked) {
+  if (wkcur.wkClicked || wkcur.noClickHide) {
     wkcur.wkClicked = false;
     return;
   }

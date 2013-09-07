@@ -383,7 +383,7 @@ var wdd = {
       text.push(href ? '</a>' : '</div>');
       if (i >= 4) break;
     }
-    t = text.join('');
+    t = text.join('') || dd.opts.defImgText || '';
     dd.imgRand = false;
     if (noAnim === true) {
       val(dd.img, t);

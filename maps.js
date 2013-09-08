@@ -1487,8 +1487,7 @@ VKMap: {
     var map = this.maps[this.api];
     if (args.zoom == 'large') {
       this.addLargeControls();
-    }
-    else if (args.zoom == 'small') {
+    } else if (args.zoom == 'small') {
       this.addSmallControls();
     }
     if (args.pan) {
@@ -1525,12 +1524,20 @@ VKMap: {
     return this.maps[this.api];
   },
   addSmallControls: function() {
+    if (this.addedControls) {
+      return;
+    }
+    this.addedControls = true;
     var map = this.maps[this.api];
     this.controls.unshift(new L.Control.Zoom());
     this.addControlsArgs.zoom = 'small';
     map.addControl(this.controls[0]);
   },
   addLargeControls: function() {
+    if (this.addedControls) {
+      return;
+    }
+    this.addedControls = true;
     var map = this.maps[this.api];
     this.controls.unshift(new L.Control.Zoom({}));
     this.addControlsArgs.zoom = 'large';

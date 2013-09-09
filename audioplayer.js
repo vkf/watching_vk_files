@@ -1383,7 +1383,7 @@ var audioPlayer = {
           _a.updateCurrentPlaylist(obj, aid);
         }
       })
-    } else if (vk.id && (cur.module == 'groups' || cur.module == 'public' || cur.module == 'profile' || cur.module == 'feed' || cur.module == 'wall')) {
+    } else if (dynPl.length < 2 && vk.id && (cur.module == 'groups' || cur.module == 'public' || cur.module == 'profile' || cur.module == 'feed' || cur.module == 'wall')) {
       var ids = aid.split('_'), local_id = ids && ids[3] || '';
       if (local_id && ge('post'+ids[2]+'_'+ids[3])) {
         var wallType = cur.wallType;

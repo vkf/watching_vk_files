@@ -646,7 +646,7 @@ var GroupsList = {
       if (cur.scrollList.eventsShow) {
         GroupsList.eventsMore();
       }
-    }});
+    }, local: 1});
   },
 
   htmlencode: function(str) {

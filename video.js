@@ -274,7 +274,7 @@ var Video = {
       },
       onFail: function(text) {
         Video.loadSilent();
-      }
+      }, local: 1
     });
   },
   show: function(e, videoId, opts, obj) {

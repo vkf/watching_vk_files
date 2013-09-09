@@ -117,7 +117,7 @@ var Friends = {
               }
             });
           }
-        }).bind(this)
+        }).bind(this), local: 1
       });
     }
 

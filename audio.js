@@ -199,7 +199,7 @@ var Audio = {
           }
         }
       });
-    }).bind(this)});
+    }).bind(this), local: 1});
   },
 
   startEvents: function() {
@@ -2187,7 +2187,7 @@ var Audio = {
     if (!cur.deletedAudios) cur.deletedAudios = [];
     cur.deletedAudios[aid] = el.innerHTML;
     var acts = geByClass1('actions', el);
-    each(acts.children, function(){if (this.tt) this.tt.hide()});
+    each(acts.children, function(){if (this.tt && this.tt.hide) this.tt.hide()});
     var a = (cur.audios || {})[aid] || [], lyrics = isVisible(ge('lyrics'+id)),
         _tw = el && geByClass1('title_wrap', el),
         performer = a[5] || _tw && (geByTag1('a', _tw) || {}).innerHTML || '',

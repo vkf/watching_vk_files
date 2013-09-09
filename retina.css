@@ -734,6 +734,30 @@
   background-image: url(/images/icons/payments_n_2x.png);
   background-size: 41px 206px;
 }
+.is_2x .payments_box_wide .payments_getvotes_method_img {
+  background-image: url(/images/icons/payments_w_2x.png);
+  background-size: 41px 164px;
+}
+.is_2x .payments_logo_cards {
+  background-image: url(/images/pics/cards_2x.png);
+  background-size: 222px 52px;
+}
+.is_2x .payments_logo_webmoney {
+  background-image: url(/images/ps/webmoney_2x.png);
+  background-size: 126px 40px;
+}
+.is_2x .payments_logo_kiwipurse {
+  background-image: url(/images/ps/qiwiwallet_2x.png);
+  background-size: 110px 40px;
+}
+.is_2x .payments_logo_yandexmoney {
+  background-image: url(/images/ps/yandexmoney_2x.png);
+  background-size: 106px 45px;
+}
+.is_2x .payments_logo_checkout {
+  background-image: url(/images/ps/googlewallet_2x.png);
+  background-size: 190px 40px;
+}
 .is_2x #stats_good_browsers a {
   background-size: 80px 80px;
 }
@@ -851,4 +875,8 @@
 .is_2x .pv_filter_font_icon {
   background-image: url('/images/icons/switch_fonts_2x.png');
   background-size: 17px 25px;
+}
+.is_2x .checkin_big {
+  background-image: url(/images/icons/checkin_big_2x.png);
+  background-size: 17px 22px;
 }

@@ -147,7 +147,6 @@
 }
 #payments_other_amount {
   padding-left: 19px;
-
 }
 #payments_get_votes_opts_other,
 #payments_getvotes_cont,
@@ -191,7 +190,10 @@
   font-weight: bold;
   font-size: 1.09em;
 }
-#payments_box_votes_num {
+#payments_box_votes_num,
+#payments_box_votes_money,
+.payments_box_votes_num,
+.payments_getvotes_waiting_amount {
   font-weight: bold;
 }
 #payments_getvotes_waiting {
@@ -346,8 +348,7 @@ h2.payments_getvotes_title {
   height: 50px;
   float: left;
   overflow: hidden;
-  color: #36638E;
-  font-weight: bold;
+  color: #777;
   font-size: 1.09em;
 }
 .payments_getvotes_ps_row:hover,
@@ -361,13 +362,25 @@ h2.payments_getvotes_title {
   float: left;
 }
 .payments_getvotes_ps_text {
-  padding-left: 62px;
+  padding-left: 55px;
+}
+.payments_getvotes_ps_row_s .payments_getvotes_ps_text h2 {
+  padding: 0;
   height: 50px;
   line-height: 50px;
 }
 .payments_getvotes_ps_text img {
-  padding-left: 5px;
+  padding: 22px 8px 0 0;
   display: none;
+}
+.payments_getvotes_ps_text h2 {
+  margin: 0;
+  padding: 7px 0 0 0;
+  color: #36638E;
+  font-weight: bold;
+  border: none;
+  font-size: 1em;
+  line-height: 120%;
 }
 #payments_getvotes_ps .payments_getvotes_active_row img {
   display: inline !important;
@@ -375,42 +388,51 @@ h2.payments_getvotes_title {
 
 .payments_tform {
   margin-left: 15px;
-  border-collapse:collapse;
+  border-collapse: collapse;
 }
 .payments_tform .tform_row {
   height: 34px;
 }
 .payments_tform td {
-  padding: 0 0 5px 0;
+  padding: 3px 0 0 0;
   vertical-align: top;
 }
 .payments_tform .label {
-  padding: 0 10px 0 0;
+  padding: 3px 10px 6px 0;
   color: #777;
   width: 110px;
   text-align: right;
 }
+.payments_tform .labeled {
+  padding: 0;
+}
 .payments_tform .labeled input {
+  padding: 4px 3px 5px 3px;
   width: 130px;
+}
+.payments_tform .selector_container td.selector {
+  padding-top: 3px;
+  padding-bottom: 3px;
 }
 #payments_phone_table {
   border: 1px solid #C0CAD5;
-  width: 138px;
+  width: 190px;
 }
 #payments_phone_prefix {
   vertical-align: top;
   width: 1px;
   color: #777;
   font-size: 1em;
-  padding: 0 0 1px 5px;
+  padding: 4px 0px 5px 5px;
+  line-height: 15px;
 }
 .payments_tform td.payments_phone_field {
   vertical-align: top;
   width: 100%;
-  padding: 0;
+  padding: 1px 0px 0px;
 }
 .is_rtl1 #payments_phone_prefix {
-  padding: 5px 0 1px 0;
+  padding: 4px 5px 5px 0px;
 }
 #payments_phone_table #phone {
   width: 100%;
@@ -531,6 +553,10 @@ h2.payments_getvotes_title {
   float: left;
   overflow: hidden;
 }
+.payments_terminal_row img {
+  width: 70px;
+  height: 70px;
+}
 .payments_terminal_name {
   color: #36638E;
   font-weight: bold;
@@ -563,6 +589,220 @@ h2.payments_getvotes_title {
   margin-left: 4px;
   color: #7C90A6;
   font-weight: bold;
+}
+
+.payments_box_wide, #payments_box_right_col {
+  height: 380px;
+  overflow: hidden;
+}
+.payments_box_wide,
+.payments_box_wide #payments_box_summary {
+  background-color: #f5f6f7;
+}
+#payments_box_left_col {
+  width: 265px;
+  display: table-cell;
+  padding-bottom: 15px;
+}
+#payments_box_right_col {
+  margin-left: 265px;
+  background-color: #FFFFFF;
+  display: table-cell;
+  width: 473px;
+  vertical-align: top;
+}
+.payments_box_wide #payments_box_summary {
+  padding: 18px 5px 30px 25px;
+}
+.payments_box_wide .payments_summary_cont {
+  font-size: 1.09em;
+  width: 168px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.payments_box_wide .payments_getvotes_method_opt {
+  margin: 0;
+  padding: 10px 13px 10px 18px;
+  color: #747d87;
+}
+.payments_box_wide .payments_getvotes_method_opt:hover {
+  background-color: #e9edf1;
+}
+.payments_box_wide .payments_getvotes_active_row,
+.payments_box_wide .payments_getvotes_active_row:hover {
+  background-color: #dae1e8;
+}
+.payments_box_wide .payments_getvotes_method_img {
+  margin-right: 15px;
+  background: url(/images/icons/payments_w.png) no-repeat 0 0;
+}
+.payments_box_wide .payments_box_menu p {
+  padding: 19px 0 0 0;
+  text-align: center;
+}
+.payments_box_wide #payments_box_close_lnk {
+  padding: 19px 21px 0 0;
+}
+.payments_box_wide #payments_getvotes_wrap {
+  padding: 15px 25px;
+}
+.payments_box_wide .payments_getvotes_term_list {
+  width: 350px;
+}
+.payments_box_wide .payments_getvotes_ps_list {
+  width: 240px;
+}
+.payments_box_wide .payments_getvotes_title {
+  margin: 0 0 17px 0;
+}
+.payments_box_wide #payments_getvotes_title {
+  margin: 15px 0 0 25px;
+  padding: 0;
+  color: #36638E;
+  font-size: 1.18em;
+  font-weight: bold;
+  border: none;
+}
+.payments_box_wide #payments_box_progress {
+  padding: 130px 0;
+}
+.payments_box_wide #payments_box_progress_link {
+  display: none;
+}
+.payments_box_wide #payments_box_error {
+  margin: 0 -10px 15px -10px;
+}
+.payments_box_wide .payments_getvotes_confirm_msg,
+.payments_box_wide #payments_getvotes_confirm_msg,
+.payments_box_wide #payments_getvotes_waiting_msg {
+  margin: 20px 0!important;
+  padding: 0!important;
+  text-align: center;
+  border: none;
+  background: #FFF;
+}
+.payments_box_wide .payments_getvotes_confirm_msg {
+  font-size: 1.09em;
+}
+.payments_box_wide #payments_getvotes_waiting_mo {
+  display: none;
+}
+.payments_box_wide .payments_getvotes_footer {
+  position: absolute;
+  bottom: 20px;
+  padding-right: 25px;
+  text-align: center;
+  color: #909090;
+  line-height: 120%;
+}
+.payments_box_wide .payments_getvotes_confirm_amount {
+  margin: 10px 0 20px 0;
+  text-align: center;
+  color: #777;
+}
+.payments_box_wide #payments_getvotes_buttons {
+  padding-left: 25px;
+  width: 289px;
+}
+.payments_box_wide #payments_getvotes_buttons .button_blue,
+.payments_box_wide #payments_getvotes_back {
+  margin: 0 0 0 135px;
+}
+.payments_box_wide #payments_getvotes_back {
+  padding-top: 5px;
+}
+.payments_box_wide #payments_getvotes_phone {
+  text-align: center;
+}
+#payments_get_votes_amounts.payments_confirm_amount {
+  padding: 15px 0 10px 0;
+  font-size: 1.3em;
+}
+.payments_box_wide #payments_getvotes_phone_msg {
+  font-size: 1.09em;
+}
+.payments_box_wide .payments_systems_logo {
+  margin: 40px 0 20px 0;
+  text-align: center;
+}
+.payments_box_wide .payments_getvotes_confirm_phone {
+  margin: 20px 0;
+  font-size: 1.19em;
+  font-weight: bold;
+  text-align: center;
+}
+.payments_box_wide .payments_getvotes_confirm_phone span {
+  font-size: 11px;
+  font-weight: normal;
+}
+.payments_box_wide #payments_getvotes_waiting_comm {
+  text-align: center;
+  line-height: 140%;
+}
+.payments_box_wide #payments_getvotes_confirm_comm_wrap {
+  margin: -10px 0 15px 0;
+  line-height: 140%;
+  text-align: center;
+}
+.payments_form_row {
+  margin: 0 auto 12px;
+  width: 154px;
+}
+.payments_form_label {
+  padding: 6px 0 10px;
+  font-size: 1.09em;
+  font-weight: bold;
+  color: #45688E;
+  text-align: left;
+}
+.payments_form_row input {
+  padding: 4px 3px 5px 3px;
+  width: 147px;
+  outline: none;
+}
+.payments_form_row #payments_phone_table {
+  width: 154px;
+}
+.payments_form_row td.payments_phone_field {
+  padding: 2px 0px 0px;
+  vertical-align: top;
+  width: 100%;
+}
+.payments_form_row .selector_container td.selector {
+  padding-top: 3px;
+  padding-bottom: 3px;
+}
+
+.payments_logo_cards {
+  background: url(/images/pics/cards.png) 50% 50% no-repeat;
+  height: 52px;
+}
+.payments_logo_webmoney {
+  background: url(/images/ps/webmoney.gif) 50% 50% no-repeat;
+  width: 126px;
+  height: 40px;
+}
+.payments_logo_kiwipurse {
+  background: url(/images/ps/qiwiwallet.gif) 50% 50% no-repeat;
+  width: 110px;
+  height: 40px;
+}
+.payments_logo_yandexmoney {
+  background: url(/images/ps/yandexmoney.png) 50% 50% no-repeat;
+  width: 106px;
+  height: 45px;
+}
+.payments_logo_checkout {
+  background: url(/images/ps/googlewallet.png) 50% 50% no-repeat;
+  width: 190px;
+  height: 40px;
+}
+.payments_box_wide .payments_logo_webmoney,
+.payments_box_wide .payments_logo_kiwipurse,
+.payments_box_wide .payments_logo_yandexmoney,
+.payments_box_wide .payments_logo_checkout {
+  width: 100%;
 }
 
 /* Old payments - begin */

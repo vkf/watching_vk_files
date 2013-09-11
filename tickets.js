@@ -723,7 +723,7 @@ saveComment: function(event, cid, hash, ticket_id) {
     this.cancelEditComment(cur.editing);
     return;
   }
-  if (event && event.ctrlKey && (event.keyCode == 10 || event.keyCode == 13)) this.doSaveComment(cid, hash, ticket_id);
+  if (event && (event.ctrlKey || event.metaKey && browser.mac) && (event.keyCode == 10 || event.keyCode == 13)) this.doSaveComment(cid, hash, ticket_id);
 },
 
 cancelEditComment: function(cid) {

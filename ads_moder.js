@@ -144,20 +144,24 @@ AdsModer.saveFeatures = function(unionId, hash, featuresInfo, editBox) {
   }
 }
 
-AdsModer.openNoteEditBox = function(objectId, noteType, noteText, hash, editActionText, isEdit) {
+AdsModer.openNoteEditBox = function(ajaxParams, noteText, noteTextParams, boxTitle, editActionText, isEdit, isOtherUser) {
   function onBoxHide() {
     delete cur.noteEditBox;
-    delete cur.noteEditBoxContext;
+    delete cur.noteEditAjaxParams;
   }
 
-  cur.noteEditBoxContext = {};
-  cur.noteEditBoxContext.hash = hash;
-  cur.noteEditBoxContext.objectId = objectId;
-  cur.noteEditBoxContext.noteType = noteType;
+  cur.noteEditAjaxParams = ajaxParams;
 
-  var boxHtml = '<div style="margin-right: 8px;"><div><textarea id="ads_note_edit" style="width: 100%; height: 100px;">' + noteText + '</textarea></div></div>';
+  var boxHtml = '<div class="ads_note_edit_wrap"><div><textarea id="ads_note_edit" ' + noteTextParams + '>' + noteText + '</textarea></div></div>';
 
-  cur.noteEditBox = showFastBox({title: 'Заметки', width: 400, onHide: onBoxHide}, boxHtml, editActionText, function() { AdsModer.saveNote(); }, getLang('box_cancel'));
+  cur.noteEditBox = showFastBox({title: boxTitle, width: 400, onHide: onBoxHide}, boxHtml);
+  cur.noteEditBox.removeButtons();
+  if (isOtherUser) {
+    cur.noteEditBox.addButton(getLang('box_cancel'), false, 'yes');
+  } else {
+    cur.noteEditBox.addButton(getLang('box_cancel'), false, 'no');
+    cur.noteEditBox.addButton(editActionText, AdsModer.saveNote.pbind(false), 'yes');
+  }
   if (isEdit) {
     cur.noteEditBox.setControlsText('<a href="#" onclick="AdsModer.saveNote(true); return false;">Удалить</a>');
   }
@@ -169,9 +173,7 @@ AdsModer.saveNote = function(isDelete) {
   }
 
   var ajaxParams = {};
-  ajaxParams.hash      = cur.noteEditBoxContext.hash;
-  ajaxParams.object_id = cur.noteEditBoxContext.objectId;
-  ajaxParams.note_type = cur.noteEditBoxContext.noteType;
+  ajaxParams = extend({}, ajaxParams, cur.noteEditAjaxParams);
   ajaxParams.note_text = (isDelete ? '' : ge('ads_note_edit').value);
   ajax.post('/adsmoder?act=a_edit_notes', ajaxParams, {onDone: onComplete, onFail: onComplete});
 

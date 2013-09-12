@@ -5358,7 +5358,7 @@ var IM = {
         peer_data = cur.tabs[peer_id].data,
         actual_peer = msg[3].match(/<\*>from:(\d+)/);
 
-    message = trim(stripHTML(replaceEntities(message).replace(/<br>/g, "\n").replace(/<\*>.*$/, '')));
+    message = trim(replaceEntities(stripHTML(message.replace(/<br>/g, "\n").replace(/<\*>.*$/, ''))));
     actual_peer = actual_peer && actual_peer[1] || msg[5].from || peer_id;
 
     if (peer_data && peer_data.members[actual_peer]) {
@@ -5381,7 +5381,7 @@ var IM = {
     } else if (msg[5].fwd) {
       message += "\n[" + getLang('mail_added_msgs') + "]";
     }
-    peer_name = (peer_name || '').replace('&nbsp;', ' ');
+    peer_name = trim(replaceEntities(stripHTML((peer_name || '').replace('&nbsp;', ' '))));
     if (cur.uiNotifications[peer_id]) {
       cur.uiNotifications[peer_id].cancel();
     }

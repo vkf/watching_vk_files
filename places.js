@@ -329,7 +329,16 @@ initPhotoMap: function(opts) {
     }
     var mapboxApiId = 'vkmaps.map-an1xcr4f';
     var mapboxApiId_2x = 'vkmaps.map-40lc3e3w';
-    map = opts.map || L.mapbox.map(opts.cont, mapboxApiId, {zoomControl: false, scrollWheelZoom: false, touchZoom: false, detectRetina: true, retinaVersion: mapboxApiId_2x});
+    if (opts.map) {
+      map = opts.map;
+    } else {
+      map = L.mapbox.map(opts.cont, false, {zoomControl: false, scrollWheelZoom: false, touchZoom: false});
+      L.mapbox.tileLayer(mapboxApiId,{
+        detectRetina: true,
+        retinaVersion: mapboxApiId_2x
+      }).addTo(map);
+
+    }
     setMapOpts(map);
 
     if (opts.bounds) {

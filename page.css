@@ -1264,7 +1264,7 @@ a.reply_parent_link,
   position: absolute;
   *left: 6px;
 }
-.wall_module img.reply_form_image {
+.wall_module .reply_form_img {
   width: 32px;
   height: 32px;
 }
@@ -4011,7 +4011,7 @@ img.page_preview_video, img.page_preview_graffiti {
   margin-top: 16px;
 }
 
-.wide_wall_module img.reply_form_image,
+.wide_wall_module .reply_form_img,
 .wide_wall_module a.reply_form_image {
   width: 50px;
   height: 50px;

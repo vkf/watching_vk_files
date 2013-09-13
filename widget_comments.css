@@ -480,7 +480,7 @@ div.wall_module .ext_video div {
 .wall_module .reply_form {
   zoom: 1;
 }
-.wall_module img.reply_form_image {
+.wall_module .reply_form_img {
   width: 32px;
   height: 32px;
 }
@@ -1279,7 +1279,7 @@ img.wcomments_bl_photo {
 .wide_wall_module .reply_button_wrap button {
   padding: 4px 14px;
 }
-.wide_wall_module img.reply_form_image,
+.wide_wall_module .reply_form_img,
 .wide_wall_module a.reply_form_image {
   width: 50px;
   height: 50px;

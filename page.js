@@ -1735,15 +1735,16 @@ var Wall = {
     }, opts = {
       onDone: Wall._repliesLoaded.pbind(post, hl),
       onFail: show.pbind('wrh_text' + post),
-      progress: 'wrh_prg' + post
+      progress: 'wrh_prg' + post,
+      local: 1
     };
     if (!hl && (!count || count > 20)) {
       extend(params, {cont: 'replies' + post});
       extend(opts, {frame: 1});
       if (!browser.msie6 && !browser.msie7)  {
-        cur.onFrameBlocksDone = function () {
+        cur.onFrameBlocksDone = /*vkLocal(*/function () {
           setTimeout(Wall.repliesSideSetup.pbind(post), browser.msie ? 100 : 10);
-        }
+        }/*)*/
       }
     }
     ajax.post('al_wall.php', params, opts);
@@ -4114,6 +4115,30 @@ var Wall = {
   switchOwner: function(obj, sw) {
     obj.innerHTML = '<div class="progress_inline"></div>';
     nav.change({owners_only: sw});
+  },
+  replyAsGroup: function(obj, postRaw) {
+    checkbox(obj);
+    var el = obj.parentNode;
+    while(el && !hasClass(el, 'reply_box')) {
+      el = el.parentNode;
+    }
+    if (!el) return;
+    var photoImg = geByClass1('reply_form_img', el);
+    if (isChecked(obj)) {
+      if (!obj.backImg) {
+        obj.backImg = photoImg.src;
+      }
+      if (postRaw == cur.wallLayer) {
+        var imgEl = geByClass1('wl_owner_head_img', ge('wl_post'));
+      } else {
+        var imgEl = geByTag1('img', geByClass1('post_image', ge('post'+postRaw)));
+      }
+      if (imgEl) {
+        photoImg.src = imgEl.src;
+      }
+    } else if (obj.backImg) {
+      photoImg.src = obj.backImg;
+    }
   }
 }
 

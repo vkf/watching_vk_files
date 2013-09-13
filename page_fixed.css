@@ -196,7 +196,7 @@
   height: 50px;
   position: absolute;
 }
-.wall_fixed .wall_module img.reply_form_image {
+.wall_fixed .wall_module .reply_form_img {
   width: 50px;
   height: 50px;
 }

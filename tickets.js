@@ -1129,7 +1129,7 @@ passTo: function(el, id) {
 <div class="tickets_add_comm">' + getLang('support_comment') + '</div>\
 <textarea id="tickets_pass_comm" onkeypress="onCtrlEnter(event, Tickets.doPass.pbind('+id+', val(\'tickets_pass_comm\'), curBox()))"></textarea>';
   text += getLang('support_pass_comment');
-  if (id == 16 || id == 17 || id == 18) {
+  if ((id == 16 || id == 17 || id == 18) && !cur.isMobileTicket) {
     text += '<input type="hidden" id="support_send_payform" value="' + (cur.sendPayFormDefault ? 1 : '') + '" />';
   }
   var box = showFastBox({title:getLang('pass_title'), width: 500}, text, getLang('support_do_pass'), function() {
@@ -1138,7 +1138,7 @@ passTo: function(el, id) {
   cur.dontSendAutoanswer = new Checkbox(ge('support_pass_autoanswer'), {label: cur.lang.no_autoanswer_single, width: 400, onChange: function() {
     toggle(ge('support_pass_answer_wrap'), this.val);
   }});
-  if (id == 16 || id == 17 || id == 18) {
+  if ((id == 16 || id == 17 || id == 18) && !cur.isMobileTicket) {
     cur.sendPayFormCheck = new Checkbox(ge('support_send_payform'), {label: cur.lang.send_pay_form, width: 400});
     cur.dontSendAutoanswer.setState(true, true);
   }

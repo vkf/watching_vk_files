@@ -156,7 +156,8 @@
 #payments_getvotes_buttons,
 #payments_other_amount,
 #payments_getvotes_terminals,
-#payments_getvotes_ps {
+#payments_getvotes_ps,
+#payments_iframe_container {
   display: none;
 }
 #payments_getvotes_descr {
@@ -591,9 +592,14 @@ h2.payments_getvotes_title {
   font-weight: bold;
 }
 
-.payments_box_wide, #payments_box_right_col {
-  height: 380px;
+.payments_box_wide,
+#payments_box_right_col {
+  height: 390px;
   overflow: hidden;
+}
+.payments_box_autoheight,
+.payments_box_autoheight #payments_box_right_col {
+  height: auto!important;
 }
 .payments_box_wide,
 .payments_box_wide #payments_box_summary {
@@ -608,11 +614,11 @@ h2.payments_getvotes_title {
   margin-left: 265px;
   background-color: #FFFFFF;
   display: table-cell;
-  width: 473px;
+  width: 495px;
   vertical-align: top;
 }
 .payments_box_wide #payments_box_summary {
-  padding: 18px 5px 30px 25px;
+  padding: 18px 5px 35px 25px;
 }
 .payments_box_wide .payments_summary_cont {
   font-size: 1.09em;
@@ -651,7 +657,7 @@ h2.payments_getvotes_title {
   width: 350px;
 }
 .payments_box_wide .payments_getvotes_ps_list {
-  width: 240px;
+  width: 220px;
 }
 .payments_box_wide .payments_getvotes_title {
   margin: 0 0 17px 0;
@@ -703,11 +709,11 @@ h2.payments_getvotes_title {
 }
 .payments_box_wide #payments_getvotes_buttons {
   padding-left: 25px;
-  width: 289px;
+  width: 300px;
 }
 .payments_box_wide #payments_getvotes_buttons .button_blue,
 .payments_box_wide #payments_getvotes_back {
-  margin: 0 0 0 135px;
+  margin: 0 0 0 146px;
 }
 .payments_box_wide #payments_getvotes_back {
   padding-top: 5px;
@@ -723,7 +729,7 @@ h2.payments_getvotes_title {
   font-size: 1.09em;
 }
 .payments_box_wide .payments_systems_logo {
-  margin: 40px 0 20px 0;
+  margin: 50px 0 20px 0;
   text-align: center;
 }
 .payments_box_wide .payments_getvotes_confirm_phone {

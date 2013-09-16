@@ -33,8 +33,8 @@ var parseJSON = (window.JSON && JSON.parse) ? function (obj) {
 
 var cur = {destroy: [], nav: []}; // Current page variables and navigation map.
 var browser = {
-  version: (_ua.match( /.+(?:me|ox|on|rv|it|era|ie)[\/: ]([\d.]+)/ ) || [0,'0'])[1],
-  opera: /opera/i.test(_ua),
+  version: (_ua.match( /.+(?:me|ox|on|rv|it|era|opr|ie)[\/: ]([\d.]+)/ ) || [0,'0'])[1],
+  opera: (/opera/i.test(_ua) || /opr/i.test(_ua)),
   msie: (/msie/i.test(_ua) && !/opera/i.test(_ua)),
   msie6: (/msie 6/i.test(_ua) && !/opera/i.test(_ua)),
   msie7: (/msie 7/i.test(_ua) && !/opera/i.test(_ua)),
@@ -155,6 +155,7 @@ if (browser.android) {
   setCookie('remixscreen_height', window.screen.height, 365);
   setCookie('remixscreen_dpr', window.devicePixelRatio || 1, 365);
 }
+setCookie('remixscreen_depth', screen.pixelDepth ? screen.pixelDepth : screen.colorDepth, 365);
 
 if (!browser.msie6) {
   delete StaticFiles['ie6.css'];
@@ -2549,6 +2550,17 @@ function q2ajx(qa) {
   return query;
 }
 
+var PageID = 1, NextPageID = 1;
+function vkLocal(f) {
+  var pid = PageID;
+  return function() {
+    if (pid != PageID) return;
+    f.apply(this, arguments);
+  }
+}
+function lTimeout(f, t) {
+  return setTimeout(vkLocal(f), t);
+}
 var stManager = {
   _waiters: [],
   _wait: function() {
@@ -2749,6 +2761,7 @@ function photoCaptchaBox(opts) {
 
 var ajaxCache = {};
 var globalAjaxCache = {};
+var iframeTO = 0;
 var ajax = {
   _init: function() {
     var r = false;
@@ -2827,7 +2840,7 @@ var ajax = {
     } else if (d === false) {
       ajax.framedata = false;
     } else {
-      (window.iframeTransport || {})._receiveTO = setTimeout(ajax._receive.pbind(d[0], d[1], d[2], true, d[3]), 0);
+      iframeTO = lTimeout(ajax._receive.pbind(d[0], d[1], d[2], true, d[3]), 0);
     }
   },
   framegot: function(c, h, j, p) {
@@ -2838,8 +2851,8 @@ var ajax = {
     }
   },
   framepost: function(url, query, done) {
+    clearTimeout(iframeTO);
     if (window.iframeTransport) {
-      clearTimeout(iframeTransport._receiveTO);
       ajax._frameover();
     }
     window.iframeTransport = utilsNode.appendChild(ce('div', {innerHTML: '<iframe></iframe>'})).firstChild;
@@ -2968,6 +2981,7 @@ var ajax = {
       if (o.hideProgress) o.hideProgress();
       if (o._suggest) cleanElems(o._suggest);
       o._suggest = o._captcha = o._box = hideBoxes(o._captcha, o._box);
+
       if (text.indexOf('The page is temporarily unavailable') != -1 && __dev) {
         ajax._post(url, q, o);
         return false;
@@ -2976,6 +2990,7 @@ var ajax = {
         topError(text, {dt: 5, type: 3, status: r.status, url: url, query: q && ajx2q(q)});
       }
     }
+    if (o.local) fail = vkLocal(fail);
     if (o.stat) {
       var statAct = false;
       stManager.add(o.stat, function() {
@@ -3154,6 +3169,7 @@ var ajax = {
       }
       if (window._updateDebug) _updateDebug();
     }
+    if (o.local) processResponse = vkLocal(processResponse);
     var done = function(text, data) { // data - for iframe transport post
       if (o.bench) {
         ajax.tDone = new Date().getTime();
@@ -3246,6 +3262,7 @@ var ajax = {
         setTimeout(arguments.callee, 100);
       }, 0);
     }
+    if (o.local) done = vkLocal(done);
     if (o.cache > 0 || o.forceGlobalCache) {
       var answer = ajaxCache[cacheKey];
       if (answer && answer._loading) {
@@ -4051,6 +4068,7 @@ var nav = {
           processDestroy(cur);
           radioBtns = h.radioBtns;
           ajaxCache = h.ajaxCache;
+          PageID = h.pid;
           boxQueue.hideAll();
           layerQueue.clear();
           if (layers.fullhide) layers.fullhide(true);
@@ -4119,9 +4137,10 @@ var nav = {
     if (opts.permanent) {
       where.params._permanent = opts.permanent;
     }
-    var curNavVersion = window._navVersion = irand(1, 1000000);
+    var curNavVersion = ++NextPageID;
+    debugLog('Old PageID: ', PageID);
     var done = function(title, html, js, params) {
-      if (curNavVersion !== window._navVersion) {
+      if (curNavVersion !== NextPageID) {
         return;
       }
       try {
@@ -4161,6 +4180,7 @@ var nav = {
           cur: cur,
           radioBtns: radioBtns,
           ajaxCache: ajaxCache,
+          pid: PageID,
           scrollTop: scrollGetY(),
           htitle: document.title.toString(),
           width: vk.width,
@@ -4186,6 +4206,8 @@ var nav = {
         _tbLink.fast = 0;
         processDestroy(cur);
       }
+      PageID = NextPageID;
+      debugLog('New PageID: ', PageID);
       radioBtns = {};
       ajaxCache = {};
       boxQueue.hideAll();
@@ -4240,7 +4262,7 @@ var nav = {
       if (opts.onDone) opts.onDone();
 
       if (browser.mobile) onBodyResize();
-      setTimeout(function() {
+      lTimeout(function() {
         nav.setLoc(params.loc || '');
         var _a = window.audioPlayer, aid = currentAudioId();
         if (_a && aid && _a.showCurrentTrack) _a.showCurrentTrack();
@@ -5072,9 +5094,13 @@ function MessageBox(options, dark) {
 function showBox(url, params, options, e) {
   if (checkEvent(e)) return false;
 
-  var opts = options || {},
-      boxParams = opts.params || {},
-      box = new MessageBox(boxParams, opts.dark), p = {
+  var opts = options || {};
+  var boxParams = opts.params || {};
+  if (opts.dark) {
+    boxParams.dark = opts.dark;
+  }
+  var box = new MessageBox(boxParams);
+  var p = {
     onDone: function(title, html, js) {
       if (!box.isVisible()) return;
       try {
@@ -5657,8 +5683,8 @@ function callHub(func, count) {
 function showWriteMessageBox(e, id) {
   gSearch.hide(e, true);
   if (cur.onFreindMessage) cur.onFreindMessage();
-  stManager.add(['page.js', 'wide_dd.js', 'writebox.js']);
-  var box = showBox('al_mail.php', {act: 'write_box', to: id}, {stat: ['page.css', 'writebox.css', 'wide_dd.css'], cache: 1}, e);
+  stManager.add(['page.js', 'wide_dd.js']);
+  var box = showBox('al_mail.php', {act: 'write_box', to: id}, {stat: ['writebox.js', 'writebox.css', 'wide_dd.css', 'page.css', 'emoji.js', 'notifier.css'], cache: 1}, e);
   if (box) cancelEvent(e);
   return !box;
 }
@@ -5850,12 +5876,14 @@ function zNav(changed, opts, fin) {
   delete changed.f;
   delete changed.w;
 
-  if (!isEmpty(changed)) return;
   if (!opts) opts = {};
   if (f) {
     handleScroll(f);
-    if (z === undefined) return false;
+    if (z === undefined) {
+      return false;
+    }
   }
+  if (!isEmpty(changed)) return;
   if (opts.hist) {
     if (z || w) {
       if (layerQueue.back('wiki', w, (zt || {})[1], (zt || {})[2])) {
@@ -5948,7 +5976,9 @@ function handleScroll(scroll) {
 
   if (!scrollEl && !focusEl) {
     scrollEl = document.getElementsByName(scroll[0])[0];
-    if (!scrollEl) {
+    if (scrollEl) {
+      scrollEl = scrollEl.nextSibling;
+    } else {
       return;
     }
   }
@@ -6164,11 +6194,11 @@ function revertLastInlineVideo(ancestor) {
 
 function showWiki(page, edit, e, opts) {
   if (checkEvent(e)) return true;
-  if (window.wkcur && wkcur.shown && wkcur.wkRaw == page.w && page.w) {
+  var opts = opts || {};
+  if (window.wkcur && wkcur.shown && wkcur.wkRaw == page.w && page.w && !page.reply) {
     WkView.restoreLayer(opts);
     return cancelEvent(e);
   }
-  var opts = opts || {};
   var stat = opts.stat || ['wkview.js' ,'wkview.css', 'wk.css', 'wk.js'];
   edit && stat.push('wysiwyg.js', 'wysiwyg.css');
   var params = {
@@ -6467,6 +6497,7 @@ TopSearch = {
               nav.go('/search?c[section]=auto&c[q]='+encodeURIComponent(q));
             }
           }
+          cancelEvent(e);
           break;
         case KEY.ESC:
           TopSearch.clear();
@@ -6996,11 +7027,11 @@ function mentionOver(el, opts) {
   });
 }
 
-function mentionClick(el, ev) {
+function mentionClick(el, ev, opts) {
   if (el && el.tt && el.tt.hide) {
     el.tt.hide({fasthide: 1});
   }
-  return nav.go(el, ev);
+  return nav.go(el, ev, opts);
 }
 
 function headPlayPause(event) {

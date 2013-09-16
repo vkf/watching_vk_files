@@ -491,7 +491,7 @@ var Page = {
     }
     txt = trim(txt).substr(0, 140);
     ajax.post('al_page.php', {act: 'current_info', oid: cur.oid, info: txt, hash: cur.options.info_hash}, {onDone: function() {
-      var c = txt ? 'my' : 'no', t = txt ? ('<span class="current_text">' + txt.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;') + '</span>') : getLang('change_current_info');
+      var c = txt ? 'my' : 'no', t = txt ? ('<span class="current_text">' + Emoji.emojiToHTML(txt.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;'), true) + '</span>') : getLang('change_current_info');
       ge('current_info').innerHTML = ge('page_current_info').firstChild.nextSibling.innerHTML = '<span class="' + c + '_current_info">' + t + '</span>';
       Page.infoCancel();
       var el = ge('current_info'), tt = el.tt;
@@ -508,7 +508,7 @@ var Page = {
         Page.infoCheck('currinfo_input');
         return true;
       }
-    }, showProgress: lockButton.pbind('currinfo_save'), hideProgress: unlockButton.pbind('currinfo_save'), stat: ['tooltips.js', 'tooltips.css']});
+    }, showProgress: lockButton.pbind('currinfo_save'), hideProgress: unlockButton.pbind('currinfo_save'), stat: ['tooltips.js', 'tooltips.css', 'emoji.js']});
   },
   infoCheckSave: function(e) {
     e = e || window.event;
@@ -3843,6 +3843,7 @@ var Wall = {
               info = '<a class="current_audio fl_l"' + attr + dataAudio + '><div class="label fl_l"></div>' + info + '</a>';
               var ci_cnt = intval(ev[5] || ''), ci_cnt_class = ci_cnt ? '' : ' hidden';
               info += '<div class="current_audio_cnt' + ci_cnt_class + ' fl_r" onmouseover="Page.audioListenersOver(this, cur.oid)" onclick="Page.showAudioListeners(cur.oid, event)"><div class="value fl_l">' + ci_cnt + '</div><div class="label fl_r"></div></div>';
+              wall.updateOwnerStatus(info, el, ev, edit);
             break;
 
             case 'app':
@@ -3850,27 +3851,16 @@ var Wall = {
               var attr = edit ? (' onclick="cur.ciApp = ' + ev[4] + '"') : (' onmouseover="showTooltip(this, {forcetoup: true, text: \'' + cur.options.ciAppTip + '\', black: 1, shift: ' + shift + '})" href="' + ev[5] + '?ref=14" onclick="return showApp(event, ' + ev[4] + ', 1, 14, cur.oid)"');
               if (ev[6]) attr += ' style="background-image: url(\'' + ev[6] + '\')"';
               info = '<a class="current_app' + addCls + '"' + attr + '>' + info + '</a>';
+              wall.updateOwnerStatus(info, el, ev, edit);
             break;
 
             default:
-              info = info ? ('<span class="current_text">' + info + '</span>') : info;
+              stManager.add(['emoji.js'], function() {
+                info = info ? ('<span class="current_text">' + Emoji.emojiToHTML(info, true) + '</span>') : info;
+                wall.updateOwnerStatus(info, el, ev, edit);
+              });
             break;
           }
-          if (edit) {
-            var cls = info ? 'my_current_info' : 'no_current_info';
-            info = '<span class="' + cls + '">' + (info || getLang('change_current_info')) + '</span>';
-            val(el.parentNode.nextSibling, info);
-            if (!isVisible('currinfo_editor') && cur.oid > 0) {
-              toggle('currinfo_audio', ev[3] != 'app');
-              toggle('currinfo_app', ev[3] == 'app');
-              addClass('currinfo_app', 'on');
-            }
-          }
-          val(el, info);
-          setStyle(el.firstChild, {backgroundColor: '#FEFAE4'});
-          animate(el.firstChild, {backgroundColor: '#FFF'}, 6000, function () {
-            setStyle(el.firstChild, {backgroundColor: ''});
-          });
         break;
 
         case 'upd_ci_cnt':
@@ -3901,6 +3891,24 @@ var Wall = {
       }
     }
     Wall.update();
+  },
+
+  updateOwnerStatus: function(info, el, ev, edit) {
+    if (edit) {
+      var cls = info ? 'my_current_info' : 'no_current_info';
+      info = '<span class="' + cls + '">' + (info || getLang('change_current_info')) + '</span>';
+      val(el.parentNode.nextSibling, info);
+      if (!isVisible('currinfo_editor') && cur.oid > 0) {
+        toggle('currinfo_audio', ev[3] != 'app');
+        toggle('currinfo_app', ev[3] == 'app');
+        addClass('currinfo_app', 'on');
+      }
+    }
+    val(el, info);
+    setStyle(el.firstChild, {backgroundColor: '#FEFAE4'});
+    animate(el.firstChild, {backgroundColor: '#FFF'}, 6000, function () {
+      setStyle(el.firstChild, {backgroundColor: ''});
+    });
   },
 
   updateMentionsIndex: function (force) {

@@ -319,7 +319,7 @@ var WriteBox = {
     params.to_ids = params.to_ids.join(',');
 
     if (cur.mbBannedHim == params.to_ids && sure !== true) {
-      showBox('al_profile.php', {act: 'banned_him', action: 'mail', mid: cur.oid}).onContinue = WriteBox.send.pbind(true);
+      showBox('al_profile.php', {act: 'banned_him', action: 'mail', mid: cur.mbBannedHim}).onContinue = WriteBox.send.pbind(true);
       return;
     }
 

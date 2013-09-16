@@ -1,5 +1,5 @@
 var Profile = {
-  showFull: function(uid, geolang) {
+  showFull: function(uid, geolang, newMap) {
     if (!cur.vkLngCode) {
       cur.vkLngCode = geolang;
     }
@@ -12,7 +12,7 @@ var Profile = {
     ge('profile_short').innerHTML = cur.options.info[1];
     show('profile_full_info');
     if (ge('profile_map')) {
-      if (!window.google) {
+      if (!newMap && !window.google) {
         headNode.appendChild(ce('script', {
           type: 'text/javascript',
           src: (window.locProtocol || 'http:') + '//maps.google.com/maps/api/js?sensor=false&callback=gMapsInit&language='+(cur.vkLngCode || 'en')
@@ -32,7 +32,7 @@ var Profile = {
             re('profile_map');
           }
         },
-        stat: ['places.js']
+        stat: newMap ? ['places.js', 'mapbox.js', 'mapbox.css'] : ['places.js']
       });
     }
   },
@@ -271,11 +271,27 @@ var Profile = {
     });
     cancelEvent(ev);
   },
+  friendTTHide: function(e) {
+    var tt = (ge('profile_am_subscribed') || {}).tt;
+    if (e) {
+      for (var el = e.target; el; el = domPN(el)) {
+        if (el.tagName && hasClass(el, 'preq_tt')) {
+          return;
+        }
+      }
+    }
+    if (tt && tt.hide) tt.hide({fasthide: 1});
+    removeEvent(document, 'click', Profile.friendTTHide);
+  },
   friendTooltip: function() {
     if (cur.viewAsBox) {
       return;
     }
 
+    setTimeout(function() {
+      removeEvent(document, 'click', Profile.friendTTHide);
+      addEvent(document, 'click', Profile.friendTTHide);
+    }, 0);
     return showTooltip(ge('profile_am_subscribed'), {
       url: 'al_friends.php',
       params: {act: 'friend_tt', mid: cur.oid},
@@ -585,6 +601,8 @@ var Profile = {
     (cur._back ? cur._back.hide : cur.destroy).push(function(c) {
       clearTimeout((c || cur).clHintTimer);
       clearTimeout((c || cur).invHintTimer);
+      Profile.hideOther(-1);
+      Profile.friendTTHide(true);
     });
     if (nav.objLoc.suggest) {
       delete nav.objLoc.suggest;

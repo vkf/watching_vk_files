@@ -925,6 +925,23 @@ closeTicket: function(hash) {
   return false;
 },
 
+showAllReplies: function() {
+  var link = ge('show_all_replies_link'), pr = geByClass1('progress', link), label = geByClass1('label', link);
+  hide(label);
+  show(pr);
+  ajax.post(nav.objLoc[0], {act: 'show', id: cur.ticket_id, all: 1}, {
+    onDone: function(content, script) {
+      if (content) ge('tickets_reply_rows').innerHTML = content;
+      if (script) eval(script);
+    },
+    onFail: function() {
+      show(label);
+      hide(pr);
+    }
+  });
+  return false;
+},
+
 addBug: function(hash) {
   return !showBox(nav.objLoc[0], {act: 'add_bug', hash: hash, ticket_id: cur.ticket_id}, { params: {width: '520px', bodyStyle: 'padding: 0px'}});
 },
@@ -2158,6 +2175,10 @@ getSearchParams: function(obj) {
         params.download = cur.searchDownload.val();
         params.photo_server = ge('tickets_photo').value;
         params.id100 = ge('tickets_id').value;
+        var mobVal = intval(cur.searchMobile.val());
+        if (mobVal) {
+          params.mobile = mobVal;
+        }
         var brVal = cur.searchBrowser.val();
         if (brVal && brVal != '0') {
           params.browser = (brVal == -1) ? cur.searchBrowser.curTerm : brVal;
@@ -2250,7 +2271,7 @@ searchAll: function() {
           ge('tickets_all').innerHTML = cont;
           if (script) eval(script);
           delete nav.objLoc.offset;
-          each(['q', 'good', 'opened', 'download', 'from_support', 'photo_server', 'id100', 'time_from', 'time_to', 'browser'], function(i, v) {
+          each(['q', 'good', 'opened', 'download', 'from_support', 'photo_server', 'id100', 'time_from', 'time_to', 'mobile', 'browser'], function(i, v) {
             if (query[v]) {
               nav.objLoc[v] = query[v];
             } else {

@@ -28,6 +28,7 @@ var Board = {
       }
     }
 
+    globalHistoryDestroy('board' + (-oid));
     ajax.post('al_board.php', {
       act: 'do_create',
       oid: oid,

@@ -893,7 +893,7 @@ uploadFile: function(uplId, file, url) {
       }
     };
     xhr.onerror = function(e) {
-      if (!e.target.responseText && fastFail) {
+      if (false && !e.target.responseText && fastFail) { // Disabled. Replace it by layer to prevent losing unsaved changes on the page.
         return nav.go('/login?act=upload_fail', false, {nocur: true, params: {context: 0, name: file.fileName || file.name || ''}});
       }
       extend(info, Upload.getFileInfo(uplId, options, file));
@@ -954,7 +954,7 @@ uploadFile: function(uplId, file, url) {
         }
       };
       xhr.onerror = function(e) {
-        if (!e.target.responseText && fastFail) {
+        if (false && !e.target.responseText && fastFail) { // Disabled. Replace it by layer to prevent losing unsaved changes on the page.
           return nav.go('/login?act=upload_fail', false, {nocur: true, params: {context: 1, name: file.fileName || file.name || ''}});
         }
         extend(info, Upload.getFileInfo(uplId, options, file));

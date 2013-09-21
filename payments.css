@@ -386,6 +386,11 @@ h2.payments_getvotes_title {
 #payments_getvotes_ps .payments_getvotes_active_row img {
   display: inline !important;
 }
+#payments_iframe_container {
+  height: 359px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
 
 .payments_tform {
   margin-left: 15px;

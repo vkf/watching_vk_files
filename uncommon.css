@@ -68,6 +68,7 @@
   filter: alpha(opacity=100);
 }
 #custom_bar.top_info_wrap .hide_button,
+#custom_bar_high.top_info_wrap .hide_button,
 #olympics_bar.top_info_wrap .hide_button {
   margin-top: 14px;
 }
@@ -496,6 +497,13 @@ ul.vk_com_only_good {
   position: relative;
   overflow: visible;
 }
+
+#custom_bar_high {
+  height: 128px;
+  position: relative;
+  overflow: visible;
+}
+
 .hide_button_good {
   *display: none;
 }
@@ -523,6 +531,15 @@ ul.vk_com_only_good {
   text-align: center;
   margin-left: 40px;
 }
+#custom_bar_high_content {
+  color: #69839f;
+  height: 82px;
+  font-size: 12px;
+  padding-top: 16px;
+  text-align: center;
+  line-height: 180%;
+}
+
 #save_fv_bar_bg,
 #chrome_bar_bg,
 #olympics_bar_bg,
@@ -530,6 +547,10 @@ ul.vk_com_only_good {
   background: url(/images/chrome_bar.gif) repeat-x left top;
   margin-top: -48px;
   height: 52px;
+}
+#custom_bar_high_bg {
+  margin-top: -18px;
+  height: 92px;
 }
 .chrome_bar_a{
   color: #3E698F;

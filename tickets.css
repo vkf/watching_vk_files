@@ -1047,6 +1047,9 @@ a.tickets_question_row_tt:hover {
   background: #FFFFFF;
   border-bottom: 1px solid #E9EDF1;
 }
+.tickets_block_link.skipped {
+  margin: 0;
+}
 .tickets_block_link:hover {
   text-decoration: none;
   background: #E9EDF1;
@@ -1127,6 +1130,10 @@ a.tickets_question_row_tt:hover {
 }
 .tickets_similar_full_text {
   display: none;
+}
+.tickets_similar_msg {
+  display: block;
+  padding-top: 4px;
 }
 .tickets_similar_text {
   line-height: 160%;

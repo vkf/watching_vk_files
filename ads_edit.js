@@ -698,7 +698,7 @@ AdsEdit.showCropPhotoBox = function(photoData) {
   showBox('/adsedit?act=crop_photo_box', ajaxParams, showOptions);
 }
 
-AdsEdit.initCropPhotoBox = function(cropBox, resultPhotoWidth, resultPhotoHeight, cropOptions) {
+AdsEdit.initCropPhotoBox = function(cropBox, resultPhotoWidth, resultPhotoHeight, resultPhotoWidthSmall, resultPhotoHeightSmall, cropOptions) {
   cropBox.removeButtons();
   cropBox.addButton(getLang('box_cancel'), false, 'no');
   cropBox.addButton(getLang('box_save'), AdsEdit.saveCropPhoto.pbind(cropBox), 'yes');
@@ -713,7 +713,7 @@ AdsEdit.initCropPhotoBox = function(cropBox, resultPhotoWidth, resultPhotoHeight
     defw: resultPhotoWidth,
     defh: resultPhotoHeight,
     icons: [
-      {width: resultPhotoWidth, height: resultPhotoHeight, box: 'ads_edit_crop_photo_small'}
+      {width: resultPhotoWidthSmall, height: resultPhotoHeightSmall, box: 'ads_edit_crop_photo_small'}
     ],
     zstart: 1000,
     crop: cropOptions,

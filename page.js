@@ -4124,7 +4124,7 @@ var Wall = {
     obj.innerHTML = '<div class="progress_inline"></div>';
     nav.change({owners_only: sw});
   },
-  replyAsGroup: function(obj, postRaw) {
+  replyAsGroup: function(obj, imgSrc) {
     checkbox(obj);
     var el = obj.parentNode;
     while(el && !hasClass(el, 'reply_box')) {
@@ -4136,13 +4136,8 @@ var Wall = {
       if (!obj.backImg) {
         obj.backImg = photoImg.src;
       }
-      if (postRaw == cur.wallLayer) {
-        var imgEl = geByClass1('wl_owner_head_img', ge('wl_post'));
-      } else {
-        var imgEl = geByTag1('img', geByClass1('post_image', ge('post'+postRaw)));
-      }
-      if (imgEl) {
-        photoImg.src = imgEl.src;
+      if (imgSrc && imgSrc != '%owner_photo%') {
+        photoImg.src = imgSrc;
       }
     } else if (obj.backImg) {
       photoImg.src = obj.backImg;

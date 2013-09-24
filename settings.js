@@ -31,6 +31,7 @@ var Settings = {
         ge('settings_privacy_result').innerHTML = result;
         show('settings_privacy_result');
         animate(ge('settings_save_msg'), {backgroundColor: '#F9F6E7'}, 2000);
+        scrollToTop(200);
       }
     });
   },
@@ -954,6 +955,16 @@ var Settings = {
       slide: 15,
       className: 'settings_about_tt',
       hasover: 1
+    });
+  },
+  disabledPrivacy: function() {
+    var el = geByClass1('settings_privacy_add_replies_view', ge('content'));
+    if (el) showTooltip(el, {
+      black: true,
+      hasover: 1,
+      className: 'settings_comments_disabled_tt',
+      shift: [160, 3, 3],
+      text: getLang('settings_comments_disabled_tt').replace('{link}', '<a href="/settings?f=cposts" onclick="return nav.go(this, event, {nocur: true})">').replace('{/link}', '</a>')
     });
   },
 

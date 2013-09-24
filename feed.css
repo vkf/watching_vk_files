@@ -682,10 +682,10 @@ vertical-align:top;
 .feedback_row {
   padding: 10px 30px 0 0;
 }
-.wide_wall_module .feedback_row .audio .title_wrap {
+.wide_wall_module .feedback_row_wrap .audio .title_wrap {
   width: 300px;
 }
-.wide_wall_module .feedback_row .audio .title_wrap b {
+.wide_wall_module .feedback_row_wrap .audio .title_wrap b {
   max-width: 210px;
 }
 .feedback_grouped_row_wrap {

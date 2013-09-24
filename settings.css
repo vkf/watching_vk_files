@@ -4,12 +4,18 @@
 
 .settings_privacy {
   background: #F7F7F7;
-  padding: 12px 30px;
+  padding: 7px 30px;
 }
 .settings_privacy_row {
   padding: 12px 12px 0;
   width: 298px;
   vertical-align: top;
+}
+.settings_privacy_disabled {
+  color: #999;
+}
+.settings_privacy_row_submit {
+  padding: 22px 12px 10px;
 }
 .settings_privacy_control {
   position: relative;
@@ -166,12 +172,20 @@ img.settings_bl_photo {
   width: 380px;
   line-height: 160%;
 }
-.settings_section h2, .setbal_section h2 {
+.settings_privacy_h {
+  padding: 15px 20px 0;
+}
+.settings_section h2,
+.settings_privacy_header,
+.setbal_section h2 {
   margin: 10px 0 15px 0;
   font-weight: bold;
   font-size: 1.09em;
   color: #36638E;
   border-color: #B9C4DA;
+}
+.settings_privacy_header {
+  margin-bottom: 5px;
 }
 .settings_section h4 {
   padding: 12px 0 0 0;

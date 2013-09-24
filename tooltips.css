@@ -74,6 +74,9 @@
   display: block;
   background: url(/images/tooltip_arrow_white.png) no-repeat;
 }
+.settings_comments_disabled_tt .toup1 .bottom_pointer {
+  margin: 0 158px;
+}
 .mobile_tt .toup .top_pointer,
 .mobile_tt .toup1 .bottom_pointer {
   margin-left: 34px;

@@ -91,7 +91,7 @@ var Gifts = {
     }, '\
 <a class="fl_r tb_close" onclick="curBox().hide()">' + getLang('global_close') + '</a>\
 <div class="tb_title">' + getLang('gifts_send_gift') + '</div>\
-<div class="gifts_do_send_wrap">\
+<div id="gifts_do_send_wrap">\
 ' + (left > 0 ? '<div class="info_msg" style="margin-bottom: 10px;">' + getLang('gifts_free_send_left', left) + '</div>' : '') + '\
 <div class="gs_box_wrap">\
   <img class="gs_box_img" src="images/gifts/256/' + num + '.jpg" />\

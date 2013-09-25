@@ -590,6 +590,9 @@ var Pads = {
         savedcnts: {},
         offset: el.childNodes.length
       });
+      extend(_pads, {
+        editing: {}
+      });
     }
     Pads.updateHeight(id);
   },
@@ -708,7 +711,7 @@ var Pads = {
       wh = 520;
 
       extend(_pads, {
-        editing: {}
+        editing: _pads.editing || {}
       });
       var ids = [];
       for (var i = domFC(el); i; i = domNS(i)) {
@@ -723,7 +726,7 @@ var Pads = {
       wh = 520;
 
       extend(_pads, {
-        editing: {}
+        editing: _pads.editing || {}
       });
       handlePageCount('nws', 0, 'feed', 'section=notifications');
     break;

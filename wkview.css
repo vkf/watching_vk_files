@@ -295,6 +295,9 @@ body.mobfixed #wk_layer_wrap {
 .editor_layer #wysiwyg_mode:hover {
   background-color: #FFFFFF !important;
 }
+.wk_likes_hidden {
+  display: none;
+}
 #wk_likes_widget {
   border-top: 1px solid #F1F1F1;
   padding: 14px 0px 0px 0px;

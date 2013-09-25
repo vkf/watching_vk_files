@@ -1560,9 +1560,17 @@ likesPreload: function () {
 likesMore: function() {
   if (isVisible('wk_likes_more_prg')) return;
   ajax.post('wkview.php', {act: 'show', w: wkcur.wkRaw, offset: wkcur.offset}, {
-    onDone: function(rows, newOffset, needMore, names) {
+    onDone: function(rows, newOffset, needMore, names, noReplies) {
       var cnt = ge('wk_likes_rows');
       if (!cnt) return;
+
+      if (noReplies) { // show all posts with hidden replies
+        var hidden = geByClass('wk_likes_hidden', cnt);
+        for (var i = 0, l = hidden.length; i < l; ++i) {
+          cnt.appendChild(hidden[i]);
+          removeClass(hidden[i], 'wk_likes_hidden');
+        }
+      }
 
       cnt.appendChild(cf(rows));
       wkcur.offset = newOffset;

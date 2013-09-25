@@ -287,6 +287,7 @@ var Privacy = {
         onDone: function(control, rules) {
           ge('privacy_'+key+'_hide').innerHTML = control;
           cur.privacy[key] = rules;
+          if (cur.onPrivacyChanged) cur.onPrivacyChanged(key);
         }
       });
     }

@@ -21,6 +21,55 @@ var Settings = {
     animate(ge('settings_save_msg'), {backgroundColor: '#F9F6E7'}, 2000);
   },
 
+  savePrivacyDone: function(id) {
+    var pe = ge(id), el = domPN(pe);
+    if (!pe) return;
+
+    for (; el && el.tagName != 'TR';) el = domPN(el);
+    if (!el) return;
+
+    for (; el && !hasClass(domFC(el), 'settings_privacy_h');) el = domPS(el);
+    if (!el) return;
+
+    el = geByClass1('settings_privacy_saved', el);
+    if (!el) return;
+
+    var y = getXY(el)[1], f = animate.pbind(el, {opacity: 1}, 200, animate.pbind(el, {opacity: 0}, 2000));
+    if (scrollGetY() > y - 20) {
+      scrollToY(y - 20, 200);
+      setTimeout(f, 200);
+    } else {
+      f();
+    }
+  },
+  savePrivacyKey: function(key) {
+    if (key == 'friends') {
+      Settings.savePrivacyDone('privacy_friends_hide');
+      return;
+    }
+    var url, params = {key: key, val: Privacy.getValue(key), hash: cur.options.hash};
+    if (key == 'search_access' || key == 'updates') {
+      if (key == 'updates') {
+        var val = Privacy.getValue(key);
+        if (val.substr(0,1) != '0') {
+          var items = val.substr(2);
+          if (!items.length) {
+            ge('privacy_header').innerHTML = ge('privacy_edit_updates').innerHTML = getLang('settings_updates_no_news');
+          }
+        }
+      }
+      url = 'al_settings.php';
+      params.act = 'a_save_special';
+    } else {
+      url = 'al_friends.php';
+      params.act = 'save_privacy';
+    }
+
+    clearTimeout(cur['privacy_timer_' + key]);
+    cur['privacy_timer_' + key] = setTimeout(ajax.post.pbind(url, params, {
+      onDone: Settings.savePrivacyDone.pbind('privacy_edit_' + key)
+    }), 500);
+  },
   savePrivacy: function() {
     var params = {act: 'a_save_privacy', hash: cur.options.privacy_hash};
     each (cur.options.privacy_keys, function (k, v) {
@@ -36,16 +85,7 @@ var Settings = {
     });
   },
   initPrivacy: function () {
-    cur.onPrivacyChanged = function (key) {
-      if (key != 'updates') return;
-      var val = Privacy.getValue(key);
-      if (val.substr(0,1) != '0') {
-        var items = val.substr(2);
-        if (!items.length) {
-          ge('privacy_header').innerHTML = ge('privacy_edit_updates').innerHTML = getLang('settings_updates_no_news');
-        }
-      }
-    }
+    cur.onPrivacyChanged = Settings.savePrivacyKey;
   },
 
   initBlacklist: function () {

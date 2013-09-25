@@ -4,7 +4,7 @@
 
 .settings_privacy {
   background: #F7F7F7;
-  padding: 7px 30px;
+  padding: 7px 30px 30px;
 }
 .settings_privacy_row {
   padding: 12px 12px 0;
@@ -13,6 +13,12 @@
 }
 .settings_privacy_disabled {
   color: #999;
+}
+.settings_privacy_saved {
+  color: #999;
+  opacity: 0;
+  font-size: 11px;
+  font-weight: normal;
 }
 .settings_privacy_row_submit {
   padding: 22px 12px 10px;

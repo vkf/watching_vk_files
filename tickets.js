@@ -1155,9 +1155,13 @@ passTo: function(el, id) {
   cur.dontSendAutoanswer = new Checkbox(ge('support_pass_autoanswer'), {label: cur.lang.no_autoanswer_single, width: 400, onChange: function() {
     toggle(ge('support_pass_answer_wrap'), this.val);
   }});
-  if ((id == 16 || id == 17 || id == 18) && !cur.isMobileTicket) {
-    cur.sendPayFormCheck = new Checkbox(ge('support_send_payform'), {label: cur.lang.send_pay_form, width: 400});
-    cur.dontSendAutoanswer.setState(true, true);
+  if (!cur.isMobileTicket) {
+    if (id == 16 || id == 17 || id == 18) {
+      cur.sendPayFormCheck = new Checkbox(ge('support_send_payform'), {label: cur.lang.send_pay_form, width: 400});
+    }
+    if (id == 16 || id == 17 || id == 18 || id == 20 || id == 23) {
+      cur.dontSendAutoanswer.setState(true, true);
+    }
   }
   hide('tis_add_lnk_auto');
   autosizeSetup('tickets_pass_comm', {minHeight: 40, maxHeight: 200});

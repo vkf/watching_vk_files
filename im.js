@@ -1779,7 +1779,13 @@ var IM = {
     }
   },
   onMediaChange: function(type, media, data, url) {
-    debugLog('onchange', type, media, data);
+    debugLog('onchange', type, media, data, url);
+
+    if (IM.r(cur.peer) || url && val(IM.getTxt(cur.peer)).indexOf(url) == -1) {
+      // debugLog(url, 'not found in', val(IM.getTxt(cur.peer)));
+      return false;
+    }
+
     if (!isArray(cur.imPeerMedias[cur.peer])) {
       cur.imPeerMedias[cur.peer] = [];
       cur.imSortedMedias[cur.peer] = [];
@@ -1807,6 +1813,7 @@ var IM = {
         }
       }
     }
+
 
     var contIndex = 0, cont, cls;
     switch (type) {
@@ -2476,7 +2483,6 @@ var IM = {
         _fixedNav = true;
       }
       removeClass(bodyNode, 'im_fixed_nav_loading');
-      hide('debuglogwrap');
     } else {
       hide('im_footer_sh', 'im_footer_filler');
       setStyle('im_resizer_wrap', {cursor: 'default', visibility: 'hidden'});
@@ -2561,7 +2567,6 @@ var IM = {
         show(_stlLeft, _stlSide);
         _stlShown = 1;
         hide('im_top_sh', 'im_bottom_sh');
-        show('debuglogwrap');
       }
       if (window.curFastChat && curFastChat.inited) {
         var chatTab;

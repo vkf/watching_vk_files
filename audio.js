@@ -249,7 +249,7 @@ var Audio = {
       removeClass(bodyNode, 'audio_fixed_nav');
       _fixedNav = false;
 
-      show(_stlSide, 'debuglogwrap');
+      show(_stlSide);
     }
     audioPlayer.deregisterPlayer('ac');
     setTimeout(function() {

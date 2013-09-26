@@ -125,7 +125,7 @@ var Gifts = {
       items: cur.users,
       noResult: getLang('gifts_nobody_found'),
       introText: getLang('gifts_start_typing_recipient'),
-      maxItems: 100,
+      maxItems: cur.giftsLimit ? cur.giftsLimit : 100,
       onChange: function(act) {
         if (act == 1 && !inArray(cur.section, ['valentines', 'love', 'friends', 'birthday'])) { // added
           setTimeout(WideDropdown.focus.pbind('gft_box_dd'), 0);

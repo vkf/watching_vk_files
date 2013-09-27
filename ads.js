@@ -102,9 +102,21 @@ Ads.unlock = function(lockKey) {
   delete cur.locks[lockKey];
 }
 
-Ads.simpleAjax = function(url) {
+Ads.simpleAjax = function(url, elem) {
+  if (elem) {
+    var elemRect = elem.getBoundingClientRect();
+    var imgTop   = (elemRect.bottom - elemRect.top - 8) / 2;
+    var span     = ce('span', {}, {position: 'relative'})
+    var img      = ce('img', {src:'/images/upload.gif'}, {position: 'absolute', top: imgTop + 'px'});
+    span.appendChild(img);
+    elem.appendChild(span);
+  }
+
   ajax.post(url, {}, {onDone: onComplete, onFail: onComplete});
   function onComplete(response) {
+    if (elem) {
+      elem.removeChild(span);
+    }
     if (response && response.html) {
       var boxOptions = {};
       boxOptions.title  = 'Сообщение';
@@ -1583,7 +1595,7 @@ Ads.createInlineEdit = function(editElem, progressElem, unionType, unionId, valu
         '<table class="ads_inline_edit_table" style="width: 100%;">' +
         '<tr><td><input class="inlInput text" type="text" /></td></tr>' +
         '<tr><td style="padding-top: 7px; height: 22px;">' +
-          '<img class="inline_recommended_cost_progress" src="images/upload.gif" />' +
+          '<img class="inline_recommended_cost_progress" src="/images/upload.gif" />' +
           '<span class="ads_inline_recommended_cost_text"></span>' +
           '<div style="width: 275px; height: 1px;"></div>' +
           '</td></tr>' +

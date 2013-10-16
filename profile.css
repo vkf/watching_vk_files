@@ -1035,4 +1035,6 @@ b.profile_mob_onl {
 }
 #profile_map_cont {
   cursor: pointer;
+  width: 390px;
+  height: 200px;
 }

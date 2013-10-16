@@ -9,8 +9,8 @@ var IM = {
     val('im_important_count', cnts[1] ? cnts[1] : '');
     toggle('im_important_btn', cnts[1] && cur.peer == -1);
 
-    val('im_spam_cnt', cnts[2] ? ' +' + cnts[2] : '');
-    toggle('im_spam_link', cnts[3]);
+    val('im_spam_cnt', cnts[3] ? ' +' + cnts[3] : '');
+    toggle('im_spam_link', cnts[2]);
   },
   updateUnreadMsgs: function () {
     cur.unreadMsgs = 0;
@@ -788,6 +788,9 @@ var IM = {
       }
     });
     cur.imSortedMedias[peer] = res;
+
+    clearTimeout(cur.tabs[cur.peer].saveDraftTO);
+    IM.saveDraft(cur.peer);
   },
   getPlainText: function() {
     var txt = Emoji.editableVal(ge('im_editable' + cur.peer));
@@ -979,6 +982,8 @@ var IM = {
         return true;
       }
     });
+
+    rowMsg = rowMsg.replace(/&lt;&lt;/g, '«').replace(/&gt;&gt;/g, '»').replace(/ \-\-/g, ' —').replace(/\-\- /g, '— ');
 
     if (cur.emoji) {
       rowMsg = Emoji.emojiToHTML(rowMsg, false);
@@ -1483,10 +1488,6 @@ var IM = {
       result = response.result;
     }
 
-    if (response.updates.length) {
-      debugLog('checked', response.updates, result);
-    }
-
     if (result) {
       for (var peer in result) {
         if (!intval(peer) || cur.flushing_peer == peer) continue;
@@ -1828,7 +1829,7 @@ var IM = {
           };
         }
         vkImage().src = data.thumb_s;
-        preview = '<div onclick="if (cur.cancelClick) return (cur.cancelClick = false); return showPhoto(\'' + media + '\', \'' + data.list + '\', ' + data.view_opts.replace(/"/g, '&quot;') + ');" class="im_preview_photo"><img class="im_preview_photo" src="' + data.thumb_s + '" onload="IM.refr()" />';
+        preview = '<div onclick="if (cur.cancelClick) return (cur.cancelClick = false); return IM.showPhoto(\'' + media + '\', \'' + data.list + '\', ' + data.view_opts.replace(/"/g, '&quot;') + ');" class="im_preview_photo"><img class="im_preview_photo" src="' + data.thumb_s + '" onload="IM.refr()" />';
         postview = '</div>';
         contIndex = 1;
         attrs = ' id="iam_photo' + media + '"';
@@ -1873,8 +1874,8 @@ var IM = {
         break;
 
       case 'mail':
-        preview = '<div class="medadd_h medadd_h_mail inl_bl">' + getLang('mail_im_forward') + '</div>';
-        postview = '<div class="medadd_c medadd_c_mail">' + getLang('mail_title_X_msgs', data[0]) + '</div>';
+        preview = '<a onclick="if (cur.cancelClick) return (cur.cancelClick = false); IM.willForward()" class="medadd_h medadd_h_mail inl_bl">' + getLang('mail_im_forward') + '</a>';
+        postview = '<div class="medadd_c medadd_c_mail"><a onclick="IM.willForward()">' + getLang('mail_title_X_msgs', data[0]) + '</a></div>';
         contIndex = 4;
         cls = 'clear_fix';
         break;
@@ -1968,8 +1969,6 @@ var IM = {
       IM.onUploadDone();
     }
     IM.scrollOn();
-    clearTimeout(cur.tabs[cur.peer].saveDraftTO);
-    IM.saveDraft(cur.peer);
     return false;
   },
   refr: function() {
@@ -1987,6 +1986,24 @@ var IM = {
       onReorder: IM.saveMedias.pbind(cur.peer),
       clsUp: 'pam_dpic_up'
     };
+  },
+  showPhoto: function(photoId, listId, opts, ev) {
+    if (cur.pvData && (!cur.pvShown || cur.pvListId != listId)) {
+      delete cur.pvData[listId];
+    }
+    for (var i in ajaxCache) {
+      if (i.toString().match(/^\/al_photos\.php\#act=show&draft_photos/)) {
+        delete ajaxCache[i];
+      }
+    }
+    var m = IM.getMedias(cur.peer), allPhotos = [];
+    each(m, function(k, v) {
+      if (v && v[0] == 'photo') {
+        allPhotos.push(v[1] + '/' + (cur.imPhLists[v[1]] || ''));
+      }
+    });
+    opts.additional = {draft_photos: allPhotos.join(';')};
+    return showPhoto(photoId, listId, extend(opts, {queue: 1}), ev);
   },
   onMediaProgress: function(type, i, data) {
     debugLog('onProgress', type, i, data);
@@ -2211,6 +2228,7 @@ var IM = {
 
     extend(cur, options, {
       deletedRows: {},
+      imPhLists: {},
       module: 'im',
       unreadMsgs: 0,
       lastOperation: 0,
@@ -2685,7 +2703,6 @@ var IM = {
   },
 
   onWindowFocus: function () {
-    // debugLog('focus', __afterFocus);
     if (!__afterFocus) return; // opera fix
     if (cur.id != vk.id) {
       nav.reload({force: true});
@@ -2699,7 +2716,6 @@ var IM = {
     } else {
       cur.focused = -1;
     }
-    // debugLog(peer, scrollGetY(true), cur.deletedDialogs);
     if (peer == -1 && scrollGetY(true) < 100) {
       var hasDel = false;
       each (cur.deletedDialogs, function (k, v) {
@@ -2708,7 +2724,6 @@ var IM = {
           return false;
         }
       });
-      // debugLog(hasDel);
       if (!hasDel) IM.updateDialogs();
     } else if (!IM.r() && IM.restoreDraft(peer)) {
       IM.restorePeerMedia(peer);
@@ -2720,7 +2735,6 @@ var IM = {
     IM.readLastMsgs();
   },
   onWindowBlur: function (e) {
-    debugLog('blur');
     cur.wasFocused = cur.focused;
     cur.focused = 0;
   },
@@ -4897,7 +4911,7 @@ var IM = {
           target.tagName == 'A' ||
           target.tagName == 'IMG' && !hasClass(target, 'emoji') && !hasClass(target, 'emoji_css') && !hasClass(target, 'im_gift') ||
           target.tagName == 'TEXTAREA' ||
-          target.className == 'play_new' ||
+          hasClass(target, 'play_new') ||
           (foundGood = checkeRE.test(target.className))
       ) {
         break;
@@ -5256,7 +5270,16 @@ var IM = {
       };
   },
   showForwardedBox: function (msg_id, ref_id, hash) {
-    showBox('al_im.php', {act: 'a_show_forward_box', id: msg_id, ref_id: ref_id, hash: hash});
+    showBox('al_im.php', {act: 'a_show_forward_box', id: msg_id, ref_id: ref_id, hash: hash}, {dark: 1});
+  },
+  willForward: function() {
+    each((cur.imPeerMedias || {})[cur.peer] || [], function(k, v) {
+      console.log(v);
+      if (v && v[0] == 'mail') {
+        showBox('al_im.php', {act: 'a_show_forward_box', will_fwd: v[1]}, {dark: 1});
+        return false;
+      }
+    });
   },
   deleteLogMsg: function (msg_id) {
     var ma = ge('ma' + msg_id), tr = ge('mess' + msg_id);
@@ -5581,7 +5604,7 @@ var IM = {
 
     var txt = IM.getNewTxt();
     cur.emojiId[cur.peer] = Emoji.init(txt, {
-      ttDiff: 44,
+      ttDiff: -98,
       controlsCont: ge('imw_emoji_wrap'),
       shouldFocus: true,
       onSend: IM.send,

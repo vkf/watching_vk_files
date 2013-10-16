@@ -49,6 +49,12 @@ var Gifts = {
       show(p.firstChild);
     }});
   },
+  markSpamGift: function(el, gift, giftData, opts) {
+    opts = opts || {};
+    ajax.post('al_gifts.php', {act: 'mark_spam', mid: opts.mid, gift: giftData, hash: opts.hash}, {onDone: function(text) {
+      ge('gift_mark_spam'+gift).innerHTML = text;
+    }});
+  },
   onReceiverChange: function() {
     var dd = cur.wdd && cur.wdd['gft_box_dd'];
     if (cur.giftsLeft) {

@@ -567,9 +567,6 @@ var html5video = {
     while (!support && (prefix = prefixes[i++])) {
       support = div.style[prefix + prop] != undefined;
     }
-    if (window._ua && /yabrowser/i.test(_ua)) {
-      support = false; // fix for YaBrowser
-    }
     cur.transformAvailable = support;
     return support;
   },

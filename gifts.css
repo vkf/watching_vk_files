@@ -661,4 +661,12 @@
 #gift_footer_balance_str {
   color: #777;
 }
-
+.box_controls_wrap .gift_box_controls {
+  padding: 8px 5px 7px;
+  height: 30px;
+  background-color: #F2F2F2;
+  border-top: 1px solid #DAE1E8;
+}
+.box_controls_wrap .gift_box_controls .box_controls_text {
+  padding: 8px 8px 0px;
+}

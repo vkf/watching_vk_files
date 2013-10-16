@@ -115,7 +115,9 @@ var tooltips = {
           setStyle(el.tt.container, {pointerEvents: 'none'});
         }
         fadeOut(el.tt.container, opts.showsp !== undefined ? opts.showsp : 200, function() {
-          setStyle(el.tt.container, {pointerEvents: 'auto'});
+          if (el.tt && el.tt.container) {
+            setStyle(el.tt.container, {pointerEvents: 'auto'});
+          }
         });
         if (opts.onHide) {
           opts.onHide();

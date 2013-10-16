@@ -151,7 +151,7 @@ var Audio = {
       cur.audiosList[cur.allAudiosIndex] = obj.all ? obj.all : [];
       if (cur.allAudiosIndex == 'all') Audio.generateAlbums();
       cur.sectionCount = (cur.audiosList[cur.curList] || []).length;
-      if (cur.canEdit && nav.objLoc.act != 'popular' && nav.objLoc.act != 'recommendations' && nav.objLoc.act != 'feed' && !browser.mobile && cur.allAudiosIndex == 'all' && !cur.shuffled) {
+      if (cur.canEdit && nav.objLoc.act != 'popular' && nav.objLoc.act != 'recommendations' && nav.objLoc.act != 'feed' && !browser.mobile && cur.allAudiosIndex == 'all' && !cur.shuffled && !cur.club) {
         if (cur.sectionCount) {
           var opts = {onReorder: Audio.onAudioReorder, onMouseDown: Audio.onDragStart, onMouseUp: Audio.onDragEnd, noMoveCursor: 1};
           if (cur.audioAlbumsWrap) {
@@ -409,7 +409,7 @@ var Audio = {
         var el = au.firstChild;
         cur.aContent.appendChild(el);
       }
-      if (cur.canEdit && nav.objLoc.act != 'popular' && nav.objLoc.act != 'recommendations' && nav.objLoc.act != 'feed' && !browser.mobile && !cur.searchStr && cur.sectionCount && cur.allAudiosIndex == 'all' && !cur.shuffled) {
+      if (cur.canEdit && nav.objLoc.act != 'popular' && nav.objLoc.act != 'recommendations' && nav.objLoc.act != 'feed' && !browser.mobile && !cur.searchStr && cur.sectionCount && cur.allAudiosIndex == 'all' && !cur.shuffled && !cur.club) {
         if (start > 0) {
           setTimeout(sorter.added.pbind(cur.aContent), 0);
         } else {

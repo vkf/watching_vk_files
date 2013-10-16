@@ -831,3 +831,10 @@ div.validation_last_button .button {
 #audios_list .audio_edited a {
   color: #777777;
 }
+#left_other_rows {
+  margin-top: -21px;
+  display: none;
+  overflow: hidden;
+  background: #FFF;
+  position: relative;
+}

@@ -27,4 +27,25 @@ function doChangeMail(opts) {
   }, progress: opts.progress});
 }
 
+function showLeftOther() {
+  var el = ge('left_other_rows');
+  if (!el.onmouseover) {
+    el.onmouseover = showLeftOther;
+    el.onmouseout = hideLeftOther;
+  }
+  clearTimeout(window._hideLeftOtherTO);
+  if (!isVisible(el)) {
+    show(el);
+    setStyle(el, {opacity: 0, height: 21});
+  }
+  animate(el, {opacity: 1, height: el.scrollHeight}, 150);
+}
+
+function hideLeftOther() {
+  clearTimeout(window._hideLeftOtherTO);
+  window._hideLeftOtherTO = setTimeout(function() {
+    animate(ge('left_other_rows'), {opacity: 0, height: 21}, 150, hide.pbind('left_other_rows'));
+  }, 200);
+}
+
 try{stManager.done('uncommon.js');}catch(e){}

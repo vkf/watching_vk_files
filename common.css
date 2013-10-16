@@ -1544,7 +1544,7 @@ wbr {
 .box_dark .box_x_button {
   background: none;
   margin: 0px;
-  padding: 17px 20px 18px;
+  padding: 17px 20px 15px;
   color: #C7D7E9;
   width: auto;
   -webkit-transition: color 100ms linear;

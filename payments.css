@@ -79,21 +79,25 @@
 
 .payments_box_gift_order_header {
   color: #000;
+  font-weight: bold;
 }
 .payments_box_gift_order .payments_box_unpaid_gifts_info {
   margin: 18px 15px 0;
 }
-.payments_box_gift_order .payments_summary_phumb {
+.payments_box_wide.payments_box_gift_order .payments_summary_phumb {
   margin: -4px 12px -4px -11px;
   width: auto;
   height: auto;
-  width: 65px;
-  height: 65px;
+  width: 76px;
+  height: 76px;
+  max-width: none!important;
+  max-height: none!important;
 }
-.payments_box_gift_order .payments_summary_cont {
+.payments_box_wide.payments_box_gift_order .payments_summary_cont {
   margin-top: -2px;
   float: left;
   color: #555;
+  width: 158px;
 }
 .payments_box_gift_order .payments_getvotes_method_opt {
   margin: 0 -3px;
@@ -614,6 +618,7 @@ h2.payments_getvotes_title {
   width: 265px;
   display: table-cell;
   padding-bottom: 15px;
+  position: relative;
 }
 #payments_box_right_col {
   margin-left: 265px;
@@ -623,7 +628,7 @@ h2.payments_getvotes_title {
   vertical-align: top;
 }
 .payments_box_wide #payments_box_summary {
-  padding: 18px 5px 35px 25px;
+  padding: 18px 5px 0 25px;
 }
 .payments_box_wide .payments_summary_cont {
   font-size: 1.09em;
@@ -631,6 +636,15 @@ h2.payments_getvotes_title {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+.payments_box_wide .payments_summary_phumb {
+  max-height: 65px!important;
+  max-width: 65px!important;
+}
+#payments_box_left_col #payments_box_menu {
+  position: absolute;
+  top: 110px;
+  width: 265px;
 }
 .payments_box_wide .payments_getvotes_method_opt {
   margin: 0;
@@ -852,7 +866,7 @@ h2.payments_getvotes_title {
 }
 .payments_systems_container .icon {
   cursor: pointer;
-  width: 68px;
+  width: 70px;
   vertical-align: top;
   text-align:center;
 }
@@ -912,7 +926,7 @@ h2.payments_getvotes_title {
 }
 
 .payments_systems_container #ps_select_card { /* See ps_select_ */
-  margin-left: 45px;
+  margin-left: 70px;
 }
 
 .payments_systems_container .terminal {
@@ -1003,7 +1017,7 @@ h2.payments_getvotes_title {
 .payments_systems_container .label_fee {
   font-size: 0.9em;
   color: #777;
-  margin-left: 143px;
+  margin-left: 120px;
   width: 180px;
 }
 

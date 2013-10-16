@@ -113,6 +113,8 @@ var WallEdit = {
             sortable: !opts.reply && !opts.copy
           }
         };
+        if (opts.teWidth) mediaOpts.options.teWidth = opts.teWidth;
+        if (opts.teHeight) mediaOpts.options.teHeight = opts.teHeight;
         if (opts.reply == 'photo_comment' || opts.reply == 'video_comment') {
           mediaOpts.options.nocl = 1;
         }
@@ -212,7 +214,9 @@ var WallEdit = {
         params = Composer.getSendParams(composer, WallEdit.savePost),
         from = cur.onepost ? 'one' : ((window.wkcur || {}).shown ? 'wk' : '');
 
-    if (post.match(/^-?\d+photo_/) && cur.pvShown) {
+    if (opts.from) {
+      from = opts.from;
+    } else if (post.match(/^-?\d+photo_/) && cur.pvShown) {
       from = 'photo';
     } else if (post.match(/^-?\d+video_/) && window.mvcur && mvcur.mvShown && !mvcur.minimized) {
       from = 'video';

@@ -96,8 +96,8 @@ init: function(txt, opts) {
           if (Emoji.shown) {
             Emoji.editableFocus(txt, false, true);
             Emoji.ttClick(optId, geByClass1('emoji_smile', opts.controlsCont), true);
+            return cancelEvent(e);
           }
-          return cancelEvent(e);
         }
       }
 
@@ -249,12 +249,12 @@ getEmojiHTML: function(code, symbol, enabled) {
   var editable = (browser.msie && intval(browser.version) > 8) ? ' contenteditable="false"' : '';
   if (Emoji.cssEmoji[code] != undefined) {
     var num = -Emoji.cssEmoji[code][0] * 17;
-    return '<img'+editable+' src="/images/blank.gif" emoji="'+code+'" class="emoji_css" style="background-position: 0px '+num+'px;" />';
+    return '<img'+editable+' src="/images/blank.gif" emoji="'+code+'" '+(symbol ? 'alt="'+symbol+'"' : symbol)+' class="emoji_css" style="background-position: 0px '+num+'px;" />';
   } else {
     if (!Emoji.imgEmoji[code] && symbol && !enabled) {
       return symbol;
     } else {
-      return '<img class="emoji" src="/images/emoji'+(window.devicePixelRatio >= 2 ? '_2x' : '')+'/'+code+'.png" />';
+      return '<img class="emoji" '+(symbol ? 'alt="'+symbol+'"' : symbol)+' src="/images/emoji'+(window.devicePixelRatio >= 2 ? '_2x' : '')+'/'+code+'.png" />';
     }
   }
 },
@@ -287,7 +287,7 @@ checkEditable: function(optId, obj, options) {
       if (ph) {
         setStyle(ph.parentNode, vk.rtl ? {left: 1 + diff} : {right: 1 + diff});
       }
-      if (bl) setStyle(bl, vk.rtl ? {left: 31 + diff} : {right: 31 + diff})
+      if (bl) setStyle(bl, vk.rtl ? {left: (opts.ttDiff || 31) + diff} : {right: (opts.ttDiff || 31) + diff})
       opts.isSized = true;
     }
   } else if (opts.isSized) {
@@ -298,7 +298,7 @@ checkEditable: function(optId, obj, options) {
     if (ph) {
       setStyle(ph.parentNode, vk.rtl ? {left: 1}: {right: 1});
     }
-    if (bl) setStyle(bl, vk.rtl ? {left: 31} : {right: 31})
+    if (bl) setStyle(bl, vk.rtl ? {left: (opts.ttDiff || 31)} : {right: (opts.ttDiff || 31)})
     opts.isSized = false;
   }
 },
@@ -637,21 +637,15 @@ reappendEmoji: function(optId, tt) {
     }
   }
   if (!tt) return;
-  if (cur.peer == -3) {
-    var smile = ge('imw_smile'), txt =  ge(opts.editable ? 'imw_editable' : 'imw_text'), diff = (txt.scrollHeight > txt.offsetHeight) ? sbWidth() : 0
-    domPN(smile).insertBefore(tt, smile);
-    setStyle(tt, vk.rtl ? {marginRight: 306 - diff} : {marginLeft: 306 - diff});
-  } else {
-    var controls = opts.controlsCont;
-    var diff = opts.isSized ? sbWidth() : 0;
+  var controls = opts.controlsCont;
+  var diff = opts.isSized ? sbWidth() : 0;
 
-    controls.insertBefore(tt, domFC(controls));
-    diff += opts.ttDiff;
-    if (opts.ttShift) {
-      diff += opts.ttShift;
-    }
-    setStyle(tt, vk.rtl ? {left: diff} : {right: diff});
+  controls.insertBefore(tt, domFC(controls));
+  diff += opts.ttDiff;
+  if (opts.ttShift) {
+    diff += opts.ttShift;
   }
+  setStyle(tt, vk.rtl ? {left: diff} : {right: diff});
   clearTimeout(cur.ttEmojiHide);
   hide(tt);
 },
@@ -875,7 +869,7 @@ emojiToHTML: function(str, replaceSymbols) {
   return str;
 },
 
-emojiReplace: function (symbol) {
+emojiReplace: function(symbol) {
   var i = 0;
   var code = '', num;
   while(num = symbol.charCodeAt(i++)) {

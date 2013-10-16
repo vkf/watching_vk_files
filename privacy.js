@@ -122,6 +122,7 @@ var Privacy = {
       },
       wheelObj: ge('flist_cont')
     });
+    addEvent(rCol, 'mousewheel', cur.flistScrollbar.wheel.bind(cur.flistScrollbar));
 
     cur.flistAllCont = ge('flist_all_list');
     cur.flistSelCont = ge('flist_sel_list');

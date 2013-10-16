@@ -4065,7 +4065,7 @@ FastChat = {
         from_id: data.from_id,
         link: data.link,
         photo: Notifier.fixPhoto(data.photo),
-        name: data.from_id == curFastChat.me.id ? getLang('mail_im_thats_u') : data.name,
+        name: data.from_id == curFastChat.me.id ? getLang('mail_im_thats_u') : stripHTML(data.name),
         classname: (data.out ? 'fc_msgs_out ' : '') + (data.unread ? 'fc_msgs_unread' : ''),
         date: data.date,
         date_str: data.date_str,
@@ -4300,7 +4300,11 @@ Scrollbar.prototype.contDown = function(ev) {
 }
 
 Scrollbar.prototype._mouseMove = function(event) {
-  this.obj.scrollTop = Math.floor((this.contHeight() - this.scrollHeight) * Math.min(1, (event.pageY - this.moveY) / (this.scrollHeight - this.innerHeight - 6)));
+  var newScroll = Math.floor((this.contHeight() - this.scrollHeight) * Math.min(1, (event.pageY - this.moveY) / (this.scrollHeight - this.innerHeight - 6)));
+  if (this.options.onScroll) {
+    this.options.onScroll(this.obj.scrollTop - newScroll);
+  }
+  this.obj.scrollTop = newScroll;
   this.update(true);
   return false;
 }

@@ -9,6 +9,7 @@ show: function(opts) {
   cur.lang = extend(cur.lang || {}, opts.lang);
   extend(cur, {
     pbField: ge('pb_text'),
+    pbTitle: ge('pb_title'),
     pbAva: ge('dark_box_ava'),
     pbClubs: opts.clubs,
     pbMyHash: opts.hash,
@@ -96,7 +97,9 @@ send: function() {
   }
   var composer = cur.pbField && data(cur.pbField, 'composer'),
       params = composer ? Composer.getSendParams(composer, PostBox.send) : {message: trim(val(cur.pbField))};
-  if (toClub) {
+  if (cur.pbSendParams) {
+    extend(params, cur.pbSendParams);
+  } else if (toClub) {
     extend(params, {
       to_id: toClubId,
       official: 1,
@@ -109,6 +112,12 @@ send: function() {
       status_export: isChecked('pb_status_export'),
       facebook_export: isChecked('pb_facebook_export')
     });
+  }
+  if (cur.pbNeedsTitle && cur.pbTitle) {
+    if (!val(cur.pbTitle)) {
+      return elfocus(cur.pbTitle);
+    }
+    params.title = val(cur.pbTitle);
   }
   if (!params.message && !params.attach1_type) {
     return elfocus(cur.pbField);
@@ -124,7 +133,10 @@ send: function() {
   })), {
     onDone: function(text) {
       WkView.hide();
-      showDoneBox(text)
+      showDoneBox(text);
+      if (cur.pbOnSend) {
+        cur.pbOnSend();
+      }
     },
     onFail: function(text) {
       cur.pbSent = false;
@@ -155,6 +167,7 @@ postChanged: function(force) {
   }
 },
 saveDraft: function() {
+  if (cur.pbDraftDisabled) return;
   if (cur.pbNoDraftSave) {
     cur.pbNoDraftSave = false;
     return;

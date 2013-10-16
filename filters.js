@@ -686,7 +686,7 @@ savePhotoFilter: function(obj) {
   }
 },
 
-changeThumbs: function(thumb) {
+changeThumbs: function(thumb, sizes) {
   if (thumb) {
     var rows = [ge('photo_row'+cur.filterPhoto), ge('photos_add_thumb'+cur.filterPhoto)];
     var childs = geByClass('page_post_thumb_wrap')
@@ -706,6 +706,21 @@ changeThumbs: function(thumb) {
           img.src = thumb;
           setStyle(img, {height: 'auto'});
         }
+      }
+    }
+    if (!cur.pvNoTemp) cur.pvNoTemp = {};
+    cur.pvNoTemp[cur.filterPhoto] = true;
+    if (window.ThumbsEdit && sizes) {
+      var c = ThumbsEdit.cache();
+      for (var i in c) {
+        var p = c[i].previews || [], found = false;
+        for (var j in p) {
+          if (p[j].type == 'photo' && p[j].photo.id == 'photo' + cur.filterPhoto) {
+            p[j].photo.sizes = sizes;
+            found = true;
+          }
+        }
+        if (found) ThumbsEdit.refresh(i);
       }
     }
   }
@@ -735,7 +750,7 @@ save: function(info) {
     }
   }
   ajax.post('al_photos.php', query, {
-    onDone: function(text, album, photoObj, thumb) {
+    onDone: function(text, album, photoObj, thumb, sizes) {
       var listId = cur.pvListId, index = cur.pvIndex;
       var listRow = cur.pvData[listId];
       if (!listRow) {
@@ -757,7 +772,7 @@ save: function(info) {
 
       var shown = cur.pvShown && listId == cur.pvListId && index == cur.pvIndex;
       if (photoObj && thumb) {
-        Filters.changeThumbs(thumb);
+        Filters.changeThumbs(thumb, sizes);
         delete ph.x_;
         delete ph.x_src;
         delete ph.y_;
@@ -783,7 +798,7 @@ save: function(info) {
 
 restoreOriginal: function(obj, oid, pid, hash) {
   ajax.post('al_photos.php', {act: 'restore_original', oid: oid, pid: pid, hash: hash}, {
-    onDone: function(photoObj, thumb) {
+    onDone: function(photoObj, thumb, sizes) {
       var listId = cur.pvListId, index = cur.pvIndex, ph = cur.pvData[listId][index];
       var shown = cur.pvShown && listId == cur.pvListId && index == cur.pvIndex;
       extend(ph, photoObj);
@@ -791,7 +806,7 @@ restoreOriginal: function(obj, oid, pid, hash) {
       if (box) {
         box.hide();
       }
-      Filters.changeThumbs(thumb);
+      Filters.changeThumbs(thumb, sizes);
       if (shown) {
         cur.pvCurData = Photoview.genData(ph, vk.pvbig ? (cur.pvVeryBig ? (cur.pvVeryBig > 1 ? 'z' : 'z') : 'y') : 'x');
         cur.pvPhoto.firstChild.src = cur.pvCurData.src;

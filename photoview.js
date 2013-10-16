@@ -1119,7 +1119,7 @@ if (ph.actions.edit/* & 2*/) {
         nl.rev = 1;
       }
     } else {
-      nl = extend(nav.objLoc, {z: 'photo' + cur.pvCurPhoto.id + '/' + cur.pvListId});
+      nl = extend(nav.objLoc, {z: 'photo' + cur.pvCurPhoto.id + '/' + (cur.pvCurPhoto.list_override || listId)});
     }
 
     if (nav.strLoc != nav.toStr(nl)) {
@@ -2535,7 +2535,7 @@ if (ph.actions.edit/* & 2*/) {
     }
     var nw = vkNow();
     for (var i = 0, len = data.length; i < len; ++i) {
-      var index = (offset + i), ph = data[i];
+      var index = (offset + i), ph = clone(data[i]);
       while (index >= count) index -= count;
       cur.pvCommsLikes[ph.id] = [ph.comments, ph.likes, vkNow(), false];
       delete(ph.comments);

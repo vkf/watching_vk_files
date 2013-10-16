@@ -33,7 +33,7 @@ var FansBox = {
       offset: opts.offset
     }, opts.preload);
 
-    box.setOptions({width: 620, bodyStyle: 'margin-top: 50px', onShow: function() {
+    box.setOptions({width: opts.intro ? 630 : 620, bodyStyle: opts.intro ? 'padding: 0px' : 'margin-top: 50px', onShow: function() {
       if (cur.fnbxWasScroll) {
         boxLayerWrap.scrollTop = cur.fnbxWasScroll;
         cur.fnbxWasScroll = false;
@@ -44,6 +44,9 @@ var FansBox = {
       removeEvent(boxLayerWrap, 'scroll', FansBox.onScroll);
       hide(cur.lSTL);
       cur.lSTLShown = 0;
+      if (opts.onHide) {
+        opts.onHide();
+      }
     }});
 
     if (!box.tbDeinit) {
@@ -326,7 +329,7 @@ var FansBox = {
       showProgress: function() {
         el.innerHTML = '<span class="progress_inline"></span>';
       }
-    })
+    });
   },
   lSTLDown: function(e) {
     e = e || window.event;

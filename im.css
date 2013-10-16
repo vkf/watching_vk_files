@@ -1476,9 +1476,16 @@ a.im_find_in_mail.im_friend_over {
   overflow: auto;
   position: relative;
 }
+.im_single_log_wrap .im_log_body {
+  width: 5000px;
+}
 .im_single_log {
   padding: 5px 10px;
   position: relative;
+}
+.im_single_log_no_author {
+  padding-top: 0;
+  padding-bottom: 10px;
 }
 .im_browse_msg_images {
   padding-top: 4px;

@@ -1,4 +1,15 @@
 var Page = {
+  showManyPhoto: function(el, photoId, listId, opts) {
+    var m = allPhotos = [];
+    each(domPN(el).childNodes, function(k, v) {
+      var cl = v && v.getAttribute && v.getAttribute('onclick'), m = cl.match(/'(-?\d+_\d+)'\s*,\s*'([a-f0-9]{18})'/i);
+      if (m) {
+        allPhotos.push(m[1] + '/' + m[2]);
+      }
+    });
+    opts.additional = {draft_photos: allPhotos.join(';')};
+    return showPhoto(photoId, listId, extend(opts, {queue: 1}));
+  },
   inviteToGroup: function(gid, mid, invited, hash) {
     var setInvited = function(invited) {
       var row = ge('member_row'+mid);
@@ -796,7 +807,7 @@ var Wall = {
     showBox('al_groups.php', {act: 'bl_edit', name: 'id' + mid, gid: gid, auto: 1}, {stat: ['page.css', 'ui_controls.js', 'ui_controls.css'], dark: 1});
   },
   withMentions: !(browser.mozilla && browser.version.match(/^2\./) || browser.mobile),
-  editPost: function(post, options, onFail) {
+  editPost: function(post, options, onFail, onDone) {
     if (cur.editingPost && ge('wpe_text')) {
       onFail && onFail();
       return elfocus('wpe_text');
@@ -811,6 +822,7 @@ var Wall = {
       var args = Array.prototype.slice.call(arguments);
       args.unshift(post);
       WallEdit.editPost.apply(window, args);
+      onDone && onDone();
     }, onFail: function() {
       cur.editingPost = false;
       onFail && onFail();
@@ -4761,6 +4773,7 @@ function initAddMedia(lnk, previewId, mediaTypes, opts) {
     _addMediaLink: lnk,
     lnkId: lnkId,
     menu: menu,
+    phLists: {},
     handlers: {},
     chosenMedias: [],
     _showAddMedia: function() {
@@ -4833,13 +4846,14 @@ function initAddMedia(lnk, previewId, mediaTypes, opts) {
           var _vopts = data.view_opts.replace(/^{|}$/g, '');
           if (_vopts) _vopts += ',';
           _vopts += 'queue:1';
+          addMedia.phLists[media] = data.list;
 
           if (editable) {
             if (!data.editable) return false;
-            if (!opts.nocl) data.editable.click = showPhoto.pbind(media, data.list, parseJSON('{' + _vopts + '}'));
+            if (!opts.nocl) data.editable.click = addMedia.showPhoto.pbind(media, data.list, parseJSON('{' + _vopts + '}'));
           }
 
-          oncl = opts.nocl ? '' : ' onclick="return showPhoto(\'' + media + '\', \'' + data.list + '\', {' + _vopts.replace(/"/g, '&quot;') + '});"';
+          oncl = opts.nocl ? '' : ' onclick="return cur.addMedia['+addMedia.lnkId+'].showPhoto(\'' + media + '\', \'' + data.list + '\', {' + _vopts.replace(/"/g, '&quot;') + '});"';
           preview = '<div ' + oncl + ' class="fl_l page_preview_photo'+(isGraffiti ? ' page_preview_ph_graff' : '')+'"><img class="page_preview_photo" src="' + data.thumb_m + '" /></div>';
           toPics = 1;
           toEl = picsEl;
@@ -5039,9 +5053,9 @@ function initAddMedia(lnk, previewId, mediaTypes, opts) {
             if (domFC(toEl)) {
               ThumbsEdit.addMedia(toEl, teMed);
             } else if (opts.teWidth && opts.teHeight) {
-              ThumbsEdit.init(toEl, [teMed], {width: opts.teWidth, height: opts.teHeight});
+              ThumbsEdit.init(toEl, [teMed], {width: opts.teWidth, height: opts.teHeight, onMove: opts.onAddMediaChange});
             } else {
-              ThumbsEdit.init(toEl, [teMed]);
+              ThumbsEdit.init(toEl, [teMed], {onMove: opts.onAddMediaChange});
             }
           }, true);
         } else {
@@ -5055,7 +5069,7 @@ function initAddMedia(lnk, previewId, mediaTypes, opts) {
                   if (docsEl.sorter) {
                     sorter.added(docsEl);
                   } else if (toEl.childNodes.length > 1) {
-                    sorter.init(docsEl, {});
+                    sorter.init(docsEl, {onReorder: opts.onAddMediaChange});
                   }
                 };
                 if (!dXY[0] && !dXY[1] && !dSz[0] && !dSz[1]) {
@@ -5167,7 +5181,7 @@ function initAddMedia(lnk, previewId, mediaTypes, opts) {
               });
               docsEl.sorter.destroy();
               re(medias[ind][2]);
-              if (docsEl.childNodes.length > 1) sorter.init(docsEl, {});
+              if (docsEl.childNodes.length > 1) sorter.init(docsEl, {onReorder: opts.onAddMediaChange});
             } else if (domPN(medias[ind][2]) == dpicsEl && dpicsEl.qsorter) {
               each (dpicsEl.qsorter.elems, function() {
                 setStyle(domFC(this), {top: 'auto', left: 'auto'});
@@ -5319,6 +5333,24 @@ function initAddMedia(lnk, previewId, mediaTypes, opts) {
         var chosen = addMedia.chosenMedia;
         return chosen ? [chosen[0] + chosen[1]] : [];
       }
+    },
+    showPhoto: function(photoId, listId, opts, ev) {
+      if (cur.pvData && (!cur.pvShown || cur.pvListId != listId)) {
+        delete cur.pvData[listId];
+      }
+      for (var i in ajaxCache) {
+        if (i.toString().match(/^\/al_photos\.php\#act=show&draft_photos/)) {
+          delete ajaxCache[i];
+        }
+      }
+      var m = addMedia.getMedias(), allPhotos = [];
+      each(m, function(k, v) {
+        if (v && v[0] == 'photo') {
+          allPhotos.push(v[1] + '/' + (addMedia.phLists[v[1]] || ''));
+        }
+      });
+      opts.additional = {draft_photos: allPhotos.join(';')};
+      return showPhoto(photoId, listId, extend(opts, {queue: 1}), ev);
     },
     showMediaProgress: function(type, i, info) {
       if (addMedia.onProgress && addMedia.onProgress(type, i, info) === false) {
@@ -5774,6 +5806,7 @@ function initAddMedia(lnk, previewId, mediaTypes, opts) {
         xsize: Math.floor(dpicsEl.offsetWidth / 110),
         width: 110,
         height: 83,
+        onReorder: opts.onAddMediaChange,
         clsUp: 'pam_dpic_up'
       };
     },

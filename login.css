@@ -702,3 +702,6 @@ table.login_blocked_reason_thumbs {
   padding-bottom: 10px;
   width: 123px;
 }
+#code_resend_wrap {
+  padding-top: 5px;
+}

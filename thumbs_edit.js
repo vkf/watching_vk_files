@@ -447,6 +447,7 @@ var ThumbsEdit = {
       var attachments = _e.cache()[ecur.id].previews;
       attachments = _e.move(attachments, ecur.i, ecur.to_i);
       _e.update(ecur.id, attachments);
+      if ((_e.cache()[ecur.id].opts || {}).onMove) _e.cache()[ecur.id].opts.onMove();
     }
 
     removeClass(el, 'moving');
@@ -577,24 +578,35 @@ var ThumbsEdit = {
     return found;
   },
   addMedia: function(el, media){
-    if(!(el = ge(el)) || !media) return;
+    if (!(el = ge(el)) || !media) return;
 
     var _e = ThumbsEdit;
 
     var id = el.id, cache = _e.cache()[id];
 
-    if(!cache) return;
+    if (!cache) return;
 
-    var opts = clone(cache.opts);
-    var medias = clone(cache.previews);
-    if(_e.hasMedia(el, media[media.type].id)){
+    var opts = clone(cache.opts), medias = clone(cache.previews);
+    if (_e.hasMedia(el, media[media.type].id)){
       return;
     }
-    if(medias.length == 10){
+    if (medias.length == 10){
       return;
     }
     medias[medias.length] = media;
 
+    _e.cache()[id] = null;
+    _e.init(id, medias, opts);
+  },
+  refresh: function(el) {
+    if (!(el = ge(el))) return;
+
+    var _e = ThumbsEdit;
+
+    var id = el.id, cache = _e.cache()[id];
+    if (!cache) return;
+
+    var opts = clone(cache.opts), medias = clone(cache.previews);
     _e.cache()[id] = null;
     _e.init(id, medias, opts);
   },

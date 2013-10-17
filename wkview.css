@@ -629,6 +629,9 @@ a.wl_owner_head_thumb {
   height: 50px;
   overflow: hidden;
 }
+.wl_owner_head_wrap.no_photo a.wl_owner_head_thumb {
+  display: none;
+}
 div.wl_owner_head_name {
   padding: 6px 0 5px;
 }

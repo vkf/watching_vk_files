@@ -246,26 +246,19 @@ a .ads_sub_link:hover {
 /* ---------- */
 
 .ads_nav .nav {
-  padding: 4px 10px;
+  padding: 6px 11px 7px 11px;
   display: block;
   overflow: hidden;
 }
 
-.ads_nav .nav {
-  border: 1px solid white;
-  background-color: white;
-}
-
 .ads_nav .nav:hover {
   background-color: #E1E7ED;
-  border-color: #E1E7ED;
   text-decoration: none;
 }
 
 .ads_nav .nav_selected,
 .ads_nav .nav_selected:hover {
-  border-color: #517295;
-  background-color: #5e82a8;
+  background-color: #6186AD;
   color: white;
 }
 
@@ -308,6 +301,20 @@ a .ads_sub_link:hover {
 }
 .ads_round_tabs_period_month .round_tab {
   width: 100px;
+}
+
+/* ------ */
+/* Office */
+/* ------ */
+
+.ads_create_button_office {
+  float: right;
+  position: relative;
+  width: 0;
+}
+.ads_create_button_office .edit_button_wrap {
+  position: absolute;
+  right: 0;
 }
 
 /* Other */
@@ -656,29 +663,21 @@ tr.ads_union_empty_row td.ads_union_empty_cell {
 
 #ads_graph_navigation a.nav,
 #ads_demography_navigation a.nav {
-  padding: 4px 5px 4px 10px;
+  padding: 6px 6px 7px 11px;
   display: block;
   overflow: hidden;
-  border: 1px solid #F7F7F7;
-}
-#ads_graph_navigation a.nav,
-#ads_demography_navigation a.nav {
-  border: 1px solid #FFFFFF;
-  background-color: #FFFFFF;
 }
 #ads_graph_navigation a.nav:hover,
 #ads_demography_navigation a.nav:hover {
   background-color: #DAE1E8;
-  border-color: #DAE1E8;
   text-decoration: none;
 }
 #ads_graph_navigation a.nav_selected,
 #ads_graph_navigation a.nav_selected:hover,
 #ads_demography_navigation a.nav_selected,
 #ads_demography_navigation a.nav_selected:hover {
-  border-color: #517295;
-  background-color: #5e82a8;
-  color: #FFF;
+  background-color: #6186AD;
+  color: white;
 }
 
 /* Some navigation - end */
@@ -1114,32 +1113,20 @@ table.ads_inline_edit_table td {
 }
 
 #unions_navigation a.nav {
-  padding: 4px 5px 4px 10px;
+  padding: 6px 6px 7px 11px;
   display: block;
   overflow: hidden;
-  border: 1px solid #F7F7F7;
-}
-#unions_navigation a.nav {
-  border: 1px solid white;
-}
-#unions_navigation a.nav {
   max-width: 133px;
   word-wrap: break-word;
 }
 #unions_navigation a.nav:hover {
-  background-color: #DAE1E8;
-  border-color: #DAE1E8;
-  text-decoration: none;
-}
-#unions_navigation a.nav:hover {
   background-color: #E1E7ED;
-  border-color: #E1E7ED;
+  text-decoration: none;
 }
 #unions_navigation a.nav_selected,
 #unions_navigation a.nav_selected:hover {
-  border-color: #517295;
-  background-color: #5e82a8;
-  color: #FFF;
+  background-color: #6186AD;
+  color: white;
 }
 
 

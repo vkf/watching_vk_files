@@ -2232,7 +2232,7 @@ var Wall = {
       }
     }
   },
-  deletePost: function(post, hash, root) {
+  deletePost: function(post, hash, root, force) {
     (cur.wallLayer ? wkcur : cur).wallMyDeleted[post] = 1;
     var r = ge('post' + post);
     ajax.post('al_wall.php', {
@@ -2240,9 +2240,14 @@ var Wall = {
       post: post,
       hash: hash,
       root: root ? 1 : 0,
+      confirm: force ? 1 : 0,
       from: 'wall'
     }, {
-      onDone: function(msg) {
+      onDone: function(msg, res, need_confirm) {
+        if (need_confirm) {
+          var box = showFastBox(msg, need_confirm, getLang('global_delete'), function() { box.hide(); wall.deletePost(post, hash, root, 1); }, getLang('box_cancel'));
+          return;
+        }
         var t = geByClass1('post_table', r) || geByClass1('reply_table', r) || geByClass1('feedback_row_t', r);
         revertLastInlineVideo(t);
         var pd = ge('post_del' + post);

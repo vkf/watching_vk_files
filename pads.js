@@ -80,7 +80,7 @@ var Pads = {
       setStyle(_pads.wrap, {left: l, top: t, bottom: b});
       toggleClass(_pads.wrap, 'fixed', fixed);
       toggleClass(_pads.wrap, 'pad_no_fixed', !fixed);
-      if (!fixed && !reverse && browser.max) { // :(
+      if (!fixed && !reverse && browser.mac) { // :(
         setTimeout(function() {
           var nt = intval(_pads.wrap.style.top);
           _pads.wrap.style.top = (nt - scrollGetY()) + 'px';

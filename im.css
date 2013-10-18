@@ -15,16 +15,16 @@
 }
 
 .im_bar_controls {
-  padding: 3px 5px 2px 0;
+  padding: 3px 5px 3px 0;
   display: none;
 }
 #im_bar .im_bar_controls .button_blue {
-  margin: 3px 0 2px 8px;
+  margin: 3px 0 3px 8px;
 }
 #im_bar .im_bar_controls button {
-  padding: 2px 8px;
+  padding: 4px 10px;
   line-height: 1.36em;
-  height: 21px;
+  height: 24px;
 }
 .im_cancel_mark {
   padding: 6px 0 0;
@@ -35,7 +35,7 @@
 }
 
 #im_tabs {
-  padding: 3px 0px 2px;
+  padding: 3px 0;
 }
 .im_tab,
 .im_tab_selected,
@@ -1128,7 +1128,7 @@ div.im_preview_photo_doc {
 }
 #im_filter {
   margin: 0;
-  padding: 4px 20px 4px 20px;
+  padding: 4px 20px 5px 20px;
   width: 304px;
   height: 15px;
   line-height: 15px;
@@ -1886,7 +1886,7 @@ b.im_friend_mob_onl {
   margin: 0 10px;
 }
 #im_search_cancel {
-  padding: 6px 7px;
+  padding: 6px 7px 7px;
   cursor: pointer;
   color: #2B587A;
   margin: 0 -5px;
@@ -2066,7 +2066,7 @@ b.im_friend_mob_onl {
   margin-right: 10px;
 }
 #im_important_btn button {
-  padding: 3px 8px;
+  padding: 5px 10px;
 }
 i.im_important_icon {
   background: url(/images/icons/im_actions_iconset2.png?8) -2px -281px no-repeat;

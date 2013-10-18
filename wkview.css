@@ -345,7 +345,7 @@ body.mobfixed #wk_layer_wrap {
 
 #wk_copy_wrap {
   padding: 0 15px 0 0;
-  height: 25px;
+  height: 26px;
   overflow: hidden;
 }
 #wk_copy_wrap button {
@@ -635,7 +635,8 @@ a.wl_owner_head_thumb {
 div.wl_owner_head_name {
   padding: 6px 0 5px;
 }
-a.wl_owner_head_name {
+a.wl_owner_head_name,
+div.wl_owner_head_name span {
   color: #000;
   font-size: 1.4em;
   font-weight: bold;
@@ -783,7 +784,7 @@ div#wl_post_actions_wrap {
 div#wl_post_actions_wrap .wl_post_like_wrap {
   visibility: visible;
   margin-right: 10px;
-  height: 25px;
+  height: 26px;
   overflow: hidden;
 }
 
@@ -809,7 +810,7 @@ div#wl_post_actions_wrap span.wl_post_like_count#wk_like_count {
 
 
 div#wl_post_actions_wrap a.wl_post_action_link {
-  padding: 6px 10px;
+  padding: 6px 10px 7px;
 }
 div#wl_post_actions_wrap a.wl_post_action_link:hover {
   background: #E1E7ED;

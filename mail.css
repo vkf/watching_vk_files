@@ -37,9 +37,9 @@
   margin-left: 8px;
 }
 #mail_bar_act button {
-  padding: 2px 8px;
+  padding: 4px 10px;
   line-height: 1.36em;
-  height: 21px;
+  height: 24px;
 }
 #mail_top_msg_wrap {
   /* position: absolute; */

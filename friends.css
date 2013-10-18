@@ -26,10 +26,10 @@
   width: 545px;
   background: #FFF url(/images/magglass.png) no-repeat 5px 6px;
   outline: none;
-  padding: 5px 40px 5px 20px;
+  padding: 5px 40px 6px 20px;
 }
 .is_rtl1 #friends #s_search {
-  padding: 5px 20px 5px 40px;
+  padding: 5px 20px 6px 40px;
   background: #FFF url(/images/magglass.png) no-repeat 328px 6px;
 }
 #friends #s_search.s_search_inv {

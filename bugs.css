@@ -14,7 +14,7 @@
 }
 .firefox #bugs_content .button_blue button,
 .firefox #bugs_content .button_gray button {
-  padding: 3px 14px;
+  padding: 5px 16px;
 }
 #bugs_content #tickets_bottom_pages {
   border-top: 1px solid #DAE1E8;

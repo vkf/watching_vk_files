@@ -6,19 +6,19 @@
 .is_2x #page_header .left,
 .is_2x #page_header .right,
 .is_2x #top_logo_down {
-  background-image: url(/images/hat_2x.gif);
+  background-image: url(/images/hatf_2x.gif);
   background-size: 145px 84px;
 }
 .is_2x #page_header.p_head1 .right,
 .is_2x #page_header.p_head1 .left,
 .is_2x #page_header.p_head1 .back,
 .is_2x #page_header.p_head1 #top_logo_down {
-  background-image: url(/images/hat_vk_2x.gif);
+  background-image: url(/images/hatf_vk_2x.gif);
   background-size: 145px 84px;
 }
 .is_rtl1.is_2x #page_header.p_head1 #top_logo_down,
 .is_rtl1.is_2x #page_header.p_head1 .right {
-  background-image: url(/images/hat_vk_rtl_2x.gif);
+  background-image: url(/images/hatf_vk_rtl_2x.gif);
   background-size: 145px 84px;
 }
 .is_2x .feedback_answer_tail,
@@ -94,6 +94,9 @@
 .is_2x .docs_add_row {
   background-image: url(/images/icons/audio_icons_2x.png?4);
   background-size: 257px 63px;
+}
+.is_2x #head_play_btn {
+  background-image: url(/images/icons/audio_iconsf_2x.png);
 }
 .is_2x .wall_module .like_wrap i,
 .is_2x .fw_reply .like_wrap i,
@@ -678,12 +681,10 @@
   background-image: url('/images/icons/iconset_2x.png');
   background-size: 13px 281px;
 }
-.is_2x .button_blue button {
-  background-image: url('/images/button_vk_2x.png');
-  background-size: 1px 84px;
-}
-.is_2x .button_blue button:active {
-  background: #5e80a5;
+.is_2x .button_blue button,
+.is_2x .button_gray button {
+  background-image: url('/images/button_bgf_2x.png');
+  background-size: 1px 96px;
 }
 .is_2x .wall_module .photo img {
   max-height: 120px;
@@ -834,11 +835,11 @@
   background-size: 8px 16px;
 }
 .is_2x .index_fb_btn button {
-  background-image: url('/images/fb_button_2x.png');
+  background-image: url(/images/fb_buttonf_2x.png);
   background-size: 1px 44px;
 }
 .is_2x .photos_choose_row_add .icon {
-  background-image: url('/images/icons/check_white_2x.png');
+  background-image: url(/images/icons/check_white_2x.png);
   background-size: 14px 13px;
 }
 .is_2x div.box_dark .selector_container td.selector_dropdown,

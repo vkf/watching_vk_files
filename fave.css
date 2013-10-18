@@ -22,7 +22,7 @@
 #fave_new_link {
   width: 449px;
   outline: none;
-  padding: 5px;
+  padding: 5px 5px 6px;
   margin-right: 5px;
 }
 
@@ -59,7 +59,7 @@
   width: 582px;
   background: #FFF url(/images/magglass.png) no-repeat 5px 6px;
   outline: none;
-  padding: 5px 5px 5px 20px;
+  padding: 5px 5px 6px 20px;
 }
 
 .fave_empty_list_message {

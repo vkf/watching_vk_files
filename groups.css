@@ -305,7 +305,7 @@ div.gl_message {
   padding: 10px;
 }
 #groups_list_search {
-  padding: 5px 40px 5px 20px;
+  padding: 5px 40px 6px 20px;
   background: url(/images/magglass.png) no-repeat scroll 5px 6px white;
   height: 13px;
   outline: none;

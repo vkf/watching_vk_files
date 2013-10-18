@@ -80,6 +80,14 @@ var Pads = {
       setStyle(_pads.wrap, {left: l, top: t, bottom: b});
       toggleClass(_pads.wrap, 'fixed', fixed);
       toggleClass(_pads.wrap, 'pad_no_fixed', !fixed);
+      if (!fixed && !reverse && browser.max) { // :(
+        setTimeout(function() {
+          var nt = intval(_pads.wrap.style.top);
+          _pads.wrap.style.top = (nt - scrollGetY()) + 'px';
+          _pads.wrap.style.position = 'fixed';
+          setTimeout(function() { _pads.wrap.style.position = ''; _pads.wrap.style.top = nt + 'px'; }, 0);
+        }, 0);
+      }
 
       toggleClass(_pads.arrow, 'head', (y < topOffset || !isVisible(gp)) && playBtn && !_pads.gpClicked);
       toggleClass(gp, 'head', (y < topOffset || !isVisible(gp)) && playBtn && !_pads.gpClicked);

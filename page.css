@@ -1321,7 +1321,7 @@ a.reply_parent_link,
   *position: relative;
 }
 .wall_module .reply_button_wrap button {
-  padding: 3px 14px;
+  padding: 5px 16px;
 }
 
 .reply_box_open .reply_field {
@@ -1779,7 +1779,7 @@ a.reply_parent_link,
   margin: -4px 0 0 10px;
 }
 .post_media_link_preview_wrap button {
-  padding: 2px 8px;
+  padding: 4px 10px;
   vertical-align: baseline;
 }
 
@@ -2261,8 +2261,7 @@ div.med_no_attach {
   padding:  0px 4px;
 }
 .box_body .search_wrap .button_blue button {
- padding: 2px 14px 2px;
- *padding: 3px 14px 1px;
+  padding: 4px 16px;
 }
 
 .box_body .choose_box .shadow div {
@@ -3063,8 +3062,8 @@ a.choose:hover {
   width: 120px;
 }
 .page_list_app button {
-  padding-right: 8px;
-  padding-left: 8px;
+  padding-right: 10px;
+  padding-left: 10px;
 }
 .page_app_run_arr {
   padding-right: 10px;
@@ -3515,6 +3514,9 @@ img.page_preview_video, img.page_preview_graffiti {
   background-position: 50% 50%;
   background-repeat: no-repeat;
   text-align: center;
+}
+.page_doc_photo_href {
+  position: relative;
 }
 .page_doc_photo_href:hover {
   text-decoration: none;
@@ -3998,7 +4000,7 @@ img.page_preview_video, img.page_preview_graffiti {
   width: 477px;
 }
 .wide_wall_module .reply_button_wrap button {
-  padding: 4px 14px;
+  padding: 6px 16px;
 }
 .wide_wall_module .reply_box_open .reply_field {
   height: 42px;
@@ -4442,8 +4444,6 @@ a.current_app_icon {
   margin-top: -1px;
 }
 .is_rtl1 .current_audio {
-  padding-left: 0px;
-  padding-right: 14px;
   background-position: right -220px;
 }
 #page_current_info {
@@ -5534,5 +5534,6 @@ button.wall_block_app_btn {
   background-color: #E7EAEE;
 }
 .page_media_place_label {
+  width: 280px;
   padding: 2px 9px;
 }

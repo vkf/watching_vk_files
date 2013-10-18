@@ -71,10 +71,10 @@
   display: none;
 }
 .video_search {
-  height: 25px;
+  height: 26px;
   background: #F7F7F7;
   padding: 10px;
-  border-bottom: 1px solid #E7EAED;
+  border-bottom: 1px solid #dae1e8;
   overflow: hidden;
 }
 .video_add_new {
@@ -105,7 +105,7 @@
 }
 .video_search #v_search {
   position: absolute;
-  padding: 5px 20px;
+  padding: 5px 20px 6px;
   width: 256px;
   background: #FFF url(/images/magglass.png) no-repeat 5px 6px;
   outline: none;

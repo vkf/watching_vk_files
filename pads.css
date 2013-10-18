@@ -777,9 +777,17 @@ div.pad_msg_text div.im_fwd_log_wrap {
   left: -1px;
 }
 #pad_audio_search div.abutton_wrap button {
-  width: 120px;
-  height: 23px;
+  width: 122px;
+  height: 25px;
   line-height: 6px;
+  -webkit-border-bottom-left-radius: 0;
+  -webkit-border-top-left-radius: 0;
+  -khtml-border-bottom-left-radius: 0;
+  -khtml-border-top-left-radius: 0;
+  -moz-border-bottom-left-radius: 0;
+  -moz-border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  border-top-left-radius: 0;
 }
 .font_medium #pad_audio_search div.abutton_wrap button {
   width: 135px;
@@ -819,12 +827,6 @@ div.pad_msg_text div.im_fwd_log_wrap {
 }
 #pad_audio_search.loading .pad_reset.shown {
   display: none;
-}
-#pad_audio_search div.abutton_wrap .button_blue {
-  -webkit-border-radius: 0 2px 2px 0;
-  -khtml-border-radius: 0 2px 2px 0;
-  -moz-border-radius: 0 2px 2px 0;
-  border-radius: 0 2px 2px 0;
 }
 
 #pad_playlist .audio .area {

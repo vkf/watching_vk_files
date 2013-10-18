@@ -6,7 +6,7 @@
   background: #F7F7F7;
   padding: 10px;
   border-bottom: 1px solid #DAE1E8;
-  min-height: 27px;
+  min-height: 26px;
 }
 
 input.docs_search {
@@ -42,6 +42,13 @@ border-bottom: 1px solid #DAE1E8;
   margin-bottom: 10px;
 }
 
+.docs_item {
+  width: 429px;
+  overflow: hidden;
+}
+#docs_side_filter {
+  width: 155px;
+}
 #docs_add_box,
 #docs_save_box {
   padding: 16px 14px;

@@ -57,7 +57,7 @@
 .app_search .s_search,
 .app_search .s_search_small {
   height: 13px;
-  padding: 5px 40px 5px 20px;
+  padding: 5px 40px 6px 20px;
   background: #FFF url(/images/magglass.png) no-repeat 5px 6px;
   outline: none;
 }

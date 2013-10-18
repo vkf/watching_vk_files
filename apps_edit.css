@@ -290,7 +290,7 @@ td.apps_edit_header {
 }
 .app_info_msg {
   background-color: #F7F7F7;
-  border: 1px solid #B9C4DA;
+  border: 1px solid #BCC9D7;
   font-weight: normal;
   padding: 8px 11px;
   line-height: 160%;
@@ -487,12 +487,12 @@ td.apps_edit_header {
 }
 #apps_addr_table .apps_edit_addr_label {
   color: #777;
-  padding: 3px 0px 3px 5px;
+  padding: 5px 0px 3px 5px;
   line-height: 160%;
 }
 #app_edit_cont #app_domain {
   border: 0;
-  padding: 5px 3px 6px 0;
+  padding: 7px 3px 8px 0;
   width: 146px;
   outline: 0;
   background: transparent;

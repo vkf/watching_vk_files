@@ -191,7 +191,11 @@
 .is_2x .media_mail_icon,
 .is_2x .tickets_media_icon,
 .is_2x .medadd_h,
-.is_2x .group_share_club {
+.is_2x .group_share_club,
+.is_2x .group_ad_post_stats,
+.is_2x .group_ad_post_link,
+.is_2x .exchange_ad_post_stats,
+.is_2x .exchange_ad_post_link {
   background-image: url(/images/icons/mono_iconset_2x.png?2);
   background-size: 11px 360px;
 }

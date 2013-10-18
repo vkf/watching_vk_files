@@ -339,8 +339,10 @@
   background-image: url(/images/fb_buttonf.png);
   border-bottom-color: #5b78a4;
 }
-div.index_fb_btn button:active,
-div.index_fb_btn button.active {
+#index_fbsign div.index_fb_btn button:active,
+#index_fbsign_box div.index_fb_btn button:active,
+#index_fbsign div.index_fb_btn button.active,
+#index_fbsign_box div.index_fb_btn button.active {
   background: #5d7bac;
 }
 .index_fb_logo {

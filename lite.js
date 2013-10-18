@@ -3356,7 +3356,7 @@ function lockButton(el) {
   el['old_width'] = el.style.width;
   el['old_height'] = el.style.height;
   var s = getSize(el.parentNode);
-  setStyle(el, {width: s[0] - 2, height: s[1] - 2});
+  setStyle(el, {width: s[0], height: s[1]});
   if (browser.msie6 || browser.msie7) {
     el['old_html'] = el.innerHTML; el.innerHTML = '';
   } else {
